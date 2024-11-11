@@ -3,14 +3,14 @@
     <body>
         <div class="container">
             <div class="form-box login">
-                <form action="">
+                <form @submit.prevent="login">
                     <h1 class="fw-bold">Login</h1>
                     <div class="input-box">
-                        <input type="text" placeholder="Username">
+                        <input type="text" v-model="username" placeholder="Username">
                         <i class='bx bxs-user'></i>
                     </div>
                     <div class="input-box">
-                        <input type="password" placeholder="Password">
+                        <input type="password" v-model="password" placeholder="Password">
                         <i class='bx bxs-hide'></i>
                         <!-- <i class='bx bxs-show'></i> -->
                     </div>
@@ -34,9 +34,47 @@
 </template>
 
 <script>
+import axios from 'axios';
+import { toast } from "vue3-toastify";
+import 'vue3-toastify/dist/index.css';
+
 export default {
     name: 'LoginComponent',
-}
+    data() {
+        return {
+            apiUrl: process.env.VUE_APP_API_URL,
+            username: '',
+            password: ''
+        };
+    },
+    mounted() {
+    },
+    methods: {
+        async login() {
+            if (!this.username || !this.password) {
+                toast.error("Please fill in both the username and password!", { autoClose: 2500 });
+                return;
+            }
+            try {
+                console.log(this.apiUrl);
+
+                await axios.post(this.apiUrl + '/api/auth/login', {
+                    username: this.username,
+                    password: this.password
+                });
+
+                localStorage.setItem('loginSuccess', JSON.stringify({ type: 'success', message: 'Login successful!', options: { autoClose: 2500 } }));
+                this.$router.push('/');
+            } catch (error) {
+                if (error.response.status === 400) {
+                    toast.error("Username or password is incorrect. Please try again!");
+                } else {
+                    toast.error("An error occurred while logging in. Please try again later.");
+                }
+            }
+        }
+    }
+};
 </script>
 <style scoped>
 body {
