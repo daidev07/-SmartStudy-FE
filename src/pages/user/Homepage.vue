@@ -4,9 +4,9 @@
 </template>
 
 <script>
+import ToastNotify from '../../components/ToastNotify.vue';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
-import ToastNotify from './ToastNotify.vue';
 export default {
   name: 'HomePage',
   components: {

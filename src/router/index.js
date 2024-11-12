@@ -1,6 +1,6 @@
 import { createWebHistory, createRouter } from 'vue-router'
 
-import Homepage from "@/components/Homepage.vue";
+import Homepage from "@/pages/user/Homepage.vue";
 import LoginComponent from "@/components/Login.vue";
 import AdminDashboard from '@/pages/admin/AdminDashboard.vue';
 import ClassManagement from '@/pages/admin/ClassManagement.vue';
@@ -17,11 +17,11 @@ const routes = [
         path: '/admin-dashboard',
         component: AdminDashboard,
         children: [
+            { path: '', component: AnalysisChart, name: 'AnalysisChart' },
             { path: 'class-management', component: ClassManagement, name: 'ClassManagement' },
             { path: 'employees-management', component: EmployeesManagement, name: 'EmployeesManagement' },
             { path: 'file-train-ai-management', component: FileTrainAIManagement, name: 'FileTrainAIManagement' },
             { path: 'toeic-tests-management', component: TOEICTestsManagement, name: 'ToeicTestsManagement' },
-            { path: '', component: AnalysisChart, name: 'AnalysisChart' }
         ]
     }
 ];

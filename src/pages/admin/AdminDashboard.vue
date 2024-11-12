@@ -23,6 +23,7 @@
         </div>
 
         <!-- Page Content -->
+
         <div id="page-content-wrapper" class="flex-grow-1 p-4">
             <component :is="activeComponent" />
         </div>
