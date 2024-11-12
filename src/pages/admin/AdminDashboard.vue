@@ -7,10 +7,11 @@
             </div>
             <ul class="nav flex-column">
                 <li class="nav-item" v-for="item in sidebarItems" :key="item.name">
-                    <a href="#" class="nav-link text-white" @mouseover="onHover($event)" @mouseout="onLeave($event)"
+                    <router-link :to="{ name: item.name }" class="nav-link text-white" @mouseover="onHover($event)"
+                        @mouseout="onLeave($event)" :class="{ 'bg-blue': item.isActive }"
                         @click="setActiveComponent(item.name)">
                         <i class="me-3" :class="item.icon"></i> {{ item.displayName }}
-                    </a>
+                    </router-link>
                 </li>
             </ul>
             <div class="logout-button mt-auto">
@@ -33,10 +34,12 @@ import ClassManagement from './ClassManagement.vue';
 import EmployeesManagement from './EmployeesManagement.vue';
 import FileTrainAIManagement from './FileTrainAIManagement.vue';
 import ToeicTestsManagement from './TOEICTestsManagement.vue';
+import AnalysisChart from './AnalysisChart.vue';
 
 export default {
     name: "AdminComponent",
     components: {
+        AnalysisChart,
         ClassManagement,
         EmployeesManagement,
         FileTrainAIManagement,
@@ -46,17 +49,35 @@ export default {
         return {
             logo: require('@/assets/logo.png'),
             sidebarItems: [
-                { name: "ClassManagement", displayName: "Class", icon: "bi bi-house" },
-                { name: "EmployeesManagement", displayName: "Employees", icon: "bi bi-people" },
-                { name: "FileTrainAIManagement", displayName: "File Train AI", icon: "bi bi-cloud-upload" },
-                { name: "ToeicTestsManagement", displayName: "TOEIC Tests", icon: "bi bi-journal-text" }
+                { name: "AnalysisChart", displayName: "Analysis", icon: "bx bx-line-chart", isActive: true },
+                { name: "ClassManagement", displayName: "Class", icon: "bi bi-house", isActive: false },
+                { name: "EmployeesManagement", displayName: "Employees", icon: "bi bi-people", isActive: false },
+                { name: "FileTrainAIManagement", displayName: "File Train AI", icon: "bi bi-cloud-upload", isActive: false },
+                { name: "ToeicTestsManagement", displayName: "TOEIC Tests", icon: "bi bi-journal-text", isActive: false }
             ],
-            activeComponent: 'ClassManagement'
+            activeComponent: 'AnalysisChart'
         };
+    },
+    mounted() {
+        const matchingItem = this.sidebarItems.find(item => item.name === this.$route.name);
+        if (matchingItem) {
+            this.setActiveComponent(matchingItem.name);
+        }
+    },
+    watch: {
+        $route(to) {
+            const matchingItem = this.sidebarItems.find(item => item.name === to.name);
+            if (matchingItem) {
+                this.setActiveComponent(matchingItem.name);
+            }
+        }
     },
     methods: {
         setActiveComponent(componentName) {
             this.activeComponent = componentName;
+            this.sidebarItems.forEach(item => {
+                item.isActive = (item.name === componentName);
+            });
         },
         onHover(event) {
             event.target.classList.add("bg-primary");
@@ -67,6 +88,7 @@ export default {
     }
 };
 </script>
+
 
 <style scoped>
 /* Main color theme */
@@ -123,6 +145,7 @@ export default {
     transition: color 0.3s;
 }
 
+
 .hover-effect {
     background-color: var(--hover-bg);
     color: var(--main-color);
@@ -131,6 +154,10 @@ export default {
 .hover-effect i {
     transform: scale(1.1);
     color: var(--main-color);
+}
+
+.bg-blue {
+    background-color: #7494ec;
 }
 
 .logout-button {
