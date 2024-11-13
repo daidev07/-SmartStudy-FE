@@ -34,7 +34,7 @@
 import ClassManagement from './ClassManagement.vue';
 import EmployeesManagement from './EmployeesManagement.vue';
 import FileTrainAIManagement from './FileTrainAIManagement.vue';
-import ToeicTestsManagement from './TOEICTestsManagement.vue';
+import ExamManagement from './ExamManagement.vue';
 import AnalysisChart from './AnalysisChart.vue';
 
 export default {
@@ -44,7 +44,7 @@ export default {
         ClassManagement,
         EmployeesManagement,
         FileTrainAIManagement,
-        ToeicTestsManagement,
+        ExamManagement,
     },
     data() {
         return {
@@ -54,7 +54,7 @@ export default {
                 { name: "ClassManagement", displayName: "Class", icon: "bi bi-house", isActive: false },
                 { name: "EmployeesManagement", displayName: "Employees", icon: "bi bi-people", isActive: false },
                 { name: "FileTrainAIManagement", displayName: "File Train AI", icon: "bi bi-cloud-upload", isActive: false },
-                { name: "ToeicTestsManagement", displayName: "TOEIC Tests", icon: "bi bi-journal-text", isActive: false }
+                { name: "ExamManagement", displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],
             activeComponent: 'AnalysisChart'
         };

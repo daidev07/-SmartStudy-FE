@@ -5,17 +5,13 @@
             width="100%" height="600px"></iframe> -->
         <h4 class="text-center fw-bold">ADDING NEW TOEIC TEST</h4>
         <form>
-            <div class="mb-2">
-                <label for="listeningFile" class="form-label">Listening File:</label>
-                <input type="file" class="form-control" id="listeningFile" required />
+            <div class="mb-2 d-flex">
+                <label for="examName" class="form-label w-50">Exam Name:</label>
+                <input type="text" class="form-control" id="examName" required />
             </div>
-            <div class="mb-2">
-                <label for="exemFile" class="form-label">Exam File: </label>
-                <input type="file" class="form-control" id="exemFile" required />
-            </div>
-            <div class="mb-2">
-                <label for="answerFile" class="form-label">Answer file (excel): </label>
-                <input type="file" class="form-control" id="answerFile" required />
+            <div class="mb-2 d-flex">
+                <label for="examFile" class="form-label w-50">Exam excel file: </label>
+                <input type="file" class="form-control" accept=".xls,.xlsx" id="examFile" required />
             </div>
             <div class="text-center">
                 <button type="button" class="btn btn-primary mt-2" @click="saveTest">Save</button>
@@ -25,11 +21,47 @@
 </template>
 
 <script>
+import { toast } from "vue3-toastify";
+import axios from 'axios';
+
 export default {
     name: 'TestAdding',
+    data() {
+        return {
+            apiUrl: process.env.VUE_APP_API_URL,
+        };
+    },
     methods: {
-        saveTest() {
-            this.$emit('close');
+        async saveTest() {
+            const examName = document.getElementById("examName").value.trim();
+            const examFile = document.getElementById("examFile").files[0];
+
+            if (!examName || !examFile) {
+                toast.error("Please enter full information");
+                return;
+            }
+            else {
+                const formData = new FormData();
+                formData.append("examName", examName);
+                formData.append("examFile", examFile);
+                try {
+                    const response = await axios.post(this.apiUrl + '/api/exams/create', formData, {
+                        headers: {
+                            'Content-Type': 'multipart/form-data'
+                        }
+                    });
+                    toast.success("Create new test successfully!");
+                    console.log("File uploaded successfully", response.data);
+                    this.$emit('close');
+                } catch (error) {
+                    if (error.response.status === 400) {
+                        toast.error("The test already exists. Try another name!");
+                    }
+                    else {
+                        toast.error("an exam create error occurred. Please try again later!");
+                    }
+                }
+            }
         },
     },
 };
