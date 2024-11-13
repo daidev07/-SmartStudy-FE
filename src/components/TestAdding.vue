@@ -14,6 +14,7 @@
                 <input type="file" class="form-control" accept=".xls,.xlsx" id="examFile" required />
             </div>
             <div class="text-center">
+                <button type="button" class="btn btn-secondary mt-2 me-2" @click="$emit('close')">Cancel</button>
                 <button type="button" class="btn btn-primary mt-2" @click="saveTest">Save</button>
             </div>
         </form>
@@ -45,14 +46,15 @@ export default {
                 formData.append("examName", examName);
                 formData.append("examFile", examFile);
                 try {
-                    const response = await axios.post(this.apiUrl + '/api/exams/create', formData, {
+                    await axios.post(this.apiUrl + '/api/exams/create', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }
                     });
-                    toast.success("Create new test successfully!");
-                    console.log("File uploaded successfully", response.data);
                     this.$emit('close');
+                    this.$emit('refresh');
+                    toast.success("Create new test successfully!");
+                    console.log("File uploaded successfully");
                 } catch (error) {
                     if (error.response.status === 400) {
                         toast.error("The test already exists. Try another name!");
