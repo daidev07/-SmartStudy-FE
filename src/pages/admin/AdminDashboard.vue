@@ -8,8 +8,7 @@
             <ul class="nav flex-column">
                 <li class="nav-item" v-for="item in sidebarItems" :key="item.name">
                     <router-link :to="{ name: item.name }" class="nav-link text-white" @mouseover="onHover($event)"
-                        @mouseout="onLeave($event)" :class="{ 'bg-blue': item.isActive }"
-                        @click="setActiveComponent(item.name)">
+                        @mouseout="onLeave($event)" :class="{ 'bg-blue': item.isActive }">
                         <i class="me-3" :class="item.icon"></i> {{ item.displayName }}
                     </router-link>
                 </li>
@@ -23,7 +22,6 @@
         </div>
 
         <!-- Page Content -->
-
         <div id="page-content-wrapper" class="flex-grow-1 p-4">
             <component :is="activeComponent" />
         </div>
@@ -36,6 +34,7 @@ import EmployeesManagement from './EmployeesManagement.vue';
 import FileTrainAIManagement from './FileTrainAIManagement.vue';
 import ExamManagement from './ExamManagement.vue';
 import AnalysisChart from './AnalysisChart.vue';
+import ClassroomDetail from './ClassroomDetail.vue';
 
 export default {
     name: "AdminComponent",
@@ -45,6 +44,7 @@ export default {
         EmployeesManagement,
         FileTrainAIManagement,
         ExamManagement,
+        ClassroomDetail
     },
     data() {
         return {
@@ -56,28 +56,25 @@ export default {
                 { name: "FileTrainAIManagement", displayName: "File Train AI", icon: "bi bi-cloud-upload", isActive: false },
                 { name: "ExamManagement", displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],
-            activeComponent: 'AnalysisChart'
         };
     },
     mounted() {
-        const matchingItem = this.sidebarItems.find(item => item.name === this.$route.name);
-        if (matchingItem) {
-            this.setActiveComponent(matchingItem.name);
+        this.updateActiveState();
+    },
+    computed: {
+        activeComponent() {
+            return this.$route.name || 'AnalysisChart';
         }
     },
     watch: {
-        $route(to) {
-            const matchingItem = this.sidebarItems.find(item => item.name === to.name);
-            if (matchingItem) {
-                this.setActiveComponent(matchingItem.name);
-            }
+        $route() {
+            this.updateActiveState();
         }
     },
     methods: {
-        setActiveComponent(componentName) {
-            this.activeComponent = componentName;
+        updateActiveState() {
             this.sidebarItems.forEach(item => {
-                item.isActive = (item.name === componentName);
+                item.isActive = (item.name === this.$route.name);
             });
         },
         onHover(event) {

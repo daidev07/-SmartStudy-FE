@@ -6,7 +6,8 @@
         <hr class="fw-bold">
     </div>
     <div class="class-card-container">
-        <div v-for="classItem in classList" :key="classItem.id" class="class-card" title="More information...">
+        <div v-for="classItem in classList" :key="classItem.id" class="class-card"
+            @click="goToClassDetail(classItem.id)" title=" More information...">
             <div class="card-header">
                 <h3 class="class-name">{{ classItem.name }}</h3>
                 <span class="icon" title="Assignment">
@@ -58,6 +59,9 @@ export default {
                 this.classListLoading = false;
             }
         },
+        goToClassDetail(classId) {
+            this.$router.push({ name: 'ClassroomDetail', params: { id: classId } });
+        }
     },
 
 };
@@ -107,14 +111,14 @@ export default {
 }
 
 .level-1 {
-    background-color: #4caf50;
+    background-color: #2196f3;
     color: #fff;
     padding: 4px 8px;
     border-radius: 4px;
 }
 
 .level-2 {
-    background-color: #2196f3;
+    background-color: #4caf50;
     /* Màu xanh nước biển sáng */
     color: #fff;
     /* Màu chữ trắng để dễ đọc */
