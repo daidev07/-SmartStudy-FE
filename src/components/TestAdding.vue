@@ -3,7 +3,7 @@
         <!-- <iframe
             src="https://docs.google.com/gview?url=https://res.cloudinary.com/daidev07/raw/upload/v1731420804/kkxuqj2dxqnglg9o6n0x&embedded=true"
             width="100%" height="600px"></iframe> -->
-        <h4 class="text-center fw-bold">ADDING NEW TOEIC TEST</h4>
+        <h4 class="text-center fw-bold">ADDING NEW EXAM</h4>
         <form>
             <div class="mb-2 d-flex">
                 <label for="examName" class="form-label w-50">Exam Name:</label>

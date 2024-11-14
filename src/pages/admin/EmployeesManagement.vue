@@ -1,5 +1,10 @@
 <template>
-    Đây là trang quản lý nhân viên
+    <div class="text-center">
+        <div class="fw-bold fs-3 border-bottom border-end border-black title">
+            EMPLOYEES MANAGEMENT
+        </div>
+        <hr class="fw-bold">
+    </div>
 </template>
 <script>
 export default {
