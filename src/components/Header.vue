@@ -4,14 +4,14 @@
         <nav class="menu">
             <ul>
                 <li>
-                    <router-link to="/" active-class="active-menu" exact-active-class="active-menu">New
-                        feeds</router-link>
+                    <router-link to="/" :class="getActiveClass('/')">New Feeds</router-link>
                 </li>
                 <li>
-                    <router-link to="/my-assignment" active-class="active-menu">My Assignment</router-link>
+                    <router-link to="/my-assignment" :class="getActiveClass('/my-assignment')">My
+                        Assignment</router-link>
                 </li>
                 <li>
-                    <router-link to="/about" active-class="active-menu">About</router-link>
+                    <router-link to="/about" :class="getActiveClass('/about')">About</router-link>
                 </li>
             </ul>
         </nav>
@@ -41,6 +41,16 @@ export default {
     mounted() {
         this.checkUserLoggedIn();
     },
+    computed: {
+        getActiveClass() {
+            return (path) => {
+                if (path === '/') {
+                    return this.$route.path === path ? 'active-menu' : '';
+                }
+                return this.$route.path.includes(path) ? 'active-menu' : '';
+            };
+        }
+    },
     methods: {
         ...mapActions(['saveUserInfo']),
         async checkUserLoggedIn() {
@@ -54,6 +64,7 @@ export default {
                 console.log("USER INFO FORM HEADER::", this.userInfo);
             }
         },
+
     }
 };
 </script>

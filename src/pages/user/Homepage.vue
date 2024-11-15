@@ -1,7 +1,6 @@
 <template>
   <div class="home-page">
     <Header />
-
     <router-view />
     <ToastNotify />
   </div>
@@ -34,5 +33,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+  min-height: 100vh;
 }
 </style>

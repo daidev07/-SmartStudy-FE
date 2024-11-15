@@ -12,12 +12,14 @@ import AnalysisChart from '@/pages/admin/AnalysisChart.vue';
 import NewFeeds from '@/pages/user/NewFeeds.vue';
 import MyAssignment from '@/pages/user/MyAssignment.vue';
 import About from '@/pages/user/About.vue';
+import DoingExam from '@/pages/user/DoingExam.vue';
 
 const routes = [
     { path: '/', component: Homepage,
         children: [
             { path: '', component: NewFeeds },
             { path: 'my-assignment', component: MyAssignment },
+            { path: 'my-assignment/do-assignment/:id', component: DoingExam, name: 'DoingExam' },
             { path: 'about', component: About },
         ]
      },
@@ -34,7 +36,7 @@ const routes = [
             { path: 'file-train-ai-management', component: FileTrainAIManagement, name: 'FileTrainAIManagement' },
             { path: 'exam-management', component: ExamManagement, name: 'ExamManagement' },
         ]
-    }
+    } 
 ];
 
 const router = createRouter({
