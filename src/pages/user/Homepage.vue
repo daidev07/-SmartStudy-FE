@@ -1,15 +1,21 @@
 <template>
-  TRANG CHỦ
-  <ToastNotify />
+  <div class="home-page">
+    <Header />
+
+    <router-view />
+    <ToastNotify />
+  </div>
 </template>
 
 <script>
 import ToastNotify from '../../components/ToastNotify.vue';
+import Header from '../../components/Header.vue';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 export default {
   name: 'HomePage',
   components: {
+    Header,
     ToastNotify
   },
   mounted() {
@@ -23,5 +29,10 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped></style>
+<style scoped>
+.home-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+</style>

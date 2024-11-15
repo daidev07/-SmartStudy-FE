@@ -9,11 +9,20 @@ import ExamManagement from '@/pages/admin/ExamManagement.vue';
 import EmployeesManagement from '@/pages/admin/EmployeesManagement.vue';
 import ClassroomDetail from '@/pages/admin/ClassroomDetail.vue';
 import AnalysisChart from '@/pages/admin/AnalysisChart.vue';
+import NewFeeds from '@/pages/user/NewFeeds.vue';
+import MyAssignment from '@/pages/user/MyAssignment.vue';
+import About from '@/pages/user/About.vue';
 
 const routes = [
-    { path: '/', component: Homepage },
+    { path: '/', component: Homepage,
+        children: [
+            { path: '', component: NewFeeds },
+            { path: 'my-assignment', component: MyAssignment },
+            { path: 'about', component: About },
+        ]
+     },
     { path: '/login', component: LoginComponent },
-
+    
     {
         path: '/admin-dashboard',
         component: AdminDashboard,

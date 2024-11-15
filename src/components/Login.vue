@@ -56,13 +56,12 @@ export default {
                 return;
             }
             try {
-                console.log(this.apiUrl);
-
-                await axios.post(this.apiUrl + '/api/auth/login', {
+                const response = await axios.post(this.apiUrl + '/api/auth/login', {
                     username: this.username,
                     password: this.password
                 });
-
+                console.log("Response login::", response);
+                localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('loginSuccess', JSON.stringify({ type: 'success', message: 'Login successful!', options: { autoClose: 2500 } }));
                 this.$router.push('/');
             } catch (error) {
