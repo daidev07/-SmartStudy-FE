@@ -28,18 +28,21 @@
 <script>
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { mapActions } from "vuex";
+
 export default {
     name: 'HeaderComponent',
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
-            userInfo: null
+            userInfo: null,
         };
     },
     mounted() {
         this.checkUserLoggedIn();
     },
     methods: {
+        ...mapActions(['saveUserInfo']),
         async checkUserLoggedIn() {
             const token = localStorage.getItem('token');
             if (token) {
@@ -47,14 +50,14 @@ export default {
                 console.log("Token Info::", tokenInfo);
                 const response = await axios.get(this.apiUrl + `/api/user/${tokenInfo.userName}`);
                 this.userInfo = response.data.data;
-                console.log("User Info::", this.userInfo);
+                this.saveUserInfo(this.userInfo);
+                console.log("USER INFO FORM HEADER::", this.userInfo);
             }
         },
     }
 };
 </script>
 <style scoped>
-/* Tạo bóng đổ cho toàn bộ header để tạo cảm giác nổi bật */
 .header {
     width: 100%;
     display: flex;
