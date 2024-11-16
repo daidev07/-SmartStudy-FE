@@ -30,6 +30,9 @@
                         <strong> {{ new Date(assignment.dueDate).toLocaleDateString() }}</strong>
                     </p>
                 </div>
+                <div class="total-point d-flex justify-content-center align-items-center" title="Exercise point ">
+                    {{ assignment.totalPoints }}
+                </div>
             </router-link>
         </div>
     </div>
@@ -96,18 +99,18 @@ export default {
 
 /* Custom card styles for different statuses */
 .bg-light-red {
-    border: 1px solid #ffcccc;
+    border: 1px solid #a51d1d;
     background-color: #ffd0d0;
 }
 
 .bg-light-orange {
     background-color: #ffecc8;
-    border: 1px solid #ffe1a9;
+    border: 1px solid #fcba40;
 }
 
 .bg-light-green {
-    background-color: #d4fde0;
-    border: 1px solid #b0ffd1;
+    background-color: #3dff77;
+    border: 1px solid #00f767;
 }
 
 /* Card styling */
@@ -140,5 +143,16 @@ export default {
 
 .bg-light-green {
     background-color: #e6ffed;
+}
+
+.total-point {
+    background-color: #f8d7da;
+    color: #721c24;
+    font-weight: bold;
+    font-size: 1.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    min-width: 80px;
+    text-align: center;
 }
 </style>
