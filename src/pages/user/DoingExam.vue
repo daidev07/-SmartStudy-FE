@@ -1,12 +1,12 @@
 <template>
     <div class="container mt-3 w-50">
         <div class="d-flex justify-content-between mb-3">
-            <h2 class="text-center fw-bold">{{ assignmentDetail ? assignmentDetail.name : 'Loading...' }}</h2>
+            <h2 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h2>
             <button class="btn btn-primary" @click="submitExam">Submit</button>
         </div>
 
-        <div v-if="assignmentDetail" class="exam-questions">
-            <div v-for="(question, index) in assignmentDetail.questions" :key="question.id" class="mb-3">
+        <div v-if="examDetail" class="exam-questions">
+            <div v-for="(question, index) in examDetail.questions" :key="question.id" class="mb-3">
                 <h5 class="mb-2">{{ index + 1 }}. {{ question.content }}</h5>
                 <div class="d-flex flex-wrap justify-content-center">
                     <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
@@ -53,23 +53,34 @@ export default {
             apiUrl: process.env.VUE_APP_API_URL,
             assignmentDetail: null,
             userId: null,
+            examDetail: null,
+            isCompleted: false
         };
     },
     computed: {
-        ...mapGetters(['getUserId']),
+        ...mapGetters(['getUserId', 'getSelectedAssignment']),
+
         assignmentId() {
             return parseInt(this.$route.params.id, 10);
         }
     },
     mounted() {
-        this.fetchAssignmentDetail();
+        this.fetchAssignment();
     },
     methods: {
-        async fetchAssignmentDetail() {
+        async fetchAssignment() {
             try {
-                const response = await axios.get(this.apiUrl + `/api/exam/${this.assignmentId}`);
-                this.assignmentDetail = response.data.data;
-                console.log("ASSIGNMENT DETAIL::", response.data.data);
+                const response = await axios.get(this.apiUrl + `/api/student-assignment/${this.assignmentId}`);
+                this.assignmentInfo = response.data.data;
+                this.fetchExam(this.assignmentInfo.exam.id);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetchExam(examId) {
+            try {
+                const response = await axios.get(this.apiUrl + `/api/exam/${examId}`);
+                this.examDetail = response.data.data;
             } catch (error) {
                 console.error(error);
             }
@@ -96,12 +107,10 @@ export default {
             try {
                 let correctAnswers = 0;
 
-                // Lấy danh sách câu trả lời và tính điểm
                 const results = this.assignmentDetail.questions.map(question => {
                     const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
                     const answerId = selectedAnswer ? parseInt(selectedAnswer.id.replace('answer-', '')) : null;
 
-                    // Kiểm tra câu trả lời đúng
                     const selectedAnswerObject = question.answers.find(answer => answer.id === answerId);
                     if (selectedAnswerObject && selectedAnswerObject.isCorrect) {
                         correctAnswers += 1;

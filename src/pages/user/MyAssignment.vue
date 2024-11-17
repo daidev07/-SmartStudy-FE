@@ -14,7 +14,7 @@
         </div>
 
         <!-- Assignment cards -->
-        <div v-for="assignment in listAssignments" :key="assignment.id" class="card mb-4 shadow-sm"
+        <div v-for="assignment in listAssignments" :key="assignment.id" class="card mb-3 shadow-sm"
             :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
             <router-link :to="'/my-assignment/do-assignment/' + assignment.id"
                 class="card-body d-flex justify-content-between text-decoration-none">
@@ -70,10 +70,8 @@ export default {
                 if (!this.getUserInfo) return;
                 const userId = this.getUserInfo.id;
                 console.log("USER ID::", userId);
-                const response = await axios.get(this.apiUrl + `/api/student-assignment/${userId}`);
+                const response = await axios.get(this.apiUrl + `/api/student-assignment/user/${userId}`);
                 this.listAssignments = response.data.data;
-                console.log("LIST ASSIGNMENT BY USER ID::", this.listAssignments);
-
             } catch (error) {
                 console.error(error);
             }
