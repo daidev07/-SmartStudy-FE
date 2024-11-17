@@ -16,6 +16,7 @@ const store = createStore({
     },
     getters: {
         getUserInfo: (state) => state.userInfo,
+        getUserId: (state) => state.userInfo?.id,
     },
 });
 

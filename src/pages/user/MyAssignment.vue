@@ -27,11 +27,11 @@
                         <strong>{{ new Date(assignment.createdAt).toLocaleDateString() }}</strong>
                     </p>
                     <p class="text-muted">Due date:
-                        <strong> {{ new Date(assignment.dueDate).toLocaleDateString() }}</strong>
+                        <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleDateString() }}</strong>
                     </p>
                 </div>
                 <div class="total-point d-flex justify-content-center align-items-center" title="Exercise point ">
-                    {{ assignment.totalPoints }}
+                    {{ assignment.point }}
                 </div>
             </router-link>
         </div>
@@ -81,7 +81,7 @@ export default {
         getStatusCardClass(status) {
             return {
                 "bg-light-red": status === "NOT_SUBMIT",
-                "bg-light-orange": status === "LATE_SUBMIT",
+                "bg-light-orange": status === "LATE_SUBMISSION",
                 "bg-light-green": status === "SUBMITTED"
             };
         }

@@ -8,18 +8,30 @@
         <div v-if="assignmentDetail" class="exam-questions">
             <div v-for="(question, index) in assignmentDetail.questions" :key="question.id" class="mb-3">
                 <h5 class="mb-2">{{ index + 1 }}. {{ question.content }}</h5>
-                <!-- Centered Answers -->
                 <div class="d-flex flex-wrap justify-content-center">
                     <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
                         <div class="form-check text-center me-2">
-                            <!-- Hidden radio button -->
                             <input class="form-check-input" type="radio" :name="'question-' + question.id"
                                 :id="'answer-' + answer.id" />
-                            <!-- Label acting as a radio button -->
                             <label class="btn form-check-label" :for="'answer-' + answer.id">
                                 {{ answer.content }}
                             </label>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="unansweredModal" tabindex="-1" aria-labelledby="unansweredModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        There are unanswered questions. Are you sure you want to submit?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Exam</button>
+                        <button type="button" class="btn btn-warning" @click="confirmSubmit">Submit Anyway</button>
                     </div>
                 </div>
             </div>
@@ -30,21 +42,26 @@
 
 <script>
 import axios from 'axios';
+import { toast } from "vue3-toastify";
+import { Modal } from 'bootstrap';
+import { mapGetters } from 'vuex';
+
 export default {
     name: 'DoingExamComponent',
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
             assignmentDetail: null,
+            userId: null,
         };
     },
     computed: {
+        ...mapGetters(['getUserId']),
         assignmentId() {
-            return this.$route.params.id;
+            return parseInt(this.$route.params.id, 10);
         }
     },
     mounted() {
-        console.log('Current Assignment ID:', this.assignmentId);
         this.fetchAssignmentDetail();
     },
     methods: {
@@ -57,8 +74,58 @@ export default {
                 console.error(error);
             }
         },
-        submitExam() {
-            alert('Exam submitted!');
+        async submitExam() {
+            const unansweredQuestions = this.assignmentDetail.questions.filter(question => {
+                const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
+                return !selectedAnswer;
+            });
+
+            if (unansweredQuestions.length > 0) {
+                const modal = new Modal(document.getElementById('unansweredModal'));
+                modal.show();
+            } else {
+                this.saveResults();
+            }
+        },
+        confirmSubmit() {
+            const modal = Modal.getInstance(document.getElementById('unansweredModal'));
+            modal.hide();
+            this.saveResults();
+        },
+        async saveResults() {
+            try {
+                let correctAnswers = 0;
+
+                // Lấy danh sách câu trả lời và tính điểm
+                const results = this.assignmentDetail.questions.map(question => {
+                    const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
+                    const answerId = selectedAnswer ? parseInt(selectedAnswer.id.replace('answer-', '')) : null;
+
+                    // Kiểm tra câu trả lời đúng
+                    const selectedAnswerObject = question.answers.find(answer => answer.id === answerId);
+                    if (selectedAnswerObject && selectedAnswerObject.isCorrect) {
+                        correctAnswers += 1;
+                    }
+
+                    return {
+                        studentAssignmentId: this.assignmentId,
+                        questionId: question.id,
+                        answerId: answerId ? answerId : null,
+                        userId: this.getUserId
+                    };
+                });
+
+                // Tính điểm
+                const totalQuestions = this.assignmentDetail.questions.length;
+                const point = parseInt((correctAnswers * 100 / totalQuestions));
+
+                // Gửi kết quả cùng với điểm đến backend
+                await axios.post(this.apiUrl + '/api/answer-result', results, { params: { point: point } });
+                console.log('ANSWER RESULTS:: ', results);
+                toast.success('Submit successfully!');
+            } catch (error) {
+                console.error('Error saving results:', error);
+            }
         }
     }
 };
