@@ -46,7 +46,7 @@ export default {
                 formData.append("examName", examName);
                 formData.append("examFile", examFile);
                 try {
-                    await axios.post(this.apiUrl + '/api/exams/create', formData, {
+                    await axios.post(this.apiUrl + '/api/exam', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }
@@ -54,7 +54,6 @@ export default {
                     this.$emit('close');
                     this.$emit('refresh');
                     toast.success("Create new test successfully!");
-                    console.log("File uploaded successfully");
                 } catch (error) {
                     if (error.response.status === 400) {
                         toast.error("The test already exists. Try another name!");

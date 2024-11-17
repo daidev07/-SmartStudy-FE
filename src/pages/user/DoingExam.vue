@@ -12,8 +12,13 @@
                     <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
                         <div class="form-check text-center me-2">
                             <input class="form-check-input" type="radio" :name="'question-' + question.id"
-                                :id="'answer-' + answer.id" />
-                            <label class="btn form-check-label" :for="'answer-' + answer.id">
+                                :id="'answer-' + answer.id" :checked="isAnswerSelected(question.id, answer.id)"
+                                disabled />
+                            <label class="form-check-label" :for="'answer-' + answer.id" :class="{
+                                'correct-answer': isCorrectAnswer(question.id, answer.id),
+                                'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
+                                'user-answer': isUserAnswerSelected(question.id, answer.id)  // To highlight the user's selected answer
+                            }">
                                 {{ answer.content }}
                             </label>
                         </div>
@@ -39,7 +44,6 @@
     </div>
 </template>
 
-
 <script>
 import axios from 'axios';
 import { toast } from "vue3-toastify";
@@ -51,10 +55,12 @@ export default {
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
-            assignmentDetail: null,
+            assignmentInfo: null,
             userId: null,
             examDetail: null,
-            isCompleted: false
+            isCompleted: false,
+            answerResults: [],
+            userAnswers: {}
         };
     },
     computed: {
@@ -72,10 +78,47 @@ export default {
             try {
                 const response = await axios.get(this.apiUrl + `/api/student-assignment/${this.assignmentId}`);
                 this.assignmentInfo = response.data.data;
+                if (this.assignmentInfo.assignmentStatus === 'SUBMITTED' || this.assignmentInfo.assignmentStatus === 'LATE_SUBMISSION') {
+                    await this.fetchAnswerResults();
+                }
                 this.fetchExam(this.assignmentInfo.exam.id);
             } catch (error) {
                 console.error(error);
             }
+        },
+        async fetchAnswerResults() {
+            try {
+                const response = await axios.get(
+                    this.apiUrl + `/api/answer-result/user/${this.getUserId}/assignment/${this.assignmentId}`
+                );
+                const answerResults = response.data.data;
+                this.answerResults = answerResults;
+                this.userAnswers = {};  // Make sure to reset user answers
+                answerResults.forEach(result => {
+                    this.userAnswers[result.questionId] = result.answerId;  // Store the user's selected answers
+                });
+            } catch (error) {
+                console.error('Error fetching answer results:', error);
+            }
+        },
+        isUserAnswerSelected(questionId, answerId) {
+            return this.userAnswers[questionId] === answerId;
+        },
+        isCorrectAnswer(questionId, answerId) {
+            const question = this.examDetail.questions.find(q => q.id === questionId);
+            if (!question) return false;
+            const answer = question.answers.find(a => a.id === answerId);
+            return answer && answer.isCorrect;
+        },
+
+        // Check if the user’s selected answer is incorrect
+        isIncorrectUserAnswer(questionId, answerId) {
+            return this.isUserAnswerSelected(questionId, answerId) && !this.isCorrectAnswer(questionId, answerId);
+        },
+
+        isAnswerSelected(questionId, answerId) {
+            if (!this.answerResults) return false;
+            return this.answerResults.some(result => result.questionId === questionId && result.answerId === answerId);
         },
         async fetchExam(examId) {
             try {
@@ -86,7 +129,7 @@ export default {
             }
         },
         async submitExam() {
-            const unansweredQuestions = this.assignmentDetail.questions.filter(question => {
+            const unansweredQuestions = this.examDetail.questions.filter(question => {
                 const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
                 return !selectedAnswer;
             });
@@ -107,7 +150,7 @@ export default {
             try {
                 let correctAnswers = 0;
 
-                const results = this.assignmentDetail.questions.map(question => {
+                const results = this.examDetail.questions.map(question => {
                     const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
                     const answerId = selectedAnswer ? parseInt(selectedAnswer.id.replace('answer-', '')) : null;
 
@@ -124,21 +167,20 @@ export default {
                     };
                 });
 
-                // Tính điểm
-                const totalQuestions = this.assignmentDetail.questions.length;
+                const totalQuestions = this.examDetail.questions.length;
                 const point = parseInt((correctAnswers * 100 / totalQuestions));
 
-                // Gửi kết quả cùng với điểm đến backend
                 await axios.post(this.apiUrl + '/api/answer-result', results, { params: { point: point } });
                 console.log('ANSWER RESULTS:: ', results);
                 toast.success('Submit successfully!');
             } catch (error) {
                 console.error('Error saving results:', error);
             }
-        }
-    }
+        },
+    },
 };
 </script>
+
 <style scoped>
 .container {
     background-color: #ffffff;
@@ -194,13 +236,11 @@ h5 {
     display: none;
 }
 
-/* Button styling for the label acting as a radio button */
 .form-check-label {
     cursor: pointer;
     font-size: 1rem;
     color: #555;
     display: block;
-    /* Make label fill the area for easy selection */
     padding: 5px;
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
@@ -209,5 +249,74 @@ h5 {
 .form-check-input:checked+.form-check-label {
     background-color: #0d6efd;
     color: #fff;
+}
+
+/* Custom styling for radio button labels */
+.form-check-label {
+    cursor: pointer;
+    font-size: 1rem;
+    color: #555;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s, color 0.3s;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Green for correct answers */
+.correct-answer {
+    background-color: #28a745;
+    /* Green */
+    color: white;
+    border-color: #28a745;
+}
+
+/* Red for incorrect answers */
+.incorrect-answer {
+    background-color: #dc3545;
+    /* Red */
+    color: white;
+    border-color: #dc3545;
+}
+
+/* Style for checked but incorrect answers */
+input[type="radio"]:checked+.form-check-label.incorrect-answer {
+    background-color: #dc3545;
+    color: white;
+}
+
+/* Style for selected (checked) correct answers */
+input[type="radio"]:checked+.form-check-label.correct-answer {
+    background-color: #28a745;
+    color: white;
+}
+
+
+/* Disabled state for labels */
+input[type="radio"]:disabled+.form-check-label {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Selected but incorrect (hover or not) */
+input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
+    background-color: #dc3545;
+}
+
+/* Styling the radio button input itself (hidden) */
+.form-check-input {
+    display: none;
+}
+
+.incorrect-answer {
+    background-color: #dc3545;
+    /* Red */
+    color: white;
+    border-color: #dc3545;
+}
+
+.user-answer {
+    background-color: #f0f0f0;
+    border: 2px solid #0d6efd;
 }
 </style>

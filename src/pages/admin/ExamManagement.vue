@@ -73,11 +73,11 @@ export default {
             this.examListLoading = true;
             this.examListError = null;
             try {
-                const response = await axios.get(this.apiUrl + '/api/exams');
+                const response = await axios.get(this.apiUrl + '/api/exam');
                 this.examList = response.data.data;
                 console.log("EXAM LIST:: ", this.examList);
                 this.$nextTick(() => {
-                    this.initDataTable(); // Initialize DataTable after examList is populated
+                    this.initDataTable();
                 });
             } catch (error) {
                 this.examListError = 'Failed to load exam list.';
