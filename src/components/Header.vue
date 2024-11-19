@@ -20,7 +20,6 @@
             <span>{{ userInfo.name }}</span>
         </div>
 
-        <!-- Nếu không có token, hiển thị nút login -->
         <router-link v-else to="/login" class="login-btn">Login</router-link>
     </header>
 </template>
@@ -57,11 +56,9 @@ export default {
             const token = localStorage.getItem('token');
             if (token) {
                 const tokenInfo = jwtDecode(token);
-                console.log("Token Info::", tokenInfo);
                 const response = await axios.get(this.apiUrl + `/api/user/${tokenInfo.userName}`);
                 this.userInfo = response.data.data;
                 this.saveUserInfo(this.userInfo);
-                console.log("USER INFO FORM HEADER::", this.userInfo);
             }
         },
 
@@ -77,19 +74,15 @@ export default {
     padding: 15px 30px;
     background-color: #ffffff;
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-    /* Bóng đổ sâu hơn */
-    border-bottom: 2px solid #f1f1f1;
-    /* Thêm đường viền dưới */
     transition: box-shadow 0.3s ease-in-out;
-    /* Hiệu ứng khi hover */
+    position: fixed;
+    z-index: 1;
 }
 
 .header:hover {
     box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-    /* Bóng đổ khi hover */
 }
 
-/* Tạo hiệu ứng cho logo */
 .logo {
     font-size: 26px;
     font-weight: bold;
@@ -100,9 +93,6 @@ export default {
 
 .logo:hover {
     transform: scale(1.1);
-    /* Phóng to logo khi hover */
-    color: #007bff;
-    /* Đổi màu logo khi hover */
 }
 
 /* Menu */
@@ -135,7 +125,7 @@ export default {
 
 .active-menu {
     color: #fff;
-    background-color: #7494ec;
+    background-color: #bdce9f;
     font-weight: bold;
     border-radius: 4px;
     padding: 8px 15px;

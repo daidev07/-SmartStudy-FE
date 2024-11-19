@@ -2,23 +2,35 @@
     <div class="container mt-3 w-50">
         <div class="d-flex justify-content-between mb-3">
             <h2 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h2>
-            <button class="btn btn-primary" @click="submitExam">Submit</button>
+            <button class="btn btn-submit" @click="submitExam" v-if="!isSubmit">Submit</button>
+            <h2 class="text-center  fw-bold" v-else>Point: <span class="text-danger">{{ assignmentInfo.point }}</span>
+            </h2>
         </div>
 
         <div v-if="examDetail" class="exam-questions">
             <div v-for="(question, index) in examDetail.questions" :key="question.id" class="mb-3">
-                <h5 class="mb-2">{{ index + 1 }}. {{ question.content }}</h5>
+                <div class="d-flex justify-content-between">
+                    <h5 class="mb-2">{{ index + 1 }}. {{ question.content }}</h5>
+                    <h5 class="bi bi-patch-question-fill" v-if="isSubmit" title="Ask AI" @click="askAI(question)"></h5>
+                </div>
                 <div class="d-flex flex-wrap justify-content-center">
                     <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
-                        <div class="form-check text-center me-2">
+                        <div v-if="isSubmit" class="form-check text-center me-2">
                             <input class="form-check-input" type="radio" :name="'question-' + question.id"
                                 :id="'answer-' + answer.id" :checked="isAnswerSelected(question.id, answer.id)"
                                 disabled />
                             <label class="form-check-label" :for="'answer-' + answer.id" :class="{
                                 'correct-answer': isCorrectAnswer(question.id, answer.id),
                                 'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
-                                'user-answer': isUserAnswerSelected(question.id, answer.id)  // To highlight the user's selected answer
+                                'user-answer': isUserAnswerSelected(question.id, answer.id)
                             }">
+                                {{ answer.content }}
+                            </label>
+                        </div>
+                        <div v-else class="form-check text-center me-2">
+                            <input class="form-check-input" type="radio" :name="'question-' + question.id"
+                                :id="'answer-' + answer.id" />
+                            <label class="form-check-label" :for="'answer-' + answer.id">
                                 {{ answer.content }}
                             </label>
                         </div>
@@ -60,7 +72,8 @@ export default {
             examDetail: null,
             isCompleted: false,
             answerResults: [],
-            userAnswers: {}
+            userAnswers: {},
+            isSubmit: false
         };
     },
     computed: {
@@ -74,11 +87,35 @@ export default {
         this.fetchAssignment();
     },
     methods: {
+        async askAI(question) {
+            try {
+                const questionContent = question.content;
+                const answerLabels = ["a", "b", "c", "d"];
+                const answers = question.answers.map((answer, index) => {
+                    return `${answerLabels[index]}. ${answer.content}`;
+                });
+
+                const combinedString = `${questionContent} ${answers.join(' ')}`;
+                const analysisString = "Phân tích ngữ pháp, từ vựng, và tại sao đáp án đó đúng cho câu: ";
+
+                const finalString = `${analysisString} ${combinedString}`
+
+                const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
+                    question: finalString
+                });
+                console.log('AI Response:', response.data);
+            } catch (error) {
+                console.error('Error asking AI:', error);
+            }
+        },
         async fetchAssignment() {
             try {
                 const response = await axios.get(this.apiUrl + `/api/student-assignment/${this.assignmentId}`);
                 this.assignmentInfo = response.data.data;
+                console.log('ASSIGNMENT INFO:: ', this.assignmentInfo);
+
                 if (this.assignmentInfo.assignmentStatus === 'SUBMITTED' || this.assignmentInfo.assignmentStatus === 'LATE_SUBMISSION') {
+                    this.isSubmit = true;
                     await this.fetchAnswerResults();
                 }
                 this.fetchExam(this.assignmentInfo.exam.id);
@@ -188,6 +225,8 @@ export default {
     padding: 30px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s;
+    padding-top: 95px;
+    height: 95vh;
 }
 
 .container:hover {
@@ -196,24 +235,26 @@ export default {
 
 /* Header title styling */
 h2 {
-    color: #0d6efd;
+    color: #617440;
     font-size: 1.8rem;
     margin-bottom: 0;
 }
 
 /* Styling for the exam questions */
 .exam-questions {
-    background-color: #f9f9f9;
+    background-color: #CFE1B9;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-top: 15px;
+    max-height: 75vh;
+    overflow-y: auto;
 }
 
 /* Question and answer spacing */
 h5 {
     font-weight: 600;
-    color: #333;
+    color: #617440;
     margin-bottom: 10px;
 }
 
@@ -318,5 +359,19 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 .user-answer {
     background-color: #f0f0f0;
     border: 2px solid #0d6efd;
+}
+
+.bi-patch-question-fill {
+    cursor: pointer;
+    color: #728156;
+    transition: transform 0.3s, color 0.3s ease;
+}
+
+.bi-patch-question-fill:hover {
+    transform: scale(1.4);
+}
+
+.btn-submit {
+    background-color: #728156;
 }
 </style>

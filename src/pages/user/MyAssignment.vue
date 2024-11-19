@@ -22,7 +22,7 @@
                     <h5 class="card-title fs-3">{{ assignment.name }}</h5>
                     <p class="card-text">{{ assignment.description }}</p>
                 </div>
-                <div class="text-end">
+                <div class="text-end align-items-center">
                     <p class="text-muted mb-1"> Assignment date:
                         <strong>{{ new Date(assignment.createdAt).toLocaleDateString() }}</strong>
                     </p>
@@ -71,7 +71,7 @@ export default {
                 const userId = this.getUserInfo.id;
                 console.log("USER ID::", userId);
                 const response = await axios.get(this.apiUrl + `/api/student-assignment/user/${userId}`);
-                this.listAssignments = response.data.data;
+                this.listAssignments = response.data.data.reverse();
             } catch (error) {
                 console.error(error);
             }
@@ -90,12 +90,11 @@ export default {
 .container {
     background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 15px;
+    padding: 90px 20px 20px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    min-height: 87vh;
+    min-height: 95vh;
 }
 
-/* Custom card styles for different statuses */
 .bg-light-red {
     border: 1px solid #a51d1d;
     background-color: #ffd0d0;
