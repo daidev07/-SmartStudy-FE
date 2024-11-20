@@ -6,6 +6,7 @@ const store = createStore({
         selectedAssignment: null,
         isChatbotOpen: false,
         isLoading: false,
+        askAIKey: 0
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -20,6 +21,12 @@ const store = createStore({
         setLoading(state, status) {
             state.isLoading = status;
         },
+        setChatbotOpen(state, status) {
+            state.isChatbotOpen = status;
+        },
+        setAskAIKey(state) {
+            state.askAIKey = state.askAIKey + 1;
+        },
     },
     actions: {
         saveUserInfo({ commit }, userInfo) {
@@ -29,8 +36,17 @@ const store = createStore({
             commit('setSelectedAssignment', assignment); 
         },
         openChatbotWithLoader({ commit }) {
-            commit('toggleChatbot');
+            commit('setChatbotOpen', true);
             commit('setLoading', true);
+        },
+        toggleChatbot({ commit }) {
+            commit('toggleChatbot');
+        },
+        openChatbot({ commit }) {
+            commit('setChatbotOpen', true);
+        },
+        closeChatbot({ commit }) {
+            commit('setChatbotOpen', false);
         },
         startLoading({ commit }) {
             commit('setLoading', true);
@@ -38,11 +54,15 @@ const store = createStore({
         stopLoading({ commit }) {
             commit('setLoading', false);
         },
+        setAskAIKey({ commit }) {
+            commit('setAskAIKey');
+        }
     },
     getters: {
         getUserInfo: (state) => state.userInfo,
         getUserId: (state) => state.userInfo?.id,
-        getSelectedAssignment: state => state.selectedAssignment 
+        getSelectedAssignment: state => state.selectedAssignment,
+        isChatbotOpen: (state) => state.isChatbotOpen,
     },
 });
 

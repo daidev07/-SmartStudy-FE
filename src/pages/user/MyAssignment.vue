@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-3 w-50">
+    <div class="container w-50">
         <!-- Status legend -->
         <div class="d-flex justify-content-center align-items-center mb-3">
             <div class="d-flex align-items-center">
@@ -90,10 +90,11 @@ export default {
 .container {
     background-color: #ffffff;
     border: 2px solid #728156;
-    border-radius: 8px;
-    padding: 90px 20px 20px 20px;
+    border-radius: 10px;
+    padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    min-height: 95vh;
+    min-height: 88vh;
+    margin-top: 95px;
 }
 
 .bg-light-red {

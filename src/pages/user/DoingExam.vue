@@ -60,7 +60,7 @@
 import axios from 'axios';
 import { toast } from "vue3-toastify";
 import { Modal } from 'bootstrap';
-import { mapGetters, mapActions } from 'vuex';
+import { mapGetters, mapActions, mapState } from 'vuex';
 
 export default {
     name: 'DoingExamComponent',
@@ -77,7 +77,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(['getUserId', 'getSelectedAssignment']),
+        ...mapGetters(['getUserId']),
+        ...mapState(['isChatbotOpen', 'isLoading']),
         assignmentId() {
             return parseInt(this.$route.params.id, 10);
         }
@@ -86,7 +87,7 @@ export default {
         this.fetchAssignment();
     },
     methods: {
-        ...mapActions(['openChatbotWithLoader']),
+        ...mapActions(['stopLoading', 'openChatbotWithLoader', 'setAskAIKey']),
         async askAI(question) {
             try {
                 this.openChatbotWithLoader();
@@ -98,7 +99,6 @@ export default {
 
                 const combinedString = `${questionContent} ${answers.join(' ')}`;
                 const analysisString = "Phân tích ngữ pháp, từ vựng, và tại sao đáp án đó đúng cho câu: ";
-
                 const finalString = `${analysisString} ${combinedString}`
 
                 const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
@@ -106,6 +106,9 @@ export default {
                     question: finalString
                 });
                 console.log('AI Response:', response.data);
+                this.setAskAIKey()
+                this.stopLoading();
+
             } catch (error) {
                 console.error('Error asking AI:', error);
             }
@@ -222,7 +225,7 @@ export default {
 <style scoped>
 .container {
     background-color: #ffffff;
-    border: 2px solid #728156;
+    /* border: 2px solid #728156; */
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);

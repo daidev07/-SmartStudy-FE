@@ -4,20 +4,21 @@
     <router-view />
     <ToastNotify />
 
-    <div class="chatbot-icon" @click="toggleChatbot" title="ASK AI">
+    <div class="chatbot-icon" @click="toggleChatbotOrClose" title="ASK AI">
       <img src="@/assets/chatbotLogo.jpg" alt="Chatbot Logo" />
     </div>
 
-    <div v-if="isChatbotOpen" class="chatbot-dialog">
+    <div v-if="this.$store.state.isChatbotOpen" class="chatbot-dialog">
       <div class="chatbot-header">
         <h5> {{ userInfo?.username }}'s Chatbot</h5>
-        <button @click="toggleChatbot">&times;</button>
+        <button @click="toggleChatbotOrClose"><i class='bx bxs-x-circle fs-3'></i></button>
       </div>
-      <div class="chatbot-body mb-3">
+      <div class="chatbot-body">
         <div v-if="isHaveHistory" class="m-3">You have not had any conversation before, let's chat...</div>
-        <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message mb-3">
+        <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message ">
           <p v-if="message.messageUser" class="user-message mb-2 p-2">{{ message.messageUser }}</p>
-          <p v-if="message.messageBot" class="chatbot-message p-2 " v-html="formatMessage(message.messageBot)"></p>
+          <p v-if="message.messageBot" class="chatbot-message p-2" v-html="formatBotMessage(message.messageBot)"></p>
+          <p class="text-body-tertiary">{{ formatDate(messageHistory?.createdAt) }}</p>
         </div>
       </div>
 
@@ -36,6 +37,8 @@ import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 import { mapGetters, mapState, mapActions } from 'vuex';
 import axios from 'axios';
+import { formatDistanceToNow } from 'date-fns';
+
 
 export default {
   name: 'HomePage',
@@ -46,8 +49,6 @@ export default {
   data() {
     return {
       apiUrl: process.env.VUE_APP_API_URL,
-      isChatbotOpen: false,
-      isChatHistoryOpen: false,
       messageHistory: {},
       messageDetails: [],
       questionSend: '',
@@ -69,17 +70,22 @@ export default {
         this.userInfo = newUserInfo;
         this.fetchMessageHistory();
       }
+    },
+    askAIKey(newAskAIKey, oldAskAIKey) {
+      if (newAskAIKey !== oldAskAIKey) {
+        this.fetchMessageHistory();
+      }
     }
   },
   computed: {
     ...mapGetters(['getUserInfo', 'getUserId']),
-    ...mapState(['isChatbotOpen', 'isLoading']),
+    ...mapState(['isLoading', 'askAIKey']),
   },
   methods: {
-    ...mapActions(['stopLoading', 'startLoading']),
-    toggleChatbot() {
-      this.isChatbotOpen = !this.isChatbotOpen;
-      this.isChatHistoryOpen = false;
+    ...mapActions(['stopLoading', 'startLoading', 'toggleChatbot']),
+    toggleChatbotOrClose() {
+      this.toggleChatbot();
+      this.scrollToBottom();
     },
     async sendMessage() {
       if (!this.questionSend.trim()) return;
@@ -97,20 +103,21 @@ export default {
         toast.error('Failed to send message, please try again.');
       } finally {
         this.stopLoading();
+        this.scrollToBottom();
       }
     },
     async fetchMessageHistory() {
       const response = await axios.get(this.apiUrl + `/api/history-chatbot/user/${this.userInfo?.id}`);
-      console.log("RESPONSE::", response.data);
       if (response.data.data == null) {
         this.isHaveHistory = true;
       } else {
         this.messageHistory = response.data.data;
+        console.log("messageHistory:: ", this.messageHistory);
         this.messageDetails = this.messageHistory.messageDetails;
       }
       this.scrollToBottom();
     },
-    formatMessage(message) {
+    formatBotMessage(message) {
       return message
         .replace(/### (.+)/g, '<strong>$1</strong>')
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
@@ -124,6 +131,11 @@ export default {
         }
       });
     },
+    formatDate(date) {
+      if (!date) return '';
+      const formattedDate = new Date(date);
+      return formatDistanceToNow(formattedDate, { addSuffix: true });
+    }
   }
 };
 </script>
@@ -187,6 +199,14 @@ export default {
   color: white;
   font-size: 20px;
   cursor: pointer;
+}
+
+.bxs-x-circle {
+  transition: transform 0.3s ease;
+}
+
+.bxs-x-circle:hover {
+  transform: scale(1.2);
 }
 
 .chatbot-body {
