@@ -1,5 +1,5 @@
 <template>
-    <div class="container mt-3 w-50">
+    <div class="container w-50">
         <div class="d-flex justify-content-between mb-3">
             <h2 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h2>
             <button class="btn btn-submit" @click="submitExam" v-if="!isSubmit">Submit</button>
@@ -60,7 +60,7 @@
 import axios from 'axios';
 import { toast } from "vue3-toastify";
 import { Modal } from 'bootstrap';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapActions } from 'vuex';
 
 export default {
     name: 'DoingExamComponent',
@@ -78,7 +78,6 @@ export default {
     },
     computed: {
         ...mapGetters(['getUserId', 'getSelectedAssignment']),
-
         assignmentId() {
             return parseInt(this.$route.params.id, 10);
         }
@@ -87,8 +86,10 @@ export default {
         this.fetchAssignment();
     },
     methods: {
+        ...mapActions(['openChatbotWithLoader']),
         async askAI(question) {
             try {
+                this.openChatbotWithLoader();
                 const questionContent = question.content;
                 const answerLabels = ["a", "b", "c", "d"];
                 const answers = question.answers.map((answer, index) => {
@@ -101,6 +102,7 @@ export default {
                 const finalString = `${analysisString} ${combinedString}`
 
                 const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
+                    userId: this.getUserId,
                     question: finalString
                 });
                 console.log('AI Response:', response.data);
@@ -130,9 +132,9 @@ export default {
                 );
                 const answerResults = response.data.data;
                 this.answerResults = answerResults;
-                this.userAnswers = {};  // Make sure to reset user answers
+                this.userAnswers = {};
                 answerResults.forEach(result => {
-                    this.userAnswers[result.questionId] = result.answerId;  // Store the user's selected answers
+                    this.userAnswers[result.questionId] = result.answerId;
                 });
             } catch (error) {
                 console.error('Error fetching answer results:', error);
@@ -148,7 +150,6 @@ export default {
             return answer && answer.isCorrect;
         },
 
-        // Check if the user’s selected answer is incorrect
         isIncorrectUserAnswer(questionId, answerId) {
             return this.isUserAnswerSelected(questionId, answerId) && !this.isCorrectAnswer(questionId, answerId);
         },
@@ -221,12 +222,13 @@ export default {
 <style scoped>
 .container {
     background-color: #ffffff;
+    border: 2px solid #728156;
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s;
-    padding-top: 95px;
-    height: 95vh;
+    margin-top: 95px;
+    height: 88vh;
 }
 
 .container:hover {
@@ -240,9 +242,9 @@ h2 {
     margin-bottom: 0;
 }
 
-/* Styling for the exam questions */
 .exam-questions {
-    background-color: #CFE1B9;
+    background-color: #e3f0d4;
+    border: 2px solid #728156;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -251,14 +253,12 @@ h2 {
     overflow-y: auto;
 }
 
-/* Question and answer spacing */
 h5 {
     font-weight: 600;
     color: #617440;
     margin-bottom: 10px;
 }
 
-/* Radio buttons hidden but styled as buttons */
 .form-check {
     background-color: #ffffff;
     border-radius: 5px;
@@ -358,7 +358,7 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 
 .user-answer {
     background-color: #f0f0f0;
-    border: 2px solid #0d6efd;
+    border: 2px solid #1e2b08;
 }
 
 .bi-patch-question-fill {

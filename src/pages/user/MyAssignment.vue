@@ -88,7 +88,8 @@ export default {
 </script>
 <style scoped>
 .container {
-    background-color: #f8f9fa;
+    background-color: #ffffff;
+    border: 2px solid #728156;
     border-radius: 8px;
     padding: 90px 20px 20px 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);

@@ -14,15 +14,16 @@
         <button @click="toggleChatbot">&times;</button>
       </div>
       <div class="chatbot-body mb-3">
-        <div v-for="(message, index) in messageDetails" :key="index" class="chat-message mb-3">
+        <div v-if="isHaveHistory" class="m-3">You have not had any conversation before, let's chat...</div>
+        <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message mb-3">
           <p v-if="message.messageUser" class="user-message mb-2 p-2">{{ message.messageUser }}</p>
-          <p v-if="message.messageBot" class="chatbot-message p-2 ">{{ message.messageBot }}</p>
+          <p v-if="message.messageBot" class="chatbot-message p-2 " v-html="formatMessage(message.messageBot)"></p>
         </div>
       </div>
 
       <div class="chatbot-footer">
-        <input v-model="userMessage" @keyup.enter="sendMessage" placeholder="Type your message..." />
-        <i class='bx bx-send send-btn' @click="sendMessage" title="Send message"></i>
+        <input v-model="questionSend" placeholder="Type your message..." />
+        <i :class="isLoading ? 'loader' : 'bx bx-send send-btn'" @click="sendMessage" title="Send message"></i>
       </div>
     </div>
   </div>
@@ -33,7 +34,7 @@ import ToastNotify from '../../components/ToastNotify.vue';
 import Header from '../../components/Header.vue';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
-import { mapGetters } from 'vuex';
+import { mapGetters, mapState, mapActions } from 'vuex';
 import axios from 'axios';
 
 export default {
@@ -44,13 +45,14 @@ export default {
   },
   data() {
     return {
-      apiUri: process.env.VUE_APP_API_URL,
+      apiUrl: process.env.VUE_APP_API_URL,
       isChatbotOpen: false,
       isChatHistoryOpen: false,
       messageHistory: {},
       messageDetails: [],
-      userMessage: '',
-      userInfo: null
+      questionSend: '',
+      userInfo: null,
+      isHaveHistory: false
     };
   },
   mounted() {
@@ -70,25 +72,58 @@ export default {
     }
   },
   computed: {
-    ...mapGetters(['getUserInfo']),
+    ...mapGetters(['getUserInfo', 'getUserId']),
+    ...mapState(['isChatbotOpen', 'isLoading']),
   },
   methods: {
+    ...mapActions(['stopLoading', 'startLoading']),
     toggleChatbot() {
       this.isChatbotOpen = !this.isChatbotOpen;
       this.isChatHistoryOpen = false;
     },
-    sendMessage() {
-
+    async sendMessage() {
+      if (!this.questionSend.trim()) return;
+      this.startLoading();
+      try {
+        const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
+          userId: this.getUserId,
+          question: this.questionSend
+        });
+        console.log("RESPONSE::", response.data);
+        this.fetchMessageHistory();
+        this.questionSend = '';
+      } catch (error) {
+        console.error('Error sending message:', error);
+        toast.error('Failed to send message, please try again.');
+      } finally {
+        this.stopLoading();
+      }
     },
     async fetchMessageHistory() {
-
-      const response = await axios.get(this.apiUri + `/api/chat/message-history/user/${this.userInfo?.id}`);
-      this.messageHistory = response.data.data;
-      console.log("MESSAGE HISTORY", this.messageHistory);
-
-      this.messageDetails = this.messageHistory.messageDetails;
-      console.log("MESSAGE DETAILS", this.messageDetails);
-    }
+      const response = await axios.get(this.apiUrl + `/api/history-chatbot/user/${this.userInfo?.id}`);
+      console.log("RESPONSE::", response.data);
+      if (response.data.data == null) {
+        this.isHaveHistory = true;
+      } else {
+        this.messageHistory = response.data.data;
+        this.messageDetails = this.messageHistory.messageDetails;
+      }
+      this.scrollToBottom();
+    },
+    formatMessage(message) {
+      return message
+        .replace(/### (.+)/g, '<strong>$1</strong>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br>');
+    },
+    scrollToBottom() {
+      this.$nextTick(() => {
+        const chatbotBody = this.$el.querySelector('.chatbot-body');
+        if (chatbotBody) {
+          chatbotBody.scrollTop = chatbotBody.scrollHeight;
+        }
+      });
+    },
   }
 };
 </script>
@@ -98,7 +133,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(180deg, #E7F5DC, #728156);
+  /* background: linear-gradient(180deg, #E7F5DC, #728156); */
   min-height: 100vh;
 }
 
@@ -115,8 +150,8 @@ export default {
 }
 
 .chatbot-icon:hover {
-  transform: scale(1.3);
-  transition: transform 0.3s ease-in-out;
+  transform: scale(1.2);
+  transition: transform 0.4s ease-in-out;
 }
 
 .chatbot-icon img {
@@ -157,6 +192,8 @@ export default {
 .chatbot-body {
   padding: 7px 15px 0px 15px;
   color: #555;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .chat-message {
@@ -168,7 +205,7 @@ export default {
 .user-message {
   border-radius: 10px;
   background-color: #728156;
-  color: #E7F5DC;
+  color: #ffffff;
   justify-self: flex-end;
   align-items: center;
 }
@@ -215,5 +252,42 @@ export default {
 
 .chatbot-footer .send-btn:hover {
   background-color: #5a683e;
+}
+
+/* HTML: <div class="loader"></div> */
+.loader {
+  width: 40px;
+  aspect-ratio: 1;
+  display: grid;
+  -webkit-mask: conic-gradient(from 15deg, #0000, #000);
+  mask: conic-gradient(from 15deg, #0000, #000);
+  animation: l26 1s infinite steps(12);
+}
+
+.loader,
+.loader:before,
+.loader:after {
+  background:
+    radial-gradient(closest-side at 50% 12.5%,
+      #5a683e 96%, #0000) 50% 0/20% 80% repeat-y,
+    radial-gradient(closest-side at 12.5% 50%,
+      #5a683e 96%, #0000) 0 50%/80% 20% repeat-x;
+}
+
+.loader:before,
+.loader:after {
+  content: "";
+  grid-area: 1/1;
+  transform: rotate(30deg);
+}
+
+.loader:after {
+  transform: rotate(60deg);
+}
+
+@keyframes l26 {
+  100% {
+    transform: rotate(1turn)
+  }
 }
 </style>

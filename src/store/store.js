@@ -3,7 +3,9 @@ import { createStore } from 'vuex';
 const store = createStore({
     state: {
         userInfo: null,
-        selectedAssignment: null
+        selectedAssignment: null,
+        isChatbotOpen: false,
+        isLoading: false,
     },
     mutations: {
         setUserInfo(state, userInfo) {
@@ -11,7 +13,13 @@ const store = createStore({
         },
         setSelectedAssignment(state, assignment) {
             state.selectedAssignment = assignment;
-        }
+        },
+        toggleChatbot(state) {
+            state.isChatbotOpen = !state.isChatbotOpen;
+        },
+        setLoading(state, status) {
+            state.isLoading = status;
+        },
     },
     actions: {
         saveUserInfo({ commit }, userInfo) {
@@ -19,7 +27,17 @@ const store = createStore({
         },
         saveSelectedAssignment({ commit }, assignment) {
             commit('setSelectedAssignment', assignment); 
-        }
+        },
+        openChatbotWithLoader({ commit }) {
+            commit('toggleChatbot');
+            commit('setLoading', true);
+        },
+        startLoading({ commit }) {
+            commit('setLoading', true);
+        },
+        stopLoading({ commit }) {
+            commit('setLoading', false);
+        },
     },
     getters: {
         getUserInfo: (state) => state.userInfo,
