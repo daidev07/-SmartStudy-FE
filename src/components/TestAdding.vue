@@ -46,7 +46,7 @@ export default {
                 formData.append("examName", examName);
                 formData.append("examFile", examFile);
                 try {
-                    await axios.post(this.apiUrl + '/api/exam', formData, {
+                    await axios.post(this.apiUrl + '/exam', formData, {
                         headers: {
                             'Content-Type': 'multipart/form-data'
                         }

@@ -56,7 +56,7 @@ export default {
             const token = localStorage.getItem('token');
             if (token) {
                 const tokenInfo = jwtDecode(token);
-                const response = await axios.get(this.apiUrl + `/api/user/${tokenInfo.userName}`);
+                const response = await axios.get(this.apiUrl + `/user/${tokenInfo.userName}`);
                 this.userInfo = response.data.data;
                 this.saveUserInfo(this.userInfo);
             }

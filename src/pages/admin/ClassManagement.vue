@@ -49,7 +49,7 @@ export default {
             this.classListLoading = true;
             this.classListError = null;
             try {
-                const response = await axios.get(this.apirUrl + '/api/class');
+                const response = await axios.get(this.apirUrl + '/class');
                 this.classList = response.data.data;
                 console.log("LIST CLASS:: ", this.classList);
 

@@ -62,7 +62,7 @@ export default {
             this.classDetailLoading = true;
             this.classDetailError = null;
             try {
-                const response = await axios.get(this.apirUrl + '/api/class/' + this.classId);
+                const response = await axios.get(this.apirUrl + '/class/' + this.classId);
                 this.classDetail = response.data.data;
                 console.log("CLASS DETAILS:: ", this.classDetail);
             } catch (error) {

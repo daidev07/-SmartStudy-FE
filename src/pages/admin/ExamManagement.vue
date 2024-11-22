@@ -73,7 +73,7 @@ export default {
             this.examListLoading = true;
             this.examListError = null;
             try {
-                const response = await axios.get(this.apiUrl + '/api/exam');
+                const response = await axios.get(this.apiUrl + '/exam');
                 this.examList = response.data.data;
                 console.log("EXAM LIST:: ", this.examList);
                 this.$nextTick(() => {

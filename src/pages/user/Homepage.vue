@@ -92,7 +92,7 @@ export default {
       if (!this.questionSend.trim()) return;
       this.startLoading();
       try {
-        const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
+        const response = await axios.post(this.apiUrl + '/chat/ask-ai', {
           userId: this.getUserId,
           question: this.questionSend
         });
@@ -108,7 +108,7 @@ export default {
       }
     },
     async fetchMessageHistory() {
-      const response = await axios.get(this.apiUrl + `/api/history-chatbot/user/${this.userInfo?.id}`);
+      const response = await axios.get(this.apiUrl + `/history-chatbot/user/${this.userInfo?.id}`);
       if (response.data.data == null) {
         this.isHaveHistory = true;
       } else {

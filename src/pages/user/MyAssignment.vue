@@ -75,7 +75,7 @@ export default {
                 if (!this.getUserInfo) return;
                 const userId = this.getUserInfo.id;
                 console.log("USER ID::", userId);
-                const response = await axios.get(this.apiUrl + `/api/student-assignment/user/${userId}`);
+                const response = await axios.get(this.apiUrl + `/student-assignment/user/${userId}`);
                 this.listAssignments = response.data.data.reverse();
             } catch (error) {
                 console.error(error);

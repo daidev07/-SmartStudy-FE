@@ -117,7 +117,7 @@ export default {
                 const analysisString = "Phân tích ngữ pháp, từ vựng, và tại sao đáp án đó đúng cho câu: ";
                 const finalString = `${analysisString} ${combinedString}`
 
-                const response = await axios.post(this.apiUrl + '/api/chat/ask-ai', {
+                const response = await axios.post(this.apiUrl + '/chat/ask-ai', {
                     userId: this.getUserId,
                     question: finalString
                 });
@@ -131,7 +131,7 @@ export default {
         },
         async fetchAssignment() {
             try {
-                const response = await axios.get(this.apiUrl + `/api/student-assignment/${this.assignmentId}`);
+                const response = await axios.get(this.apiUrl + `/student-assignment/${this.assignmentId}`);
                 this.assignmentInfo = response.data.data;
                 console.log('ASSIGNMENT INFO:: ', this.assignmentInfo);
 
@@ -147,7 +147,7 @@ export default {
         async fetchAnswerResults() {
             try {
                 const response = await axios.get(
-                    this.apiUrl + `/api/answer-result/user/${this.getUserId}/assignment/${this.assignmentId}`
+                    this.apiUrl + `/answer-result/user/${this.getUserId}/assignment/${this.assignmentId}`
                 );
                 const answerResults = response.data.data;
                 this.answerResults = answerResults;
@@ -179,7 +179,7 @@ export default {
         },
         async fetchExam(examId) {
             try {
-                const response = await axios.get(this.apiUrl + `/api/exam/${examId}`);
+                const response = await axios.get(this.apiUrl + `/exam/${examId}`);
                 this.examDetail = response.data.data;
             } catch (error) {
                 console.error(error);
@@ -227,7 +227,7 @@ export default {
                 const totalQuestions = this.examDetail.questions.length;
                 const point = parseInt((correctAnswers * 100 / totalQuestions));
 
-                await axios.post(this.apiUrl + '/api/answer-result', results, { params: { point: point } });
+                await axios.post(this.apiUrl + '/answer-result', results, { params: { point: point } });
                 this.isSubmit = true;
                 toast.success('Submit successfully!');
                 this.fetchAnswerResults();
