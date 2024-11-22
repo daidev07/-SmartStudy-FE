@@ -95,7 +95,6 @@ export default {
     transform: scale(1.1);
 }
 
-/* Menu */
 .menu ul {
     list-style: none;
     display: flex;
@@ -111,7 +110,6 @@ export default {
     font-weight: 500;
     padding: 8px 15px;
     border-radius: 4px;
-    /* Bo góc các mục menu */
     transition: background-color 0.3s, color 0.3s, transform 0.3s ease;
 }
 
@@ -125,13 +123,12 @@ export default {
 
 .active-menu {
     color: #fff;
-    background-color: #bdce9f;
+    background-color: #7c95e6;
     font-weight: bold;
     border-radius: 4px;
     padding: 8px 15px;
 }
 
-/* Nút login */
 .login-btn {
     background-color: #007bff;
     color: white;

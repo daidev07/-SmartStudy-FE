@@ -9,7 +9,7 @@
     </div>
 
     <div v-if="this.$store.state.isChatbotOpen" class="chatbot-dialog">
-      <div class="chatbot-header">
+      <div class="chatbot-header align-items-center justify-content-between">
         <h5> {{ userInfo?.username }}'s Chatbot</h5>
         <button @click="toggleChatbotOrClose"><i class='bx bxs-x-circle fs-3'></i></button>
       </div>
@@ -18,13 +18,14 @@
         <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message ">
           <p v-if="message.messageUser" class="user-message mb-2 p-2">{{ message.messageUser }}</p>
           <p v-if="message.messageBot" class="chatbot-message p-2" v-html="formatBotMessage(message.messageBot)"></p>
-          <p class="text-body-tertiary">{{ formatDate(messageHistory?.createdAt) }}</p>
+          <p class="text-body-tertiary">{{ formatDate(message?.respondedAt) }}</p>
         </div>
       </div>
 
       <div class="chatbot-footer">
         <input v-model="questionSend" placeholder="Type your message..." />
-        <i :class="isLoading ? 'loader' : 'bx bx-send send-btn'" @click="sendMessage" title="Send message"></i>
+        <button :class="isLoading ? 'loader' : 'bx bx-send send-btn'" @click="sendMessage" title="Send message"
+          :disabled="!questionSend.trim()"></button>
       </div>
     </div>
   </div>
@@ -145,7 +146,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* background: linear-gradient(180deg, #E7F5DC, #728156); */
+  background: linear-gradient(180deg, #c9d6ff, #e2e2e2);
   min-height: 100vh;
 }
 
@@ -186,9 +187,7 @@ export default {
 
 .chatbot-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #7f8d65;
+  background-color: #3b62e6;
   color: white;
   padding: 10px;
 }
@@ -212,7 +211,7 @@ export default {
 .chatbot-body {
   padding: 7px 15px 0px 15px;
   color: #555;
-  max-height: 60vh;
+  max-height: 64vh;
   overflow-y: auto;
 }
 
@@ -224,18 +223,21 @@ export default {
 
 .user-message {
   border-radius: 10px;
-  background-color: #728156;
+  background-color: #3b62e6;
   color: #ffffff;
   justify-self: flex-end;
   align-items: center;
+  margin-left: 50px;
 }
 
 .chatbot-message {
+  margin-bottom: 3px;
   border-radius: 10px;
-  background-color: #E7F5DC;
-  color: #728156;
+  background-color: #dee5fc;
+  color: #415bb1;
   justify-self: flex-start;
   align-items: center;
+  margin-right: 50px;
 }
 
 .chatbot-footer {
@@ -246,7 +248,7 @@ export default {
   background-color: #f1f1f1;
 }
 
-.chatbot-footer i {
+.chatbot-footer button {
   font-size: 24px;
   cursor: pointer;
   margin-right: 10px;
@@ -262,7 +264,7 @@ export default {
 }
 
 .chatbot-footer .send-btn {
-  background-color: #728156;
+  background-color: #3b62e6;
   color: white;
   border: none;
   border-radius: 5px;
@@ -271,10 +273,9 @@ export default {
 }
 
 .chatbot-footer .send-btn:hover {
-  background-color: #5a683e;
+  background-color: #0a38cf;
 }
 
-/* HTML: <div class="loader"></div> */
 .loader {
   width: 40px;
   aspect-ratio: 1;
@@ -289,9 +290,9 @@ export default {
 .loader:after {
   background:
     radial-gradient(closest-side at 50% 12.5%,
-      #5a683e 96%, #0000) 50% 0/20% 80% repeat-y,
+      #6280e4 96%, #0000) 50% 0/20% 80% repeat-y,
     radial-gradient(closest-side at 12.5% 50%,
-      #5a683e 96%, #0000) 0 50%/80% 20% repeat-x;
+      #6280e4 96%, #0000) 0 50%/80% 20% repeat-x;
 }
 
 .loader:before,

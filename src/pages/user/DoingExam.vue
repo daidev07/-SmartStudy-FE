@@ -1,43 +1,57 @@
 <template>
     <div class="container w-50">
-        <div class="d-flex justify-content-between mb-3">
-            <h2 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h2>
-            <button class="btn btn-submit" @click="submitExam" v-if="!isSubmit">Submit</button>
-            <h2 class="text-center  fw-bold" v-else>Point: <span class="text-danger">{{ assignmentInfo.point }}</span>
-            </h2>
+        <div v-if="!isSubmit" class="d-flex justify-content-between mb-3">
+            <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
+            <button class="btn btn-submit" @click="submitExam">Submit</button>
         </div>
-
+        <div v-else class="d-flex justify-content-between mb-3">
+            <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
+            <h4 class="text-center  fw-bold">
+                Point: <span class="text-danger">{{ assignmentInfo.point }}</span>
+            </h4>
+        </div>
+        <div v-if="isSubmit" class=" d-flex align-items-center  justify-content-center">
+            <span class="status-legend bg-light-red me-2"></span><span class="me-4">Wrong answer</span>
+            <span class="status-legend bg-light-green me-2"></span><span class="me-4">Correct answer</span>
+            <span class="status-legend bg-white me-2"></span><span class="me-4">Your answer</span>
+        </div>
         <div v-if="examDetail" class="exam-questions">
-            <div v-for="(question, index) in examDetail.questions" :key="question.id" class="mb-3">
-                <div class="d-flex justify-content-between">
-                    <h5 class="mb-2">{{ index + 1 }}. {{ question.content }}</h5>
-                    <h5 class="bi bi-patch-question-fill" v-if="isSubmit" title="Ask AI" @click="askAI(question)"></h5>
-                </div>
-                <div class="d-flex flex-wrap justify-content-center">
-                    <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
-                        <div v-if="isSubmit" class="form-check text-center me-2">
-                            <input class="form-check-input" type="radio" :name="'question-' + question.id"
-                                :id="'answer-' + answer.id" :checked="isAnswerSelected(question.id, answer.id)"
-                                disabled />
-                            <label class="form-check-label" :for="'answer-' + answer.id" :class="{
-                                'correct-answer': isCorrectAnswer(question.id, answer.id),
-                                'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
-                                'user-answer': isUserAnswerSelected(question.id, answer.id)
-                            }">
-                                {{ answer.content }}
-                            </label>
+            <div class="row">
+                <div v-for="(question, index) in examDetail.questions" :key="question.id" class="col-6">
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between">
+                            <p class="mb-2">{{ index + 1 }}. {{ question.content }}</p>
+                            <h5 class="bi bi-patch-question-fill" v-if="isSubmit" title="Ask AI"
+                                @click="askAI(question)"></h5>
                         </div>
-                        <div v-else class="form-check text-center me-2">
-                            <input class="form-check-input" type="radio" :name="'question-' + question.id"
-                                :id="'answer-' + answer.id" />
-                            <label class="form-check-label" :for="'answer-' + answer.id">
-                                {{ answer.content }}
-                            </label>
+                        <div class="d-flex flex-wrap justify-content-center">
+                            <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
+                                <div v-if="isSubmit" class="form-check text-center me-2">
+                                    <input class="form-check-input" type="radio" :name="'question-' + question.id"
+                                        :id="'answer-' + answer.id" :checked="isAnswerSelected(question.id, answer.id)"
+                                        disabled />
+                                    <label class="form-check-label" :for="'answer-' + answer.id" :class="{
+                                        'correct-answer': isCorrectAnswer(question.id, answer.id),
+                                        'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
+                                        'user-answer': isUserAnswerSelected(question.id, answer.id)
+                                    }">
+                                        {{ answer.content }}
+                                    </label>
+                                </div>
+                                <div v-else class="form-check text-center me-2">
+                                    <input class="form-check-input" type="radio" :name="'question-' + question.id"
+                                        :id="'answer-' + answer.id" />
+                                    <label class="form-check-label" :for="'answer-' + answer.id">
+                                        {{ answer.content }}
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <div class="modal fade" id="unansweredModal" tabindex="-1" aria-labelledby="unansweredModalLabel"
             aria-hidden="true">
@@ -47,8 +61,10 @@
                         There are unanswered questions. Are you sure you want to submit?
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Exam</button>
-                        <button type="button" class="btn btn-warning" @click="confirmSubmit">Submit Anyway</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue
+                            Exam</button>
+                        <button type="button" class="btn btn-warning" @click="confirmSubmit">Submit
+                            Anyway</button>
                     </div>
                 </div>
             </div>
@@ -212,8 +228,9 @@ export default {
                 const point = parseInt((correctAnswers * 100 / totalQuestions));
 
                 await axios.post(this.apiUrl + '/api/answer-result', results, { params: { point: point } });
-                console.log('ANSWER RESULTS:: ', results);
+                this.isSubmit = true;
                 toast.success('Submit successfully!');
+                this.fetchAnswerResults();
             } catch (error) {
                 console.error('Error saving results:', error);
             }
@@ -225,7 +242,7 @@ export default {
 <style scoped>
 .container {
     background-color: #ffffff;
-    /* border: 2px solid #728156; */
+    border: 2px solid #6280e4;
     border-radius: 10px;
     padding: 30px;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -239,26 +256,25 @@ export default {
 }
 
 /* Header title styling */
-h2 {
-    color: #617440;
-    font-size: 1.8rem;
+h4 {
+    color: #6280e4;
     margin-bottom: 0;
 }
 
 .exam-questions {
-    background-color: #e3f0d4;
-    border: 2px solid #728156;
+    background-color: #f2f5ff;
+    border: 2px solid #6280e4;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-top: 15px;
-    max-height: 75vh;
+    height: 74vh;
     overflow-y: auto;
 }
 
-h5 {
+p {
     font-weight: 600;
-    color: #617440;
+    color: #6280e4;
     margin-bottom: 10px;
 }
 
@@ -280,15 +296,6 @@ h5 {
     display: none;
 }
 
-.form-check-label {
-    cursor: pointer;
-    font-size: 1rem;
-    color: #555;
-    display: block;
-    padding: 5px;
-    border-radius: 5px;
-    transition: background-color 0.3s, color 0.3s;
-}
 
 .form-check-input:checked+.form-check-label {
     background-color: #0d6efd;
@@ -307,10 +314,8 @@ h5 {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-/* Green for correct answers */
 .correct-answer {
     background-color: #28a745;
-    /* Green */
     color: white;
     border-color: #28a745;
 }
@@ -354,19 +359,18 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 
 .incorrect-answer {
     background-color: #dc3545;
-    /* Red */
     color: white;
     border-color: #dc3545;
 }
 
 .user-answer {
     background-color: #f0f0f0;
-    border: 2px solid #1e2b08;
+    border: 2px solid #0a38cf;
 }
 
 .bi-patch-question-fill {
     cursor: pointer;
-    color: #728156;
+    color: #6280e4;
     transition: transform 0.3s, color 0.3s ease;
 }
 
@@ -375,6 +379,29 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 }
 
 .btn-submit {
-    background-color: #728156;
+    background-color: #6280e4;
+    color: white;
+}
+
+.status-legend {
+    display: inline-block;
+    width: 32px;
+    height: 16px;
+    border-radius: 15%;
+}
+
+.bg-light-red {
+    background-color: #dc3545;
+    opacity: 0.6;
+}
+
+.bg-white {
+    border: 2px solid #6280e4;
+    border-radius: 4px;
+}
+
+.bg-light-green {
+    background-color: #28a745;
+    opacity: 0.6;
 }
 </style>

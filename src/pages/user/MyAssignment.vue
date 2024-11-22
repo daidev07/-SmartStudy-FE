@@ -1,6 +1,5 @@
 <template>
     <div class="container w-50">
-        <!-- Status legend -->
         <div class="d-flex justify-content-center align-items-center mb-3">
             <div class="d-flex align-items-center">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
@@ -14,26 +13,32 @@
         </div>
 
         <!-- Assignment cards -->
-        <div v-for="assignment in listAssignments" :key="assignment.id" class="card mb-3 shadow-sm"
-            :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
-            <router-link :to="'/my-assignment/do-assignment/' + assignment.id"
-                class="card-body d-flex justify-content-between text-decoration-none">
-                <div>
-                    <h5 class="card-title fs-3">{{ assignment.name }}</h5>
+        <div class="p-2 assign-card">
+            <div v-for="assignment in listAssignments" :key="assignment.id" class="card shadow-sm"
+                :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
+                <router-link :to="'/my-assignment/do-assignment/' + assignment.id"
+                    class="card-body justify-content-between text-decoration-none">
+                    <h5 class="card-title">{{ assignment.name }}</h5>
                     <p class="card-text">{{ assignment.description }}</p>
-                </div>
-                <div class="text-end align-items-center">
-                    <p class="text-muted mb-1"> Assignment date:
-                        <strong>{{ new Date(assignment.createdAt).toLocaleDateString() }}</strong>
-                    </p>
-                    <p class="text-muted">Due date:
-                        <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleDateString() }}</strong>
-                    </p>
-                </div>
-                <div class="total-point d-flex justify-content-center align-items-center" title="Exercise point ">
-                    {{ assignment.point }}
-                </div>
-            </router-link>
+                    <div class="d-flex justify-content-between">
+                        <div class="align-items-center">
+                            <p class="text-muted mb-1"> Assignment date:
+                                <strong>{{ new Date(assignment.createdAt).toLocaleDateString() }}</strong>
+                            </p>
+                            <p class="text-muted">Due date:
+                                <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleDateString()
+                                    }}</strong>
+                            </p>
+                        </div>
+                        <div class="col-2 d-flex justify-content-center align-items-center total-point"
+                            title="Exercise point ">
+                            {{ assignment.point }}
+                        </div>
+                    </div>
+
+
+                </router-link>
+            </div>
         </div>
     </div>
 </template>
@@ -89,7 +94,7 @@ export default {
 <style scoped>
 .container {
     background-color: #ffffff;
-    border: 2px solid #728156;
+    border: 2px solid #6280e4;
     border-radius: 10px;
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
@@ -112,7 +117,6 @@ export default {
     border: 1px solid #00f767;
 }
 
-/* Card styling */
 .card {
     border-radius: 8px;
     transition: transform 0.3s, box-shadow 0.3s;
@@ -124,7 +128,6 @@ export default {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
 
-/* Status legend styling */
 .status-legend {
     display: inline-block;
     width: 32px;
@@ -145,13 +148,18 @@ export default {
 }
 
 .total-point {
-    background-color: #f8d7da;
-    color: #721c24;
+    color: #5a010a;
     font-weight: bold;
-    font-size: 1.5rem;
-    padding: 0.5rem 1rem;
+    font-size: 40px;
     border-radius: 0.5rem;
-    min-width: 80px;
-    text-align: center;
+    min-width: 50px;
+}
+
+.assign-card {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    gap: 10px;
+    max-height: 77vh;
+    overflow-y: auto;
 }
 </style>
