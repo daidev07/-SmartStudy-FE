@@ -14,7 +14,7 @@
         <button @click="toggleChatbotOrClose"><i class='bx bxs-x-circle fs-3'></i></button>
       </div>
       <div class="chatbot-body">
-        <div v-if="isHaveHistory" class="m-3">You have not had any conversation before, let's chat...</div>
+        <div v-if="!isHaveHistory" class="m-3">You have not had any conversation before, let's chat...</div>
         <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message ">
           <p v-if="message.messageUser" class="user-message mb-2 p-2">{{ message.messageUser }}</p>
           <p v-if="message.messageBot" class="chatbot-message p-2" v-html="formatBotMessage(message.messageBot)"></p>
@@ -54,7 +54,7 @@ export default {
       messageDetails: [],
       questionSend: '',
       userInfo: null,
-      isHaveHistory: false
+      isHaveHistory: true
     };
   },
   mounted() {
@@ -97,6 +97,7 @@ export default {
           question: this.questionSend
         });
         console.log("RESPONSE::", response.data);
+        this.isHaveHistory = true;
         this.fetchMessageHistory();
         this.questionSend = '';
       } catch (error) {
@@ -110,7 +111,7 @@ export default {
     async fetchMessageHistory() {
       const response = await axios.get(this.apiUrl + `/history-chatbot/user/${this.userInfo?.id}`);
       if (response.data.data == null) {
-        this.isHaveHistory = true;
+        this.isHaveHistory = false;
       } else {
         this.messageHistory = response.data.data;
         console.log("messageHistory:: ", this.messageHistory);

@@ -13,8 +13,21 @@
         <TestAdding @close="toggleTestAdding" @refresh="fetchExamList" />
     </div>
 
+    <div class="menu-header mt-3">
+        <button :class="{ active: activeTab === 'grammar' }" @click="setActiveTab('grammar')" class="me-3">
+            Grammar
+        </button>
+        <button :class="{ active: activeTab === 'listening' }" @click="setActiveTab('listening')" class="me-3">
+            Listening
+        </button>
+        <button :class="{ active: activeTab === 'reading' }" @click="setActiveTab('reading')">
+            Reading
+        </button>
+    </div>
+
     <!-- Table to display Exams -->
     <div v-if="examList.length > 0" class="mt-3 w-50">
+        <h3 class="text-center">{{ capitalize(activeTab) }} Exams</h3>
         <table id="examTable" class="table table-striped table-bordered">
             <thead class="thead-dark">
                 <tr>
@@ -38,7 +51,7 @@
         </table>
     </div>
     <div v-else class="text-center mt-3">
-        <h3>No exams available</h3>
+        <h3>No exams available for {{ capitalize(activeTab) }}</h3>
     </div>
 </template>
 <script>
@@ -57,6 +70,7 @@ export default {
             examListLoading: false,
             examListError: null,
             showTestAdding: false,
+            activeTab: 'grammar',
         };
     },
     created() {
@@ -64,6 +78,11 @@ export default {
     },
     components: {
         TestAdding,
+    },
+    computed: {
+        filteredExams() {
+            return this.examList.filter((exam) => exam.type === this.activeTab);
+        },
     },
     methods: {
         toggleTestAdding() {
@@ -88,12 +107,19 @@ export default {
         },
         initDataTable() {
             $('#examTable').DataTable({
-                pageLength: 10, // Set the number of rows per page
+                pageLength: 10,
                 paging: true,
                 columnDefs: [
-                    { targets: '_all', className: 'text-start' } // Apply left alignment to all columns
-                ]// Enable pagination
+                    { targets: '_all', className: 'text-start' }
+                ]
             });
+        },
+        setActiveTab(tab) {
+            this.activeTab = tab;
+        },
+        capitalize(value) {
+            if (!value) return '';
+            return value.charAt(0).toUpperCase() + value.slice(1);
         },
     },
 }
@@ -106,5 +132,33 @@ export default {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     /* background: #7494ec; */
+}
+
+.menu-header button {
+    border-radius: 7px;
+    background-color: #f0f0f0;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.1s;
+}
+
+.menu-header button.active {
+    background-color: #303030;
+    color: white;
+}
+
+.menu-header button:hover {
+    background-color: #747373;
+}
+
+.exam-management-container {
+    padding: 20px;
+}
+
+.table th,
+.table td {
+    text-align: center;
 }
 </style>

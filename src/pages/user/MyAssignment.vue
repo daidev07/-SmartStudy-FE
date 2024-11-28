@@ -3,7 +3,7 @@
         <div class="d-flex justify-content-center align-items-center mb-3">
             <div class="d-flex align-items-center">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
-                <span class="status-legend bg-light-orange me-2"></span><span class="me-4">Late submit</span>
+                <span class="status-legend bg-light-orange me-2"></span><span class="me-4">Late submitted</span>
                 <span class="status-legend bg-light-green me-2"></span><span>Submitted</span>
             </div>
         </div>

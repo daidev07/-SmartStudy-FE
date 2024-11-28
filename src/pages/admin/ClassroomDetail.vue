@@ -1,9 +1,15 @@
 <template>
     <div class="classroom-detail-container">
         <!-- Header với tên lớp -->
-        <div class="class-header">
-            <h1 class="class-name">{{ classDetail.name }}</h1>
-            <h4> Level {{ classDetail.level?.name }}</h4>
+        <div class="d-flex justify-content-between">
+            <div class="class-header">
+                <h1 class="class-name">{{ classDetail.name }}</h1>
+                <h4> Level {{ classDetail.level?.name }}</h4>
+            </div>
+            <div>
+                <button v-if="activeTab === 'classwork'" class="btn btn-success">New Classwork</button>
+                <button v-else class="btn btn-success">New Student</button>
+            </div>
         </div>
         <hr>
 
@@ -21,12 +27,36 @@
         <div class="content">
             <div v-if="activeTab === 'classwork'" class="classwork-tab">
                 <h2>Classwork</h2>
-                <ul v-if="classDetail.classwork && classDetail.classwork.length">
-                    <li v-for="(work, index) in classDetail.classwork" :key="index">
-                        {{ work.title }} - Due: {{ work.dueDate }}
-                    </li>
-                </ul>
-                <p v-else>No classwork assigned yet.</p>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Assigned At</th>
+                            <th>Due Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody v-if="classworks && classworks.length">
+                        <tr v-for="(classwork, index) in classworks" :key="classwork.id">
+                            <td>{{ index + 1 }}</td>
+                            <td>{{ classwork.name }}</td>
+                            <td>{{ classwork.description || 'No description' }}</td>
+                            <td>{{ formatDate(classwork.assignedAt) }}</td>
+                            <td>{{ classwork.dueDate ? formatDate(classwork.dueDate) : 'No due date' }}</td>
+                            <td>
+                                <button class="btn btn-primary btn-sm me-3">View exam</button>
+                                <button class="btn btn-danger btn-sm">Edit</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tbody v-else>
+                        <tr>
+                            <td colspan="5" class="text-center">No classworks available.</td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
 
             <div v-else-if="activeTab === 'students'" class="students-tab">
@@ -43,32 +73,44 @@
 </template>
 <script>
 import axios from 'axios';
-
+import { formatDate } from '@/services/DateService';
 
 export default {
     data() {
         return {
             apirUrl: process.env.VUE_APP_API_URL,
             classDetail: [],
+            classworks: [],
             classId: this.$route.params.id,
             activeTab: 'classwork',
         };
     },
     mounted() {
         this.fetchClass();
+        this.fetchClasswork();
     },
     methods: {
+        formatDate,
         async fetchClass() {
             this.classDetailLoading = true;
             this.classDetailError = null;
             try {
                 const response = await axios.get(this.apirUrl + '/class/' + this.classId);
                 this.classDetail = response.data.data;
-                console.log("CLASS DETAILS:: ", this.classDetail);
             } catch (error) {
                 this.classDetailError = error;
             } finally {
                 this.classDetailLoading = false;
+            }
+        },
+        async fetchClasswork() {
+            try {
+                const response = await axios.get(this.apirUrl + '/classroom-assignment/class/' + this.classId);
+                this.classworks = response.data.data;
+            } catch (error) {
+                this.classworkError = error;
+            } finally {
+                this.classworkLoading = false;
             }
         },
         setActiveTab(tab) {
@@ -131,5 +173,14 @@ export default {
     margin-bottom: 10px;
     padding: 10px;
     border-bottom: 1px solid #ddd;
+}
+
+.table {
+    margin-top: 20px;
+}
+
+.text-center {
+    text-align: center;
+    color: gray;
 }
 </style>
