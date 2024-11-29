@@ -37,6 +37,7 @@
 import axios from 'axios';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
+import { mapActions } from 'vuex';
 
 export default {
     name: 'LoginComponent',
@@ -50,6 +51,7 @@ export default {
     mounted() {
     },
     methods: {
+        ...mapActions(['saveUserInfo']),
         async login() {
             if (!this.username || !this.password) {
                 toast.error("Please fill in both the username and password!", { autoClose: 2500 });
@@ -63,6 +65,7 @@ export default {
                 console.log("Response login::", response);
                 localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('loginSuccess', JSON.stringify({ type: 'success', message: 'Login successful!', options: { autoClose: 2500 } }));
+                this.saveUserInfo(response.data.data.user);
                 this.$router.push('/');
             } catch (error) {
                 if (error.response.status === 400) {

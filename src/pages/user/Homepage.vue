@@ -114,7 +114,6 @@ export default {
         this.isHaveHistory = false;
       } else {
         this.messageHistory = response.data.data;
-        console.log("messageHistory:: ", this.messageHistory);
         this.messageDetails = this.messageHistory.messageDetails;
       }
       this.scrollToBottom();

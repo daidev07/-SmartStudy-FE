@@ -12,6 +12,9 @@ const store = createStore({
         setUserInfo(state, userInfo) {
             state.userInfo = userInfo;
         },
+        clearUserInfo(state) {
+            state.userInfo = null;
+        },
         setSelectedAssignment(state, assignment) {
             state.selectedAssignment = assignment;
         },
@@ -31,6 +34,9 @@ const store = createStore({
     actions: {
         saveUserInfo({ commit }, userInfo) {
             commit('setUserInfo', userInfo);
+        },
+        logout({ commit }) {
+            commit('clearUserInfo');
         },
         saveSelectedAssignment({ commit }, assignment) {
             commit('setSelectedAssignment', assignment); 

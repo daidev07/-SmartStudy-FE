@@ -59,6 +59,8 @@ export default {
                 const response = await axios.get(this.apiUrl + `/user/${tokenInfo.userName}`);
                 this.userInfo = response.data.data;
                 this.saveUserInfo(this.userInfo);
+                console.log("USER INFO HEADER: ", this.userInfo);
+
             }
         },
 
