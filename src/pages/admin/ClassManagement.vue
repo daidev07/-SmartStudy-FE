@@ -11,7 +11,7 @@
             <div class="card-header">
                 <h3 class="class-name">{{ classItem.name }}</h3>
                 <span class="icon" title="Assignment">
-                    <i class="fas fa-tasks"></i> <!-- Icon giao bài tập -->
+                    <i class="fas fa-tasks" @click="openAssignmentModal(classItem.id)"></i>
                 </span>
             </div>
             <div class="card-body mt-4">
@@ -27,10 +27,42 @@
                     Level {{ classItem.level.name }}</p>
             </div>
         </div>
+        <div v-if="isModalVisible" class="modal-overlay">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Create Assignment</h3>
+                    <button @click="closeModal">X</button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="submitAssignment">
+                        <div class="form-group">
+                            <label for="assignmentName">Assignment Name</label>
+                            <input v-model="assignment.name" type="text" id="assignmentName" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="assignmentDescription">Description</label>
+                            <textarea v-model="assignment.description" id="assignmentDescription" required></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="dueDate">Due Date</label>
+                            <input v-model="assignment.dueDate" type="datetime-local" id="dueDate" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="examSelect">Select Exam</label>
+                            <select v-model="assignment.examId" id="examSelect" required>
+                                <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.name }}</option>
+                            </select>
+                        </div>
+                        <button type="submit">Create Assignment</button>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
 import axios from 'axios';
+import { toast } from 'vue3-toastify';
 
 export default {
     data() {
@@ -39,6 +71,15 @@ export default {
             classList: [],
             classListLoading: false,
             classListError: null,
+            isModalVisible: false,
+            assignment: {
+                name: '',
+                description: '',
+                dueDate: '',
+                examId: null
+            },
+            exams: [],
+            currentClassId: null
         };
     },
     created() {
@@ -61,6 +102,38 @@ export default {
         },
         goToClassDetail(classId) {
             this.$router.push({ name: 'ClassroomDetail', params: { id: classId } });
+        },
+        openAssignmentModal(classId) {
+            this.currentClassId = classId;
+            this.isModalVisible = true;
+            this.fetchExams();
+        },
+        closeModal() {
+            this.isModalVisible = false;
+        },
+        async fetchExams() {
+            try {
+                const response = await axios.get(this.apirUrl + '/exam');
+                this.exams = response.data;
+            } catch (error) {
+                console.error('Failed to fetch exams:', error);
+            }
+        },
+        async submitAssignment() {
+            const formattedDueDate = this.assignment.dueDate ? this.assignment.dueDate + ":00" : null;
+            const assignmentData = {
+                ...this.assignment,
+                dueDate: formattedDueDate,
+                classId: this.currentClassId
+            };
+            try {
+                await axios.post(`${this.apirUrl}/assignments`, assignmentData);
+                toast.success('Assignment created successfully');
+                this.closeModal();
+            } catch (error) {
+                console.error('Error creating assignment:', error);
+                toast.error('Failed to create assignment');
+            }
         }
     },
 
