@@ -73,7 +73,7 @@
         <div v-if="isModalVisible" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Update Classwork</h3>
+                    <h3>New Classwork</h3>
                     <button @click="closeModal">X</button>
                 </div>
                 <div class="modal-body">
@@ -97,7 +97,7 @@
                                 <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.name }}</option>
                             </select>
                         </div>
-                        <button type="submit">Update Classwork</button>
+                        <button type="submit">Submit</button>
                     </form>
                 </div>
             </div>
@@ -175,25 +175,26 @@ export default {
         },
         async submitClasswork() {
             const { name, description, dueDate, examId } = this.classwork;
-
-            const formattedDueDate = new Date(dueDate).toISOString();
-
             try {
                 const res = await axios.post(`${this.apirUrl}/classroom-assignment/assign/${this.classId}/${examId}`, {
                     name,
                     description,
-                    dueDate: formattedDueDate,
+                    dueDate: dueDate,
                 });
                 console.log('Classwork created:', res.data);
                 toast.success('Classwork created successfully!');
                 this.closeModal();
                 this.fetchClasswork();
             } catch (error) {
-                console.error('Error creating classwork:', error);
-                toast.error('Failed to create classwork');
+                console.log('error::', error);
+                if (error.response.data.code == 410) {
+                    toast.error('Due date must be in the future.');
+                }
+                if (error.response.data.code == 411) {
+                    toast.error('Assignment exists! Please choose another exam.');
+                }
             }
         }
-
     },
 };
 </script>
