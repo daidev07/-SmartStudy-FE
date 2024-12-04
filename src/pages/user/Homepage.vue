@@ -5,7 +5,7 @@
     <ToastNotify />
 
     <div class="chatbot-icon" @click="toggleChatbotOrClose" title="ASK AI">
-      <img src="@/assets/chatbotLogo.jpg" alt="Chatbot Logo" />
+      <img src="@/assets/logoHeader.jpg" alt="Chatbot Logo" />
     </div>
 
     <div v-if="this.$store.state.isChatbotOpen" class="chatbot-dialog">
@@ -277,33 +277,25 @@ export default {
 }
 
 .loader {
-  width: 40px;
+  width: 50px;
+  padding: 8px;
   aspect-ratio: 1;
-  display: grid;
-  -webkit-mask: conic-gradient(from 15deg, #0000, #000);
-  mask: conic-gradient(from 15deg, #0000, #000);
-  animation: l26 1s infinite steps(12);
+  border-radius: 50%;
+  background: #3b62e6;
+  --_m:
+    conic-gradient(#0000 10%, #000),
+    linear-gradient(#000 0 0) content-box;
+  -webkit-mask: var(--_m);
+  mask: var(--_m);
+  -webkit-mask-composite: source-out;
+  mask-composite: subtract;
+  animation: l3 1s infinite linear;
 }
 
-.loader,
-.loader:before,
-.loader:after {
-  background:
-    radial-gradient(closest-side at 50% 12.5%,
-      #6280e4 96%, #0000) 50% 0/20% 80% repeat-y,
-    radial-gradient(closest-side at 12.5% 50%,
-      #6280e4 96%, #0000) 0 50%/80% 20% repeat-x;
-}
-
-.loader:before,
-.loader:after {
-  content: "";
-  grid-area: 1/1;
-  transform: rotate(30deg);
-}
-
-.loader:after {
-  transform: rotate(60deg);
+@keyframes l3 {
+  to {
+    transform: rotate(1turn)
+  }
 }
 
 @keyframes l26 {

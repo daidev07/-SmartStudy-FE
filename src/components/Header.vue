@@ -1,14 +1,25 @@
 <template>
     <header class="header">
-        <div class="logo">Your Logo</div>
+        <img class="logo" :src="require('@/assets/logoHeader.jpg')" />
         <nav class="menu">
             <ul>
                 <li>
                     <router-link to="/" :class="getActiveClass('/')">New Feeds</router-link>
                 </li>
                 <li>
-                    <router-link to="/my-assignment" :class="getActiveClass('/my-assignment')">My
+                    <router-link to="/my-assignment" :class="getActiveClass('/my-assignment')">
                         Assignment</router-link>
+                </li>
+                <li>
+                    <router-link to="/my-assignment" :class="getActiveClass('/listening')"> Listening</router-link>
+                </li>
+                <li>
+                    <router-link to="/my-assignment" :class="getActiveClass('/writing')">
+                        Writing</router-link>
+                </li>
+                <li>
+                    <router-link to="/my-assignment" :class="getActiveClass('/reading')">
+                        Reading</router-link>
                 </li>
                 <li>
                     <router-link to="/about" :class="getActiveClass('/about')">About</router-link>
@@ -86,8 +97,7 @@ export default {
 }
 
 .logo {
-    font-size: 26px;
-    font-weight: bold;
+    width: 3%;
     color: #333;
     cursor: pointer;
     transition: transform 0.3s, color 0.3s ease;

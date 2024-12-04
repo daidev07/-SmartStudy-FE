@@ -73,7 +73,7 @@
         <div v-if="isModalVisible" class="modal-overlay">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h3>Create Classwork</h3>
+                    <h3>Update Classwork</h3>
                     <button @click="closeModal">X</button>
                 </div>
                 <div class="modal-body">
@@ -97,7 +97,7 @@
                                 <option v-for="exam in exams" :key="exam.id" :value="exam.id">{{ exam.name }}</option>
                             </select>
                         </div>
-                        <button type="submit">Create Classwork</button>
+                        <button type="submit">Update Classwork</button>
                     </form>
                 </div>
             </div>
