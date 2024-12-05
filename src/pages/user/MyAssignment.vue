@@ -23,10 +23,10 @@
                     <div class="d-flex justify-content-between">
                         <div class="align-items-center">
                             <p class="text-muted mb-1"> Assignment date:
-                                <strong>{{ new Date(assignment.createdAt).toLocaleDateString() }}</strong>
+                                <strong>{{ new Date(assignment.assignedAt).toLocaleDateString() }}</strong>
                             </p>
                             <p class="text-muted">Due date:
-                                <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleDateString()
+                                <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleString()
                                     }}</strong>
                             </p>
                         </div>
@@ -74,9 +74,10 @@ export default {
             try {
                 if (!this.getUserInfo) return;
                 const userId = this.getUserInfo.id;
-                console.log("USER ID::", userId);
                 const response = await axios.get(this.apiUrl + `/student-assignment/user/${userId}`);
                 this.listAssignments = response.data.data.reverse();
+                console.log("LIST ASSIGNMENTS:: ", this.listAssignments);
+
             } catch (error) {
                 console.error(error);
             }

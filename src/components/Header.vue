@@ -11,17 +11,6 @@
                         Assignment</router-link>
                 </li>
                 <li>
-                    <router-link to="/my-assignment" :class="getActiveClass('/listening')"> Listening</router-link>
-                </li>
-                <li>
-                    <router-link to="/my-assignment" :class="getActiveClass('/writing')">
-                        Writing</router-link>
-                </li>
-                <li>
-                    <router-link to="/my-assignment" :class="getActiveClass('/reading')">
-                        Reading</router-link>
-                </li>
-                <li>
                     <router-link to="/about" :class="getActiveClass('/about')">About</router-link>
                 </li>
             </ul>

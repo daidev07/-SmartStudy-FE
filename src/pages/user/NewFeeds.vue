@@ -136,7 +136,6 @@ export default {
     background-color: #ffffff;
     border-radius: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    min-height: 88vh;
     margin-top: 95px;
     padding: 20px;
     width: 600px;
@@ -294,7 +293,6 @@ export default {
     height: 100%;
     object-fit: cover;
     border-radius: 8px;
-    margin-top: 10px;
 }
 
 .actions {
