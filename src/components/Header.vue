@@ -7,8 +7,8 @@
                     <router-link to="/" :class="getActiveClass('/')">New Feeds</router-link>
                 </li>
                 <li>
-                    <router-link to="/my-assignment" :class="getActiveClass('/my-assignment')">
-                        Assignment</router-link>
+                    <router-link to="/my-excercise" :class="getActiveClass('/my-excercise')">
+                        My excercise</router-link>
                 </li>
                 <li>
                     <router-link to="/about" :class="getActiveClass('/about')">About</router-link>

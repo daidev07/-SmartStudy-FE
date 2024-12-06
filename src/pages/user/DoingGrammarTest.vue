@@ -79,7 +79,7 @@ import { Modal } from 'bootstrap';
 import { mapGetters, mapActions, mapState } from 'vuex';
 
 export default {
-    name: 'DoingExamComponent',
+    name: 'DoingGrammarTest',
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,

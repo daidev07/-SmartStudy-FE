@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-50">
+    <div class="container">
         <div class="d-flex justify-content-center align-items-center mb-3">
             <div class="d-flex align-items-center">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
@@ -16,16 +16,21 @@
         <div class="p-2 assign-card">
             <div v-for="assignment in listAssignments" :key="assignment.id" class="card shadow-sm"
                 :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
-                <router-link :to="'/my-assignment/do-assignment/' + assignment.id"
+                <router-link :to="toRouterLink(assignment.exam.examType, assignment.id)"
                     class="card-body justify-content-between text-decoration-none">
-                    <h5 class="card-title">{{ assignment.name }}</h5>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title">{{ assignment.name }}</h5>
+                        <span :class="getExamType(assignment.exam.examType)"
+                            class="tagType p-1 rounded-2 border border-secondary"> {{
+                                assignment.exam.examType }} </span>
+                    </div>
                     <p class="card-text">{{ assignment.description }}</p>
                     <div class="d-flex justify-content-between">
-                        <div class="align-items-center">
+                        <div class="align-items-end">
                             <p class="text-muted mb-1"> Assignment date:
                                 <strong>{{ new Date(assignment.assignedAt).toLocaleDateString() }}</strong>
                             </p>
-                            <p class="text-muted">Due date:
+                            <p class="text-muted mb-0">Due date:
                                 <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleString()
                                     }}</strong>
                             </p>
@@ -35,8 +40,6 @@
                             {{ assignment.point }}
                         </div>
                     </div>
-
-
                 </router-link>
             </div>
         </div>
@@ -49,7 +52,7 @@ import axios from 'axios';
 import { mapGetters } from "vuex";
 
 export default {
-    name: 'MyAssignment',
+    name: 'MyExcercise',
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
@@ -82,11 +85,31 @@ export default {
                 console.error(error);
             }
         },
+        toRouterLink(examType, assignmentId) {
+            switch (examType) {
+                case "GRAMMAR":
+                    return `my-excercise/do-grammar-test/${assignmentId}`;
+                case "READING":
+                    return `my-excercise/do-reading-test/${assignmentId}`;
+                case "LISTENING":
+                    return `my-excercise/do-listening-test/${assignmentId}`;
+                case "WRITING":
+                    return `my-excercise/do-writing-test/${assignmentId}`;
+            }
+        },
         getStatusCardClass(status) {
             return {
                 "bg-light-red": status === "NOT_SUBMIT",
                 "bg-light-orange": status === "LATE_SUBMISSION",
                 "bg-light-green": status === "SUBMITTED"
+            };
+        },
+        getExamType(examType) {
+            return {
+                "bg-warning-subtle": examType === "LISTENING",
+                "bg-body-secondary": examType === "WRITING",
+                "bg-primary-subtle": examType === "GRAMMAR",
+                "bg-success-subtle": examType === "READING"
             };
         }
     },
@@ -97,7 +120,7 @@ export default {
     background-color: #ffffff;
     border: 2px solid #6280e4;
     border-radius: 10px;
-    padding: 20px;
+    padding: 10px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     min-height: 88vh;
     margin-top: 95px;
@@ -158,9 +181,13 @@ export default {
 
 .assign-card {
     display: grid;
-    grid-template-columns: repeat(2, minmax(300px, 1fr));
+    grid-template-columns: repeat(3, minmax(300px, 1fr));
     gap: 10px;
     max-height: 77vh;
     overflow-y: auto;
+}
+
+.tagType {
+    font-size: x-small;
 }
 </style>

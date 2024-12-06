@@ -10,16 +10,22 @@ import EmployeesManagement from '@/pages/admin/EmployeesManagement.vue';
 import ClassroomDetail from '@/pages/admin/ClassroomDetail.vue';
 import AnalysisChart from '@/pages/admin/AnalysisChart.vue';
 import NewFeeds from '@/pages/user/NewFeeds.vue';
-import MyAssignment from '@/pages/user/MyAssignment.vue';
 import About from '@/pages/user/About.vue';
-import DoingExam from '@/pages/user/DoingExam.vue';
+import DoingGrammarTest from '@/pages/user/DoingGrammarTest.vue';
+import MyExercise from '@/pages/user/MyExercise.vue';
+import DoingListeningTest from '@/pages/user/DoingListeningTest.vue';
+import DoingReadingTest from '@/pages/user/DoingReadingTest.vue';
+import DoingWritingTest from '@/pages/user/DoingWritingTest.vue';
 
 const routes = [
     { path: '/', component: Homepage,
         children: [
             { path: '', component: NewFeeds },
-            { path: 'my-assignment', component: MyAssignment },
-            { path: 'my-assignment/do-assignment/:id', component: DoingExam, name: 'DoingExam' },
+            { path: 'my-excercise', component: MyExercise },
+            { path: 'my-excercise/do-grammar-test/:id', component: DoingGrammarTest, name: 'DoingGrammarTest' },
+            { path: 'my-excercise/do-listening-test/:id', component: DoingListeningTest, name: 'DoingListeningTest' },
+            { path: 'my-excercise/do-reading-test/:id', component: DoingReadingTest, name: 'DoingReadingTest' },
+            { path: 'my-excercise/do-writing-test/:id', component: DoingWritingTest, name: 'DoingWritingTest' },
             { path: 'about', component: About },
         ]
      },
