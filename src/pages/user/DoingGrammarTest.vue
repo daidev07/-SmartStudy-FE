@@ -1,8 +1,9 @@
 <template>
-    <div class="container w-50">
+    <div class="container w-75">
         <div v-if="!isSubmit" class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
-            <button class="btn btn-submit" @click="submitExam">Submit</button>
+            <button class="btn-submit" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
+                Submit</button>
         </div>
         <div v-else class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
@@ -263,6 +264,21 @@ h4 {
     margin-bottom: 0;
 }
 
+.btn-submit {
+    background-color: #6280e4;
+    color: white;
+    border: none;
+
+}
+
+.btn-submit:hover {
+    cursor: pointer;
+    background-color: #4d64b8;
+    color: white;
+    transform: scale(1.1);
+    transition: transform 0.4s ease-in-out;
+}
+
 .exam-questions {
     background-color: #f2f5ff;
     border: 2px solid #6280e4;
@@ -378,11 +394,6 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 
 .bi-patch-question-fill:hover {
     transform: scale(1.4);
-}
-
-.btn-submit {
-    background-color: #6280e4;
-    color: white;
 }
 
 .status-legend {
