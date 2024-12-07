@@ -8,7 +8,7 @@
         <div v-else class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <h4 class="text-center  fw-bold">
-                Point: <span class="text-danger">{{ assignmentInfo?.point }}</span>
+                Your point: <span class="text-danger">{{ assignmentInfo?.point }}</span>
             </h4>
         </div>
         <div v-if="isSubmit" class=" d-flex align-items-center  justify-content-center">

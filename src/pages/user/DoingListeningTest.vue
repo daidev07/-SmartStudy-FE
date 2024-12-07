@@ -1,6 +1,6 @@
 <template>
     <div class="container w-75">
-        <div v-if="!isSubmit" class="d-flex justify-content-between mb-3">
+        <div v-if="!isSubmit" class="d-flex justify-content-between mb-2">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <button class="btn-submit p-2 rounded-2" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
                 Submit</button>
@@ -8,11 +8,11 @@
         <div v-else class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <h4 class="text-center fw-bold">
-                Point: <span class="text-danger">{{ assignmentInfo?.point }}</span>
+                Your point: <span class="text-danger">{{ assignmentInfo?.point }}</span>
             </h4>
         </div>
         <div class="d-flex justify-content-around gap-2">
-            <div class="mp3-pdf w-50 border border-primary rounded-3 p-2">
+            <div class="mp3-pdf w-50 border border-2 border-primary rounded-3 p-2">
                 <div class="w-100" v-if="examDetail?.listenFileUrl?.fileUrl">
                     <audio controls class="w-100">
                         <source :src="examDetail.listenFileUrl.fileUrl" type="audio/mpeg">
@@ -24,8 +24,18 @@
                 </div>
                 <div v-else>The pdf file is no longer available, please contact your teacher.</div>
             </div>
-            <div class="quizz w-50 border border-primary rounded-3 p-3">
-                Select your answer below
+            <div class="quizz w-50 border border-2 border-primary rounded-3 p-3">
+                <div v-if="!isSubmit"> Select your answer below</div>
+                <div v-else class="d-flex justify-content-between">
+                    <div>
+                        Result for exam
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="status-legend bg-light-red me-1"></span><span class="me-3">Wrong answer</span>
+                        <span class="status-legend bg-light-green me-1"></span><span class="me-3">Correct answer</span>
+                        <span class="status-legend bg-white me-1"></span><span class="">Your answer</span>
+                    </div>
+                </div>
                 <div v-if="examDetail" class="exam-questions">
                     <div class="row">
                         <div v-for="(question, index) in examDetail.questions" :key="question.id">
@@ -34,7 +44,8 @@
                                     <p class="mb-2">{{ index + 1 }}. {{ question.content }}</p>
                                 </div>
                                 <div class="">
-                                    <div v-for="answer in question.answers" :key="answer.id" class="mb-2">
+                                    <div v-for="(answer, answerIndex) in question.answers" :key="answer.id"
+                                        class="mb-2">
                                         <div v-if="isSubmit" class="form-check">
                                             <input class="form-check-input" type="radio"
                                                 :name="'question-' + question.id" :id="'answer-' + answer.id"
@@ -44,6 +55,7 @@
                                                 'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
                                                 'user-answer': isUserAnswerSelected(question.id, answer.id)
                                             }">
+                                                <strong>{{ answerLetters[answerIndex] }}.</strong>
                                                 {{ answer.content }}
                                             </label>
                                         </div>
@@ -51,6 +63,7 @@
                                             <input class="form-check-input" type="radio"
                                                 :name="'question-' + question.id" :id="'answer-' + answer.id" />
                                             <label class="form-check-label" :for="'answer-' + answer.id">
+                                                <strong>{{ answerLetters[answerIndex] }}.</strong>
                                                 {{ answer.content }}
                                             </label>
                                         </div>
@@ -62,12 +75,30 @@
                 </div>
             </div>
         </div>
+        <div class="modal fade" id="unansweredModal" tabindex="-1" aria-labelledby="unansweredModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        There are unanswered questions. Are you sure you want to submit?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue
+                            Exam</button>
+                        <button type="button" class="btn btn-warning" @click="confirmSubmit">Submit
+                            Anyway</button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
 <script>
 import axios from 'axios';
 import { toast } from "vue3-toastify";
+import { Modal } from 'bootstrap';
+import { mapGetters } from 'vuex';
 
 export default {
     name: 'DoingListeningTest',
@@ -75,12 +106,14 @@ export default {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
             stuAssignId: null,
+            userId: null,
             assignmentInfo: {},
             examDetail: null,
             isCompleted: false,
             answerResults: [],
             userAnswers: {},
             isSubmit: false,
+            answerLetters: ['A', 'B', 'C', 'D'],
         };
     },
     mounted() {
@@ -90,9 +123,61 @@ export default {
         this.fetchAssignment();
     },
     computed: {
-
+        ...mapGetters(['getUserId']),
     },
     methods: {
+        async saveResults() {
+            try {
+                let correctAnswers = 0;
+
+                const results = this.examDetail.questions.map(question => {
+                    const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
+                    const answerId = selectedAnswer ? parseInt(selectedAnswer.id.replace('answer-', '')) : null;
+
+                    const selectedAnswerObject = question.answers.find(answer => answer.id === answerId);
+                    if (selectedAnswerObject && selectedAnswerObject.isCorrect) {
+                        correctAnswers += 1;
+                    }
+
+                    return {
+                        studentAssignmentId: this.stuAssignId,
+                        questionId: question.id,
+                        answerId: answerId ? answerId : null,
+                        userId: this.getUserId
+                    };
+                });
+
+                const totalQuestions = this.examDetail.questions.length;
+                const point = parseInt((correctAnswers * 100 / totalQuestions));
+                console.log('RESULTS:: ', results);
+
+                await axios.post(this.apiUrl + '/answer-result', results, { params: { point: point } });
+
+                this.isSubmit = true;
+                toast.success('Submit successfully!');
+                this.fetchAnswerResults();
+            } catch (error) {
+                console.error('Error saving results:', error);
+            }
+        },
+        isUserAnswerSelected(questionId, answerId) {
+            return this.userAnswers[questionId] === answerId;
+        },
+        isCorrectAnswer(questionId, answerId) {
+            const question = this.examDetail.questions.find(q => q.id === questionId);
+            if (!question) return false;
+            const answer = question.answers.find(a => a.id === answerId);
+            return answer && answer.isCorrect;
+        },
+
+        isIncorrectUserAnswer(questionId, answerId) {
+            return this.isUserAnswerSelected(questionId, answerId) && !this.isCorrectAnswer(questionId, answerId);
+        },
+
+        isAnswerSelected(questionId, answerId) {
+            if (!this.answerResults) return false;
+            return this.answerResults.some(result => result.questionId === questionId && result.answerId === answerId);
+        },
         async fetchAssignment() {
             try {
                 const response = await axios.get(this.apiUrl + `/student-assignment/${this.stuAssignId}`);
@@ -111,7 +196,7 @@ export default {
         async fetchAnswerResults() {
             try {
                 const response = await axios.get(
-                    this.apiUrl + `/answer-result/user/${this.getUserId}/assignment/${this.assignmentId}`
+                    this.apiUrl + `/answer-result/user/${this.getUserId}/assignment/${this.stuAssignId}`
                 );
                 const answerResults = response.data.data;
                 this.answerResults = answerResults;
@@ -122,6 +207,24 @@ export default {
             } catch (error) {
                 console.error('Error fetching answer results:', error);
             }
+        },
+        async submitExam() {
+            const unansweredQuestions = this.examDetail.questions.filter(question => {
+                const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
+                return !selectedAnswer;
+            });
+
+            if (unansweredQuestions.length > 0) {
+                const modal = new Modal(document.getElementById('unansweredModal'));
+                modal.show();
+            } else {
+                this.saveResults();
+            }
+        },
+        confirmSubmit() {
+            const modal = Modal.getInstance(document.getElementById('unansweredModal'));
+            modal.hide();
+            this.saveResults();
         },
     }
 }
@@ -177,7 +280,7 @@ h4 {
 
 .exam-questions {
     background-color: #f2f5ff;
-    border: 2px solid #6280e4;
+    border: 1px solid #6280e4;
     padding: 15px;
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
@@ -189,7 +292,7 @@ h4 {
 .form-check {
     background-color: #ffffff;
     border-radius: 5px;
-    padding: 5px;
+    padding: 2px;
     box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s, box-shadow 0.2s;
     cursor: pointer;
@@ -204,19 +307,16 @@ h4 {
     display: none;
 }
 
-
 .form-check-input:checked+.form-check-label {
     background-color: #6280e4;
     color: #fff;
 }
 
-/* Custom styling for radio button labels */
 .form-check-label {
     cursor: pointer;
-    font-size: 1rem;
     color: #555;
     display: block;
-    padding: 10px;
+    padding: 7px;
     border-radius: 5px;
     transition: background-color 0.3s, color 0.3s;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
@@ -228,10 +328,8 @@ h4 {
     border-color: #28a745;
 }
 
-/* Red for incorrect answers */
 .incorrect-answer {
     background-color: #dc3545;
-    /* Red */
     color: white;
     border-color: #dc3545;
 }
