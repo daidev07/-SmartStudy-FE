@@ -41,7 +41,7 @@
                         <div v-for="(question, index) in examDetail.questions" :key="question.id">
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between">
-                                    <p class="mb-2">{{ index + 1 }}. {{ question.content }}</p>
+                                    <p class="ques-content mb-2">{{ index + 1 }}. {{ question.content }}</p>
                                 </div>
                                 <div class="">
                                     <div v-for="(answer, answerIndex) in question.answers" :key="answer.id"

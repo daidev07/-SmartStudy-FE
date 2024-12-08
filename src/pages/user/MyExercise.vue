@@ -1,7 +1,8 @@
 <template>
     <div class="container">
-        <div class="d-flex justify-content-center align-items-center mb-3">
-            <div class="d-flex align-items-center">
+        <div class="d-flex justify-content-center align-items-center mb-1">
+            Status of excercise:
+            <div class="d-flex align-items-center ms-3">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
                 <span class="status-legend bg-light-orange me-2"></span><span class="me-4">Late submitted</span>
                 <span class="status-legend bg-light-green me-2"></span><span>Submitted</span>
@@ -18,23 +19,35 @@
                 :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
                 <router-link :to="toRouterLink(assignment.exam.examType, assignment.id)"
                     class="card-body justify-content-between text-decoration-none">
-                    <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
                         <h5 class="card-title">{{ assignment.name }}</h5>
                         <span :class="getExamType(assignment.exam.examType)"
                             class="tagType p-1 rounded-2 border border-secondary"> {{
                                 assignment.exam.examType }} </span>
                     </div>
-                    <p class="card-text">{{ assignment.description }}</p>
+                    <p class="card-text mb-2" :title="assignment.description">{{ assignment.description.length > 5 ?
+                        assignment.description.slice(0, 50) +
+                        '...' : assignment.description }}</p>
                     <div class="d-flex justify-content-between">
-                        <div class="align-items-end">
-                            <p class="text-muted mb-1"> Assignment date:
-                                <strong>{{ new Date(assignment.assignedAt).toLocaleDateString() }}</strong>
-                            </p>
-                            <p class="text-muted mb-0">Due date:
-                                <strong class="text-danger"> {{ new Date(assignment.dueDate).toLocaleString()
-                                    }}</strong>
-                            </p>
-                        </div>
+                        <table>
+                            <tbody>
+                                <tr>
+                                    <td class="pe-2">Assignment time:</td>
+                                    <td class="text-muted">{{ new Date(assignment.assignedAt).toLocaleString() }}</td>
+                                </tr>
+                                <tr>
+                                    <td class="pe-2">Due date:</td>
+                                    <td class="text-danger fw-bold">{{ new Date(assignment.dueDate).toLocaleString() }}
+                                    </td>
+                                </tr>
+                                <tr
+                                    v-if="assignment.assignmentStatus === 'SUBMITTED' || assignment.assignmentStatus === 'LATE_SUBMISSION'">
+                                    <td class="pe-2">Submitted on:</td>
+                                    <td class="text-muted">{{ new Date(assignment.submittedAt).toLocaleString() }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                         <div class="col-2 d-flex justify-content-center align-items-center total-point"
                             title="Exercise point ">
                             {{ assignment.point }}
@@ -171,12 +184,15 @@ export default {
     background-color: #e6ffed;
 }
 
+td {
+    font-size: 13px;
+}
+
 .total-point {
-    color: #5a010a;
+    color: #6280e4;
     font-weight: bold;
     font-size: 40px;
-    border-radius: 0.5rem;
-    min-width: 50px;
+    border-radius: 50%;
 }
 
 .assign-card {

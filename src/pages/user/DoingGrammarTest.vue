@@ -2,7 +2,7 @@
     <div class="container w-75">
         <div v-if="!isSubmit" class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
-            <button class="btn-submit" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
+            <button class="btn-submit p-2 rounded-2" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
                 Submit</button>
         </div>
         <div v-else class="d-flex justify-content-between mb-3">
@@ -21,7 +21,7 @@
                 <div v-for="(question, index) in examDetail.questions" :key="question.id" class="col-6">
                     <div class="mb-3">
                         <div class="d-flex justify-content-between">
-                            <p class="mb-2">{{ index + 1 }}. {{ question.content }}</p>
+                            <p class="ques-content mb-2">{{ index + 1 }}. {{ question.content }}</p>
                             <h5 class="bi bi-patch-question-fill" v-if="isSubmit" title="Ask AI"
                                 @click="askAI(question)"></h5>
                         </div>
@@ -290,10 +290,9 @@ h4 {
     overflow-y: auto;
 }
 
-p {
+.ques-content {
     font-weight: 600;
     color: #6280e4;
-    margin-bottom: 10px;
 }
 
 .form-check {

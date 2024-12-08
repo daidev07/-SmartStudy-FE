@@ -10,8 +10,8 @@
                 <input type="text" class="form-control" id="examName" required />
             </div>
             <div class="mb-2 d-flex">
-                <label for="examFile" class="form-label w-50">Exam excel file: </label>
-                <input type="file" class="form-control" accept=".xls,.xlsx" id="examFile" required />
+                <label for="grammarFile" class="form-label w-50">Exam excel file: </label>
+                <input type="file" class="form-control" accept=".xls,.xlsx" id="grammarFile" required />
             </div>
             <div class="text-center">
                 <button type="button" class="btn btn-secondary mt-2 me-2" @click="$emit('close')">Cancel</button>
@@ -35,16 +35,16 @@ export default {
     methods: {
         async saveTest() {
             const examName = document.getElementById("examName").value.trim();
-            const examFile = document.getElementById("examFile").files[0];
+            const grammarFile = document.getElementById("grammarFile").files[0];
 
-            if (!examName || !examFile) {
+            if (!examName || !grammarFile) {
                 toast.error("Please enter full information");
                 return;
             }
             else {
                 const formData = new FormData();
                 formData.append("examName", examName);
-                formData.append("examFile", examFile);
+                formData.append("grammarFile", grammarFile);
                 try {
                     await axios.post(this.apiUrl + '/exam', formData, {
                         headers: {

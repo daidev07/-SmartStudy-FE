@@ -149,7 +149,7 @@ export default {
         async fetchClasswork() {
             try {
                 const response = await axios.get(this.apirUrl + '/classroom-assignment/class/' + this.classId);
-                this.classworks = response.data.data;
+                this.classworks = response.data.data.reverse();
             } catch (error) {
                 this.classworkError = error;
             } finally {
