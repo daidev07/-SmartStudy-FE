@@ -1,6 +1,9 @@
 <template>
     <header class="header">
-        <img class="logo" :src="require('@/assets/logoHeader.jpg')" />
+        <router-link to="/" class="d-flex align-items-center logo-name">
+            <img class="logo" :src="require('@/assets/logoHeader.jpg')" />
+            <h3 class="ms-3 fw-bold">Smart Study</h3>
+        </router-link>
         <nav class="menu">
             <ul>
                 <li>
@@ -15,7 +18,7 @@
                 </li>
             </ul>
         </nav>
-        <div v-if="userInfo" class="user-info">
+        <div v-if="userInfo" class="user-info d-flex justify-content-end align-items-center">
             <img :src="userInfo.avatarUrl || require('@/assets/nonAvatar.png')" alt="User Avatar" class="avatar me-2" />
             <span>{{ userInfo.name }}</span>
         </div>
@@ -81,19 +84,23 @@ export default {
     z-index: 1;
 }
 
-.header:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
-}
-
-.logo {
-    width: 3%;
-    color: #333;
+.logo-name {
+    text-decoration: none;
+    color: #6280e4;
+    width: 20%;
     cursor: pointer;
     transition: transform 0.3s, color 0.3s ease;
 }
 
-.logo:hover {
-    transform: scale(1.1);
+.logo-name:hover {
+    transform: scale(1.05);
+    transition: transform 0.4s ease-in-out;
+    color: #4661b8;
+}
+
+.logo {
+    width: 15%;
+    color: #333;
 }
 
 .menu ul {
@@ -104,34 +111,30 @@ export default {
     padding: 0;
 }
 
+
 .menu a {
     text-decoration: none;
     color: #333;
     font-size: 16px;
     font-weight: 500;
-    padding: 8px 15px;
-    border-radius: 4px;
-    transition: background-color 0.3s, color 0.3s, transform 0.3s ease;
 }
 
 .menu a:hover {
-    color: #fff;
-    background-color: #007bff;
-    /* Màu nền khi hover */
-    transform: translateY(-3px);
-    /* Hiệu ứng nâng khi hover */
+    color: #7c95e6;
+    transform: scale(1.1);
+    transition: transform 0.4s ease-in-out;
 }
 
 .active-menu {
-    color: #fff;
-    background-color: #7c95e6;
+    color: #6280e4 !important;
     font-weight: bold;
+    border-bottom: 2px solid #6280e4;
     border-radius: 4px;
-    padding: 8px 15px;
+    padding: 10px 0px;
 }
 
 .login-btn {
-    background-color: #007bff;
+    background-color: #6280e4;
     color: white;
     border: none;
     padding: 10px 20px;
@@ -144,14 +147,10 @@ export default {
 .login-btn:hover {
     background-color: #0056b3;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    /* Tạo hiệu ứng bóng đổ cho nút login */
 }
 
-/* Thêm hiệu ứng bóng đổ nhẹ khi menu đang hover */
-.menu li:hover {
-    background-color: rgba(0, 123, 255, 0.1);
-    /* Hiệu ứng nền mờ khi hover lên các menu item */
-    border-radius: 4px;
+.user-info {
+    width: 20%;
 }
 
 .avatar {

@@ -187,7 +187,7 @@ export default {
 
 .chatbot-header {
   display: flex;
-  background-color: #3b62e6;
+  background-color: #6280e4;
   color: white;
   padding: 10px;
 }
@@ -264,7 +264,7 @@ export default {
 }
 
 .chatbot-footer .send-btn {
-  background-color: #3b62e6;
+  background-color: #6280e4;
   color: white;
   border: none;
   border-radius: 5px;
@@ -302,5 +302,9 @@ export default {
   100% {
     transform: rotate(1turn)
   }
+}
+
+.text-body-tertiary {
+  font-size: 13px;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="d-flex justify-content-center align-items-center mb-1">
+        <div class="d-flex justify-content-center align-items-center mb-2">
             Status of excercise:
             <div class="d-flex align-items-center ms-3">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
@@ -19,14 +19,14 @@
                 :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
                 <router-link :to="toRouterLink(assignment.exam.examType, assignment.id)"
                     class="card-body justify-content-between text-decoration-none">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
                         <h5 class="card-title">{{ assignment.name }}</h5>
                         <span :class="getExamType(assignment.exam.examType)"
                             class="tagType p-1 rounded-2 border border-secondary"> {{
                                 assignment.exam.examType }} </span>
                     </div>
-                    <p class="card-text mb-2" :title="assignment.description">{{ assignment.description.length > 5 ?
-                        assignment.description.slice(0, 50) +
+                    <p class="card-text mb-2" :title="assignment.description">{{ assignment.description.length > 55 ?
+                        assignment.description.slice(0, 55) +
                         '...' : assignment.description }}</p>
                     <div class="d-flex justify-content-between">
                         <table>
@@ -49,7 +49,7 @@
                             </tbody>
                         </table>
                         <div class="col-2 d-flex justify-content-center align-items-center total-point"
-                            title="Exercise point ">
+                            :class="getPointColor(assignment.point)" title="Exercise point ">
                             {{ assignment.point }}
                         </div>
                     </div>
@@ -119,11 +119,20 @@ export default {
         },
         getExamType(examType) {
             return {
-                "bg-warning-subtle": examType === "LISTENING",
+                "bg-body-tertiary": examType === "LISTENING",
                 "bg-body-secondary": examType === "WRITING",
                 "bg-primary-subtle": examType === "GRAMMAR",
                 "bg-success-subtle": examType === "READING"
             };
+        },
+        getPointColor(point) {
+            if (point < 30) {
+                return 'text-danger';
+            } else if (point >= 30 && point < 70) {
+                return 'text-warning';
+            } else {
+                return 'point-blue';
+            }
         }
     },
 };
@@ -189,10 +198,13 @@ td {
 }
 
 .total-point {
-    color: #6280e4;
     font-weight: bold;
     font-size: 40px;
     border-radius: 50%;
+}
+
+.point-blue {
+    color: #6280e4;
 }
 
 .assign-card {

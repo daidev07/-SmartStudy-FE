@@ -20,10 +20,10 @@
             <div class="row">
                 <div v-for="(question, index) in examDetail.questions" :key="question.id" class="col-6">
                     <div class="mb-3">
-                        <div class="d-flex justify-content-between">
-                            <p class="ques-content mb-2">{{ index + 1 }}. {{ question.content }}</p>
-                            <h5 class="bi bi-patch-question-fill" v-if="isSubmit" title="Ask AI"
-                                @click="askAI(question)"></h5>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <p class="ques-content fw-bold">{{ index + 1 }}. {{ question.content }}</p>
+                            <h5 class="btn-askAI me-4" v-if="isSubmit" title="Ask AI" @click="askAI(question)"><i
+                                    class="bi bi-patch-question"></i></h5>
                         </div>
                         <div class="d-flex flex-wrap justify-content-center">
                             <div v-for="answer in question.answers" :key="answer.id" class="col-5 mb-2">
@@ -115,7 +115,7 @@ export default {
                 });
 
                 const combinedString = `${questionContent} ${answers.join(' ')}`;
-                const analysisString = "Phân tích ngữ pháp, từ vựng, và tại sao đáp án đó đúng cho câu: ";
+                const analysisString = "Phân tích câu sau: ";
                 const finalString = `${analysisString} ${combinedString}`
 
                 const response = await axios.post(this.apiUrl + '/chat/ask-ai', {
@@ -291,7 +291,6 @@ h4 {
 }
 
 .ques-content {
-    font-weight: 600;
     color: #6280e4;
 }
 
@@ -385,14 +384,71 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     border: 2px solid #0a38cf;
 }
 
-.bi-patch-question-fill {
+.btn-askAI:hover {
+    transform: scale(1.1);
+}
+
+.btn-askAI {
+    padding: 0.5em;
+    outline: none;
+    color: rgb(255, 255, 255);
+    background: #6280e4;
     cursor: pointer;
-    color: #6280e4;
+    position: relative;
+    z-index: 0;
+    border-radius: 10px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
     transition: transform 0.3s, color 0.3s ease;
 }
 
-.bi-patch-question-fill:hover {
-    transform: scale(1.4);
+.btn-askAI:before {
+    content: "";
+    background: linear-gradient(90deg,
+            #526fd6,
+            #6280e4,
+            #8298f4,
+            #9fb8ff,
+            #6280e4,
+            #526fd6);
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    background-size: 400%;
+    z-index: -1;
+    filter: blur(5px);
+    -webkit-filter: blur(5px);
+    width: calc(100% + 4px);
+    height: calc(100% + 4px);
+    animation: glowing-btn-askAI 20s linear infinite;
+    transition: opacity 0.3s ease-in-out;
+}
+
+@keyframes glowing-btn-askAI {
+    0% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 400% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+.btn-askAI:after {
+    z-index: -1;
+    content: "";
+    position: absolute;
+    width: 100%;
+    /* height: 100%; */
+    background: #6280e4;
+    left: 0;
+    top: 0;
+    border-radius: 10px;
 }
 
 .status-legend {
