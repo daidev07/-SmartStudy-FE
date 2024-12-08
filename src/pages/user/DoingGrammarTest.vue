@@ -8,7 +8,7 @@
         <div v-else class="d-flex justify-content-between mb-3">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <h4 class="text-center  fw-bold">
-                Your point: <span class="text-danger">{{ assignmentInfo?.point }}</span>
+                Your point: <span class="text-danger">{{ assignmentInfo.point }}</span>
             </h4>
         </div>
         <div v-if="isSubmit" class=" d-flex align-items-center  justify-content-center">
@@ -53,7 +53,6 @@
             </div>
         </div>
 
-
         <div class="modal fade" id="unansweredModal" tabindex="-1" aria-labelledby="unansweredModalLabel"
             aria-hidden="true">
             <div class="modal-dialog">
@@ -78,6 +77,11 @@ import axios from 'axios';
 import { toast } from "vue3-toastify";
 import { Modal } from 'bootstrap';
 import { mapGetters, mapActions, mapState } from 'vuex';
+import {
+    fetchAssignment,
+    fetchAnswerResults,
+    saveResults
+} from '@/services/examService';
 
 export default {
     name: 'DoingGrammarTest',
@@ -101,7 +105,7 @@ export default {
         }
     },
     mounted() {
-        this.fetchAssignment();
+        this.loadAssignmentData();
     },
     methods: {
         ...mapActions(['stopLoading', 'openChatbotWithLoader', 'setAskAIKey']),
@@ -130,34 +134,31 @@ export default {
                 console.error('Error asking AI:', error);
             }
         },
-        async fetchAssignment() {
+        async loadAssignmentData() {
             try {
-                const response = await axios.get(this.apiUrl + `/student-assignment/${this.assignmentId}`);
-                this.assignmentInfo = response.data.data;
+                this.assignmentInfo = await fetchAssignment(this.assignmentId);
                 console.log('ASSIGNMENT INFO:: ', this.assignmentInfo);
-
+                this.examDetail = this.assignmentInfo.exam;
                 if (this.assignmentInfo.assignmentStatus === 'SUBMITTED' || this.assignmentInfo.assignmentStatus === 'LATE_SUBMISSION') {
                     this.isSubmit = true;
-                    await this.fetchAnswerResults();
+                    await this.loadAnswerResults();
                 }
-                this.fetchExam(this.assignmentInfo.exam.id);
+
+                this.loadExamData(this.assignmentInfo.exam.id);
             } catch (error) {
-                console.error(error);
+                console.error('Error loading assignment data:', error);
             }
         },
-        async fetchAnswerResults() {
+        async loadAnswerResults() {
             try {
-                const response = await axios.get(
-                    this.apiUrl + `/answer-result/user/${this.getUserId}/assignment/${this.assignmentId}`
-                );
-                const answerResults = response.data.data;
+                const answerResults = await fetchAnswerResults(this.getUserId, this.assignmentId);
                 this.answerResults = answerResults;
                 this.userAnswers = {};
                 answerResults.forEach(result => {
                     this.userAnswers[result.questionId] = result.answerId;
                 });
             } catch (error) {
-                console.error('Error fetching answer results:', error);
+                console.error('Error loading answer results:', error);
             }
         },
         isUserAnswerSelected(questionId, answerId) {
@@ -178,14 +179,6 @@ export default {
             if (!this.answerResults) return false;
             return this.answerResults.some(result => result.questionId === questionId && result.answerId === answerId);
         },
-        async fetchExam(examId) {
-            try {
-                const response = await axios.get(this.apiUrl + `/exam/${examId}`);
-                this.examDetail = response.data.data;
-            } catch (error) {
-                console.error(error);
-            }
-        },
         async submitExam() {
             const unansweredQuestions = this.examDetail.questions.filter(question => {
                 const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
@@ -196,46 +189,23 @@ export default {
                 const modal = new Modal(document.getElementById('unansweredModal'));
                 modal.show();
             } else {
-                this.saveResults();
+                this.submitResults();
             }
         },
         confirmSubmit() {
             const modal = Modal.getInstance(document.getElementById('unansweredModal'));
             modal.hide();
-            this.saveResults();
+            this.submitResults();
         },
-        async saveResults() {
+        async submitResults() {
             try {
-                let correctAnswers = 0;
-
-                const results = this.examDetail.questions.map(question => {
-                    const selectedAnswer = document.querySelector(`input[name='question-${question.id}']:checked`);
-                    const answerId = selectedAnswer ? parseInt(selectedAnswer.id.replace('answer-', '')) : null;
-
-                    const selectedAnswerObject = question.answers.find(answer => answer.id === answerId);
-                    if (selectedAnswerObject && selectedAnswerObject.isCorrect) {
-                        correctAnswers += 1;
-                    }
-
-                    return {
-                        studentAssignmentId: this.assignmentId,
-                        questionId: question.id,
-                        answerId: answerId ? answerId : null,
-                        userId: this.getUserId
-                    };
-                });
-
-                const totalQuestions = this.examDetail.questions.length;
-                const point = parseInt((correctAnswers * 100 / totalQuestions));
-
-                await axios.post(this.apiUrl + '/answer-result', results, { params: { point: point } });
-                console.log(results);
-
+                const point = await saveResults(this.assignmentId, this.examDetail.questions, this.getUserId);
+                this.assignmentInfo.point = point;
                 this.isSubmit = true;
                 toast.success('Submit successfully!');
-                this.fetchAnswerResults();
+                this.loadAnswerResults();
             } catch (error) {
-                console.error('Error saving results:', error);
+                console.error('Error submitting results:', error);
             }
         },
     },
