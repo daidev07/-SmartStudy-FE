@@ -41,7 +41,7 @@
                         <div v-for="(question, index) in examDetail.questions" :key="question.id">
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between">
-                                    <p class="ques-content mb-2">{{ index + 1 }}. {{ question.content }}</p>
+                                    <p class="ques-content fw-bold mb-2">{{ index + 1 }}. {{ question.content }}</p>
                                 </div>
                                 <div class="">
                                     <div v-for="(answer, answerIndex) in question.answers" :key="answer.id"
@@ -168,8 +168,6 @@ export default {
                     this.isSubmit = true;
                     await this.loadAnswerResults();
                 }
-
-                this.loadExamData(this.assignmentInfo.exam.id);
             } catch (error) {
                 console.error('Error loading assignment data:', error);
             }
@@ -241,19 +239,19 @@ h4 {
 }
 
 .mp3-pdf {
-    height: 78vh;
+    height: 80vh;
     overflow-y: auto;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .pdf-file {
-    height: 68vh;
+    height: 72vh;
     overflow-y: auto;
 }
 
 .quizz {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    height: 78vh;
+    height: 80vh;
 }
 
 .exam-questions {
@@ -263,8 +261,12 @@ h4 {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
     margin-top: 10px;
-    height: 70vh;
+    height: 73vh;
     overflow-y: auto;
+}
+
+.ques-content {
+    color: #6280e4;
 }
 
 .form-check {
