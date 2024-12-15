@@ -27,7 +27,8 @@
                     <input type="text" class="form-control" v-model="grammar.examName" required />
                 </div>
                 <div class="mb-2 d-flex">
-                    <label for="grammarFile" class="form-label w-50">Exam Excel File:</label>
+                    <label for="grammarFile" class="form-label w-50"> Exam Excel File
+                        <i class="bi bi-exclamation-diamond me-1"></i>:</label>
                     <input type="file" class="form-control" @change="onFileChange($event, 'grammarFile')"
                         accept=".xls,.xlsx" required />
                 </div>
@@ -51,7 +52,8 @@
                         accept=".pdf" required />
                 </div>
                 <div class="mb-2 d-flex">
-                    <label for="listenAnswerFile" class="form-label w-50">Listening Answer File:</label>
+                    <label for="listenAnswerFile" class="form-label w-50">Listening Answer File
+                        <i class="bi bi-exclamation-diamond me-1"></i>:</label>
                     <input type="file" class="form-control" @change="onFileChange($event, 'listenAnswerFile')"
                         accept=".xls,.xlsx" required />
                 </div>
@@ -70,7 +72,8 @@
                         accept=".pdf" required />
                 </div>
                 <div class="mb-2 d-flex">
-                    <label for="readingAnswerFile" class="form-label w-50">Reading Answer File:</label>
+                    <label for="readingAnswerFile" class="form-label w-50">Reading Answer File
+                        <i class="bi bi-exclamation-diamond me-1"></i>:</label>
                     <input type="file" class="form-control" @change="onFileChange($event, 'readingAnswerFile')"
                         accept=".xls,.xlsx" required />
                 </div>
