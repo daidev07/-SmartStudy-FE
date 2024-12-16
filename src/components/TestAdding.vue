@@ -96,7 +96,7 @@ export default {
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
-            activeTab: "grammar", // Tab mặc định
+            activeTab: "grammar",
             grammar: {
                 examName: "",
                 grammarFile: null,

@@ -2,11 +2,6 @@ import axios from 'axios';
 
 const apiUrl = process.env.VUE_APP_API_URL;
 
-/**
- * Lấy thông tin bài kiểm tra.
- * @param {number} assignmentId - ID của bài kiểm tra.
- * @returns {Promise<Object>} - Dữ liệu bài kiểm tra.
- */
 export async function fetchAssignment(assignmentId) {
     try {
         const response = await axios.get(`${apiUrl}/student-assignment/${assignmentId}`);
@@ -17,12 +12,6 @@ export async function fetchAssignment(assignmentId) {
     }
 }
 
-/**
- * Lấy kết quả câu trả lời của người dùng.
- * @param {number} userId - ID người dùng.
- * @param {number} assignmentId - ID bài kiểm tra.
- * @returns {Promise<Object[]>} - Danh sách kết quả câu trả lời.
- */
 export async function fetchAnswerResults(userId, assignmentId) {
     try {
         const response = await axios.get(`${apiUrl}/answer-result/user/${userId}/assignment/${assignmentId}`);
@@ -33,11 +22,6 @@ export async function fetchAnswerResults(userId, assignmentId) {
     }
 }
 
-/**
- * Lấy thông tin chi tiết bài kiểm tra.
- * @param {number} examId - ID bài kiểm tra.
- * @returns {Promise<Object>} - Thông tin chi tiết bài kiểm tra.
- */
 export async function fetchExam(examId) {
     try {
         const response = await axios.get(`${apiUrl}/exam/${examId}`);
@@ -48,13 +32,6 @@ export async function fetchExam(examId) {
     }
 }
 
-/**
- * Lưu kết quả làm bài kiểm tra của người dùng.
- * @param {number} assignmentId - ID của bài kiểm tra.
- * @param {Array} questions - Danh sách câu hỏi.
- * @param {number} userId - ID của người dùng.
- * @returns {Promise<void>}
- */
 export async function saveResults(assignmentId, questions, userId) {
     try {
         let correctAnswers = 0;

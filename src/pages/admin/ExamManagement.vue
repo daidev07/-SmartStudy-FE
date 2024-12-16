@@ -13,45 +13,95 @@
         <TestAdding @close="toggleTestAdding" @refresh="fetchExamList" />
     </div>
 
-    <div class="menu-header mt-3">
-        <button :class="{ active: activeTab === 'grammar' }" @click="setActiveTab('grammar')" class="me-3">
-            Grammar
-        </button>
-        <button :class="{ active: activeTab === 'listening' }" @click="setActiveTab('listening')" class="me-3">
-            Listening
-        </button>
-        <button :class="{ active: activeTab === 'reading' }" @click="setActiveTab('reading')">
-            Reading
-        </button>
-    </div>
+    <ul class="nav nav-tabs mt-3">
+        <li class="nav-item">
+            <button class="nav-link" :class="{ active: activeTab === 'GRAMMAR', 'fw-bold': activeTab === 'GRAMMAR' }"
+                @click="setActiveTab('GRAMMAR')">
+                GRAMMAR
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link"
+                :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
+                @click="setActiveTab('LISTENING')">
+                LISTENING
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="nav-link" :class="{ active: activeTab === 'READING', 'fw-bold': activeTab === 'READING' }"
+                @click="setActiveTab('READING')">
+                READING
+            </button>
+        </li>
+    </ul>
 
-    <!-- Table to display Exams -->
-    <div v-if="examList.length > 0" class="mt-3 w-50">
-        <h3 class="text-center">{{ capitalize(activeTab) }} Exams</h3>
-        <table id="examTable" class="table table-striped table-bordered">
-            <thead class="thead-dark">
-                <tr>
-                    <th class="text-center">#</th>
-                    <th>Exam Name</th>
-                    <th class="text-start">Date Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="exam in examList" :key="exam.id" scope="row">
-                    <td class="text-center">{{ exam.id }}</td>
-                    <td>{{ exam.name }}</td>
-                    <td>{{ exam.createdAt }}</td>
-                    <td class="text-center">
-                        <button class="btn btn-primary btn-sm me-2">View</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div v-else class="text-center mt-3">
-        <h3>No exams available for {{ capitalize(activeTab) }}</h3>
+    <div class="">
+        <div class="w-50">
+            <div v-if="filteredExams.length > 0" class="mt-3">
+                <table id="examTable" class="table table-striped table-bordered">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th class="text-center">#</th>
+                            <th>Exam Name</th>
+                            <th>Date Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="exam in examList" :key="exam.id" scope="row">
+                            <td class="text-center">{{ exam.id }}</td>
+                            <td>{{ exam.name }}</td>
+                            <td>{{ exam.createdAt }}</td>
+                            <td class="text-center">
+                                <button class="btn btn-info btn-sm me-2" @click="fetchExamDetail(exam.id)">View /
+                                    Update</button>
+                                <button class="btn btn-danger btn-sm">Delete</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div v-else class="text-center mt-3">
+                <p>No exams available for {{ activeTab }}</p>
+            </div>
+        </div>
+
+        <div v-if="!isViewClick" class="text-center"> No exam available to view, let's select one.</div>
+        <div v-else-if="examDetails" class="detail-container shadow rounded-3 p-3">
+            <h4 class="text-center">Details for {{ examDetails.name }} exam</h4>
+            <div class="d-flex">
+                <div class="show-file w-50 p-3">
+                    <div v-if="examDetails.listenFileUrl">
+                        <h5 class="fw-bold">MP3 Listen File: </h5>
+                        <iframe :src="examDetails.listenFileUrl.fileUrl" class="w-100"></iframe>
+                    </div>
+                    <div v-if="examDetails.pdfFileUrl">
+                        <h5 class="fw-bold">PDF File: </h5>
+                        <iframe :src="examDetails.pdfFileUrl.fileUrl" class="w-100"
+                            :style="{ height: examDetails.listenFileUrl ? '73vh' : '83vh' }"></iframe>
+                    </div>
+                </div>
+
+                <div class="answer-file w-50 p-3 overflow-auto border-start border-dark">
+                    <h5 class="fw-bold">Answer File: </h5>
+                    <div v-for="question in examDetails.questions" :key="question.id" class="mt-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="mt-2">
+                                <strong> {{ question.questionNumber }}. </strong> {{ question.content }}</span>
+                            <i class="bi bi-pencil-square ms-2"></i>
+                        </div>
+                        <div v-for="(answer, answerIndex) in question.answers" :key="answer.id">
+                            <div class="d-flex">
+                                <label
+                                    :class="{ 'bg-success-subtle border border-success rounded-3 px-2': answer.isCorrect }">
+                                    {{ answerLetters[answerIndex] }}. {{ answer.content }}
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -61,6 +111,7 @@ import axios from 'axios';
 import $ from 'jquery';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import 'datatables.net';
+import { fetchExam, } from '@/services/examService';
 
 export default {
     data() {
@@ -70,7 +121,10 @@ export default {
             examListLoading: false,
             examListError: null,
             showTestAdding: false,
-            activeTab: 'grammar',
+            answerLetters: ['A', 'B', 'C', 'D'],
+            activeTab: 'GRAMMAR',
+            isViewClick: false,
+            examDetails: null,
         };
     },
     created() {
@@ -81,12 +135,22 @@ export default {
     },
     computed: {
         filteredExams() {
-            return this.examList.filter((exam) => exam.type === this.activeTab);
+            return this.examList.filter((exam) => exam.examType === this.activeTab);
         },
     },
     methods: {
         toggleTestAdding() {
             this.showTestAdding = !this.showTestAdding;
+        },
+        async fetchExamDetail(examId) {
+            this.isViewClick = true;
+            try {
+                const response = await fetchExam(examId);
+                this.examDetails = response;
+                console.log("EXAM DETAILS:: ", this.examDetails);
+            } catch (error) {
+                console.error(error);
+            }
         },
         async fetchExamList() {
             this.examListLoading = true;
@@ -94,7 +158,6 @@ export default {
             try {
                 const response = await axios.get(this.apiUrl + '/exam');
                 this.examList = response.data.data;
-                console.log("EXAM LIST:: ", this.examList);
                 this.$nextTick(() => {
                     this.initDataTable();
                 });
@@ -117,14 +180,10 @@ export default {
         setActiveTab(tab) {
             this.activeTab = tab;
         },
-        capitalize(value) {
-            if (!value) return '';
-            return value.charAt(0).toUpperCase() + value.slice(1);
-        },
     },
 }
 </script>
-<style>
+<style scoped>
 .title {
     display: inline-block;
     padding: 10px 20px;
@@ -160,5 +219,17 @@ export default {
 .table th,
 .table td {
     text-align: center;
+}
+
+.detail-container {
+    height: 96vh;
+}
+
+.show-file {
+    height: 90vh;
+}
+
+.answer-file {
+    height: 90vh;
 }
 </style>
