@@ -5,8 +5,18 @@
             <button class="btn-submit p-2 rounded-2" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
                 Submit</button>
         </div>
-        <div v-else class="d-flex justify-content-between mb-3">
+        <div v-else class="d-flex justify-content-between mb-3 align-items-center">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
+            <div v-if="isSubmit" class="d-flex justify-content-between">
+                <div class="me-3">
+                    Result for exam
+                </div>
+                <div class="d-flex align-items-center">
+                    <span class="status-legend bg-light-red me-1"></span><span class="me-3">Wrong answer</span>
+                    <span class="status-legend bg-light-green me-1"></span><span class="me-3">Correct answer</span>
+                    <span class="status-legend bg-white me-1"></span><span class="">Your answer</span>
+                </div>
+            </div>
             <h4 class="text-center fw-bold">
                 Your point: <span class="text-danger">{{ assignmentInfo.point }}</span>
             </h4>
@@ -18,54 +28,40 @@
                 </div>
                 <div v-else>The pdf file is no longer available, please contact your teacher.</div>
             </div>
-            <div class="quizz w-50 border border-2 border-primary rounded-3 p-3">
-                <div v-if="!isSubmit"> Select your answer below</div>
-                <div v-else class="d-flex justify-content-between">
-                    <div>
-                        Result for exam
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <span class="status-legend bg-light-red me-1"></span><span class="me-3">Wrong answer</span>
-                        <span class="status-legend bg-light-green me-1"></span><span class="me-3">Correct answer</span>
-                        <span class="status-legend bg-white me-1"></span><span class="">Your answer</span>
-                    </div>
-                </div>
-                <div v-if="examDetail" class="exam-questions">
-                    <div class="row">
-                        <div v-for="(question) in examDetail.questions" :key="question.id">
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <p class="ques-content fw-bold mb-2">{{ question.questionNumber }}. {{
-                                        question.content }}
-                                    </p>
-                                    <h5 class="btn-askAI me-1" v-if="isSubmit" title="Ask AI" @click="askAI(question)">
-                                        <i class="bi bi-patch-question"></i>
-                                    </h5>
-                                </div>
-                                <div class="">
-                                    <div v-for="(answer, answerIndex) in question.answers" :key="answer.id"
-                                        class="mb-2">
-                                        <div v-if="isSubmit" class="form-check">
-                                            <input class="form-check-input" type="radio"
-                                                :name="'question-' + question.id" :id="'answer-' + answer.id"
-                                                :checked="isAnswerSelected(question.id, answer.id)" disabled />
-                                            <label class="form-check-label" :for="'answer-' + answer.id" :class="{
-                                                'correct-answer': isCorrectAnswer(question.id, answer.id),
-                                                'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
-                                                'user-answer': isUserAnswerSelected(question.id, answer.id)
-                                            }">
-                                                <strong>{{ answerLetters[answerIndex] }}.</strong>
-                                                {{ answer.content }}
-                                            </label>
-                                        </div>
-                                        <div v-else class="form-check me-2">
-                                            <input class="form-check-input" type="radio"
-                                                :name="'question-' + question.id" :id="'answer-' + answer.id" />
-                                            <label class="form-check-label" :for="'answer-' + answer.id">
-                                                <strong>{{ answerLetters[answerIndex] }}.</strong>
-                                                {{ answer.content }}
-                                            </label>
-                                        </div>
+            <div v-if="examDetail" class="quizz w-50 border border-2 border-primary rounded-3 p-3">
+                <div class="row">
+                    <div v-for="(question) in examDetail.questions" :key="question.id">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <p class="ques-content fw-bold mb-2">{{ question.questionNumber }}. {{
+                                    question.content }}
+                                </p>
+                                <h5 class="btn-askAI me-1" v-if="isSubmit" title="Ask AI" @click="askAI(question)">
+                                    <i class="bi bi-patch-question"></i>
+                                </h5>
+                            </div>
+                            <div class="">
+                                <div v-for="(answer, answerIndex) in question.answers" :key="answer.id" class="mb-2">
+                                    <div v-if="isSubmit" class="form-check">
+                                        <input class="form-check-input" type="radio" :name="'question-' + question.id"
+                                            :id="'answer-' + answer.id"
+                                            :checked="isAnswerSelected(question.id, answer.id)" disabled />
+                                        <label class="form-check-label" :for="'answer-' + answer.id" :class="{
+                                            'correct-answer': isCorrectAnswer(question.id, answer.id),
+                                            'incorrect-answer': isIncorrectUserAnswer(question.id, answer.id),
+                                            'user-answer': isUserAnswerSelected(question.id, answer.id)
+                                        }">
+                                            <strong>{{ answerLetters[answerIndex] }}.</strong>
+                                            {{ answer.content }}
+                                        </label>
+                                    </div>
+                                    <div v-else class="form-check me-2">
+                                        <input class="form-check-input" type="radio" :name="'question-' + question.id"
+                                            :id="'answer-' + answer.id" />
+                                        <label class="form-check-label" :for="'answer-' + answer.id">
+                                            <strong>{{ answerLetters[answerIndex] }}.</strong>
+                                            {{ answer.content }}
+                                        </label>
                                     </div>
                                 </div>
                             </div>
@@ -277,16 +273,6 @@ h4 {
 .quizz {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     height: 80vh;
-}
-
-.exam-questions {
-    background-color: #f2f5ff;
-    border: 1px solid #6280e4;
-    padding: 15px;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    margin-top: 10px;
-    height: 73vh;
     overflow-y: auto;
 }
 

@@ -67,8 +67,10 @@
         </div>
 
         <div v-if="!isViewClick" class="text-center"> No exam available to view, let's select one.</div>
-        <div v-else-if="examDetails" class="detail-container shadow rounded-3 p-3">
-            <h4 class="text-center">Details for {{ examDetails.name }} exam</h4>
+        <div v-else-if="examDetails" class="detail-container shadow rounded-3 p-3" ref="examDetailSection">
+            <h4 class="text-center">Details for
+                <span class="text-primary fw-bold"> {{ examDetails.name }} </span> exam
+            </h4>
             <div class="d-flex">
                 <div class="show-file w-50 p-3">
                     <div v-if="examDetails.listenFileUrl">
@@ -76,24 +78,28 @@
                         <iframe :src="examDetails.listenFileUrl.fileUrl" class="w-100"></iframe>
                     </div>
                     <div v-if="examDetails.pdfFileUrl">
-                        <h5 class="fw-bold">PDF File: </h5>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="fw-bold">PDF File: </h5>
+                            <i class="bi bi-pencil-square ms-2 " v-tooltip:top="'Update PDF file'"></i>
+                        </div>
                         <iframe :src="examDetails.pdfFileUrl.fileUrl" class="w-100"
                             :style="{ height: examDetails.listenFileUrl ? '73vh' : '83vh' }"></iframe>
                     </div>
                 </div>
 
                 <div class="answer-file w-50 p-3 overflow-auto border-start border-dark">
-                    <h5 class="fw-bold">Answer File: </h5>
+                    <h5 class="fw-bold">Answer Details: </h5>
                     <div v-for="question in examDetails.questions" :key="question.id" class="mt-2">
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="mt-2">
                                 <strong> {{ question.questionNumber }}. </strong> {{ question.content }}</span>
-                            <i class="bi bi-pencil-square ms-2"></i>
+                            <i class="bi bi-pencil-square ms-2 " v-tooltip:top="'Update this question'"></i>
                         </div>
                         <div v-for="(answer, answerIndex) in question.answers" :key="answer.id">
                             <div class="d-flex">
                                 <label
-                                    :class="{ 'bg-success-subtle border border-success rounded-3 px-2': answer.isCorrect }">
+                                    :class="{ 'bg-success-subtle border border-success rounded-3 px-2': answer.isCorrect }"
+                                    class="ms-3">
                                     {{ answerLetters[answerIndex] }}. {{ answer.content }}
                                 </label>
                             </div>
@@ -112,6 +118,7 @@ import $ from 'jquery';
 import 'datatables.net-dt/css/dataTables.dataTables.css';
 import 'datatables.net';
 import { fetchExam, } from '@/services/examService';
+import { nextTick } from 'vue';
 
 export default {
     data() {
@@ -148,6 +155,10 @@ export default {
                 const response = await fetchExam(examId);
                 this.examDetails = response;
                 console.log("EXAM DETAILS:: ", this.examDetails);
+                await nextTick();
+                if (this.$refs.examDetailSection) {
+                    this.$refs.examDetailSection.scrollIntoView({ behavior: 'smooth' });
+                }
             } catch (error) {
                 console.error(error);
             }
