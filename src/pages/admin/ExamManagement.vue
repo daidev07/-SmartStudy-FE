@@ -1,61 +1,57 @@
 <template>
     <div class="text-center">
-        <div class="fw-bold fs-3 border-bottom border-end border-black title">
-            EXAMS MANAGEMENT
-        </div>
+        <div class="fw-bold fs-3 border-bottom border-end border-black title">EXAMS MANAGEMENT</div>
     </div>
-    <div class="border-top border-black">
-        <div class="btn btn-success mt-2" @click="toggleTestAdding">
-            <i class='bx bxs-file-plus fs-5'></i> New exam
-        </div>
-    </div>
-    <div v-if="showTestAdding">
+    <div class="btn btn-success mt-2" @click="toggleTestAdding"><i class="bx bxs-file-plus fs-5"></i> New exam</div>
+    <div v-if="showTestAdding" class="d-flex justify-content-center">
         <TestAdding @close="toggleTestAdding" @refresh="fetchExamList" />
     </div>
 
-    <ul class="nav nav-tabs mt-3">
-        <li class="nav-item">
-            <button class="nav-link" :class="{ active: activeTab === 'GRAMMAR', 'fw-bold': activeTab === 'GRAMMAR' }"
-                @click="setActiveTab('GRAMMAR')">
-                GRAMMAR
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link"
-                :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
-                @click="setActiveTab('LISTENING')">
-                LISTENING
-            </button>
-        </li>
-        <li class="nav-item">
-            <button class="nav-link" :class="{ active: activeTab === 'READING', 'fw-bold': activeTab === 'READING' }"
-                @click="setActiveTab('READING')">
-                READING
-            </button>
-        </li>
-    </ul>
+    <div>
+        <ul class="nav nav-tabs mt-3">
+            <li class="nav-item">
+                <button class="nav-link"
+                    :class="{ active: activeTab === 'GRAMMAR', 'fw-bold': activeTab === 'GRAMMAR' }"
+                    @click="setActiveTab('GRAMMAR')">
+                    Grammar
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link"
+                    :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
+                    @click="setActiveTab('LISTENING')">
+                    Listening
+                </button>
+            </li>
+            <li class="nav-item">
+                <button class="nav-link"
+                    :class="{ active: activeTab === 'READING', 'fw-bold': activeTab === 'READING' }"
+                    @click="setActiveTab('READING')">
+                    Reading
+                </button>
+            </li>
+        </ul>
 
-    <div class="">
-        <div class="w-50">
+        <div class="shadow rounded-3 p-3">
             <div v-if="filteredExams.length > 0" class="mt-3">
                 <table id="examTable" class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
-                            <th class="text-center">#</th>
-                            <th>Exam Name</th>
+                            <th class="text-center">Exam Id</th>
+                            <th class="text-start">Exam Name</th>
                             <th>Date Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="exam in examList" :key="exam.id" scope="row">
+                        <tr v-for="exam in filteredExams" :key="exam.id" scope="row">
                             <td class="text-center">{{ exam.id }}</td>
-                            <td>{{ exam.name }}</td>
-                            <td>{{ exam.createdAt }}</td>
+                            <td class="text-start">{{ exam.name }}</td>
+                            <td>{{ new Date(exam.createdAt).toLocaleString() }}</td>
                             <td class="text-center">
                                 <button class="btn btn-info btn-sm me-2" @click="fetchExamDetail(exam.id)">View /
                                     Update</button>
-                                <button class="btn btn-danger btn-sm">Delete</button>
+                                <button class="btn btn-danger btn-sm"><i class="bi bi-trash"></i></button>
                             </td>
                         </tr>
                     </tbody>
@@ -64,44 +60,52 @@
             <div v-else class="text-center mt-3">
                 <p>No exams available for {{ activeTab }}</p>
             </div>
-        </div>
 
-        <div v-if="!isViewClick" class="text-center"> No exam available to view, let's select one.</div>
-        <div v-else-if="examDetails" class="detail-container shadow rounded-3 p-3" ref="examDetailSection">
-            <h4 class="text-center">Details for
-                <span class="text-primary fw-bold"> {{ examDetails.name }} </span> exam
-            </h4>
-            <div class="d-flex">
-                <div class="show-file w-50 p-3">
-                    <div v-if="examDetails.listenFileUrl">
-                        <h5 class="fw-bold">MP3 Listen File: </h5>
-                        <iframe :src="examDetails.listenFileUrl.fileUrl" class="w-100"></iframe>
-                    </div>
-                    <div v-if="examDetails.pdfFileUrl">
-                        <div class="d-flex justify-content-between">
-                            <h5 class="fw-bold">PDF File: </h5>
-                            <i class="bi bi-pencil-square ms-2 " v-tooltip:top="'Update PDF file'"></i>
+            <div v-if="!isViewClick" class="text-center">No exam available to view, let's select one.</div>
+            <div v-else-if="examDetails" class="detail-container" ref="examDetailSection">
+                <h4 class="text-center">
+                    Details for <span class="text-primary fw-bold"> {{ examDetails.name }} </span> exam
+                </h4>
+                <div class="d-flex">
+                    <div class="show-file w-50 p-3">
+                        <div v-if="examDetails.listenFileUrl">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="fw-bold">MP3 Listen File:</h5>
+                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
+                                    style="cursor: pointer"></i>
+                            </div>
+                            <audio controls class="w-100">
+                                <source :src="examDetails.listenFileUrl.fileUrl" type="audio/mpeg" />
+                            </audio>
                         </div>
-                        <iframe :src="examDetails.pdfFileUrl.fileUrl" class="w-100"
-                            :style="{ height: examDetails.listenFileUrl ? '73vh' : '83vh' }"></iframe>
+                        <div v-if="examDetails.pdfFileUrl">
+                            <div class="d-flex justify-content-between">
+                                <h5 class="fw-bold">PDF File:</h5>
+                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
+                                    style="cursor: pointer"></i>
+                            </div>
+                            <iframe :src="examDetails.pdfFileUrl.fileUrl" class="w-100"
+                                :style="{ height: examDetails.listenFileUrl ? '77vh' : '83vh' }"></iframe>
+                        </div>
                     </div>
-                </div>
 
-                <div class="answer-file w-50 p-3 overflow-auto border-start border-dark">
-                    <h5 class="fw-bold">Answer Details: </h5>
-                    <div v-for="question in examDetails.questions" :key="question.id" class="mt-2">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span class="mt-2">
-                                <strong> {{ question.questionNumber }}. </strong> {{ question.content }}</span>
-                            <i class="bi bi-pencil-square ms-2 " v-tooltip:top="'Update this question'"></i>
-                        </div>
-                        <div v-for="(answer, answerIndex) in question.answers" :key="answer.id">
-                            <div class="d-flex">
-                                <label
-                                    :class="{ 'bg-success-subtle border border-success rounded-3 px-2': answer.isCorrect }"
-                                    class="ms-3">
-                                    {{ answerLetters[answerIndex] }}. {{ answer.content }}
-                                </label>
+                    <div class="answer-file w-50 p-3 overflow-auto border-start border-dark">
+                        <h5 class="fw-bold">Answer Details:</h5>
+                        <div v-for="question in examDetails.questions" :key="question.id" class="mt-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="mt-2">
+                                    <strong> {{ question.questionNumber }}. </strong> {{ question.content }}</span>
+                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update this question'"
+                                    style="cursor: pointer"></i>
+                            </div>
+                            <div v-for="(answer, answerIndex) in question.answers" :key="answer.id">
+                                <div class="d-flex">
+                                    <label
+                                        :class="{ 'bg-success-subtle border border-success rounded-3 px-2': answer.isCorrect }"
+                                        class="ms-3">
+                                        {{ answerLetters[answerIndex] }}. {{ answer.content }}
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -111,14 +115,14 @@
     </div>
 </template>
 <script>
-import TestAdding from '../../components/TestAdding.vue';
+import TestAdding from "../../components/TestAdding.vue";
 // import { toast } from "vue3-toastify";
-import axios from 'axios';
-import $ from 'jquery';
-import 'datatables.net-dt/css/dataTables.dataTables.css';
-import 'datatables.net';
-import { fetchExam, } from '@/services/examService';
-import { nextTick } from 'vue';
+import axios from "axios";
+// import $ from 'jquery';
+import "datatables.net-dt/css/dataTables.dataTables.css";
+import "datatables.net";
+import { fetchExam } from "@/services/examService";
+import { nextTick } from "vue";
 
 export default {
     data() {
@@ -128,8 +132,8 @@ export default {
             examListLoading: false,
             examListError: null,
             showTestAdding: false,
-            answerLetters: ['A', 'B', 'C', 'D'],
-            activeTab: 'GRAMMAR',
+            answerLetters: ["A", "B", "C", "D"],
+            activeTab: "GRAMMAR",
             isViewClick: false,
             examDetails: null,
         };
@@ -157,7 +161,7 @@ export default {
                 console.log("EXAM DETAILS:: ", this.examDetails);
                 await nextTick();
                 if (this.$refs.examDetailSection) {
-                    this.$refs.examDetailSection.scrollIntoView({ behavior: 'smooth' });
+                    this.$refs.examDetailSection.scrollIntoView({ behavior: "smooth" });
                 }
             } catch (error) {
                 console.error(error);
@@ -167,32 +171,34 @@ export default {
             this.examListLoading = true;
             this.examListError = null;
             try {
-                const response = await axios.get(this.apiUrl + '/exam');
+                const response = await axios.get(this.apiUrl + "/exam");
                 this.examList = response.data.data;
-                this.$nextTick(() => {
-                    this.initDataTable();
-                });
+                console.log("EXAM LIST:: ", this.examList);
+                // this.$nextTick(() => {
+                //     this.initDataTable();
+                // });
             } catch (error) {
-                this.examListError = 'Failed to load exam list.';
+                this.examListError = "Failed to load exam list.";
                 console.error(error);
             } finally {
                 this.examListLoading = false;
             }
         },
-        initDataTable() {
-            $('#examTable').DataTable({
-                pageLength: 10,
-                paging: true,
-                columnDefs: [
-                    { targets: '_all', className: 'text-start' }
-                ]
-            });
-        },
+        // initDataTable() {
+        //     $('#examTable').DataTable({
+        //         pageLength: 10,
+        //         paging: true,
+        //         columnDefs: [
+        //             { targets: '_all', className: 'text-start' }
+        //         ]
+        //     });
+        // },
         setActiveTab(tab) {
             this.activeTab = tab;
+            console.log("Active tab: ", this.activeTab);
         },
     },
-}
+};
 </script>
 <style scoped>
 .title {
@@ -233,7 +239,7 @@ export default {
 }
 
 .detail-container {
-    height: 96vh;
+    height: 97vh;
 }
 
 .show-file {
@@ -241,6 +247,6 @@ export default {
 }
 
 .answer-file {
-    height: 90vh;
+    height: 92vh;
 }
 </style>
