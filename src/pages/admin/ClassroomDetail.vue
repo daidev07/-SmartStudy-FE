@@ -53,8 +53,10 @@
                         </tr>
                     </tbody>
                     <tbody v-else>
-                        <tr>
-                            <td colspan="5" class="text-center">No classworks available.</td>
+                        <tr class="p-3 text-center">
+                            <td colspan="6" class="text-body-tertiary">
+                                No classworks available.
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -256,11 +258,6 @@ export default {
 
 .table {
     margin-top: 20px;
-}
-
-.text-center {
-    text-align: center;
-    color: gray;
 }
 
 .modal-overlay {

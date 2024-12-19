@@ -7,11 +7,11 @@
     </div>
     <div class="class-card-container">
         <div v-for="classItem in classList" :key="classItem.id" class="class-card"
-            @click="goToClassDetail(classItem.id)" title=" More information...">
-            <div class="card-header">
+            @click="goToClassDetail(classItem.id)" v-tooltip:bottom="'More information...'">
+            <div class="d-flex justify-content-between align-items-center">
                 <h3 class="class-name">{{ classItem.name }}</h3>
-                <span class="icon" title="Assignment">
-                    <i class="fas fa-tasks" @click="openAssignmentModal(classItem.id)"></i>
+                <span class="icon" title="Assignment" @click="openAssignmentModal(classItem.id)">
+                    <i class="bi bi-chevron-double-up text-success fw-bold fs-4" v-tooltip:right="'Upgrade level'"></i>
                 </span>
             </div>
             <div class="card-body mt-4">
@@ -140,6 +140,14 @@ export default {
 };
 </script>
 <style scoped>
+.title {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    /* background: #7494ec; */
+}
+
 .class-card-container {
     display: flex;
     flex-wrap: wrap;
@@ -158,14 +166,7 @@ export default {
 
 .class-card:hover {
     cursor: pointer;
-    transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
-.card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
 }
 
 .class-name {

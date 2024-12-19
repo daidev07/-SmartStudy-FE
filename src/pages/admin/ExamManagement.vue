@@ -58,10 +58,11 @@
                 </table>
             </div>
             <div v-else class="text-center mt-3">
-                <p>No exams available for {{ activeTab }}</p>
+                <p class="text-secondary">No exams available for {{ activeTab }}</p>
             </div>
 
-            <div v-if="!isViewClick" class="text-center">No exam available to view, let's select one.</div>
+            <div v-if="!isViewClick" class="text-center text-secondary">No exam available to view, let's select one.
+            </div>
             <div v-else-if="examDetails" class="detail-container" ref="examDetailSection">
                 <h4 class="text-center">
                     Details for <span class="text-primary fw-bold"> {{ examDetails.name }} </span> exam
@@ -204,7 +205,6 @@ export default {
 .title {
     display: inline-block;
     padding: 10px 20px;
-    margin-bottom: 20px;
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
     /* background: #7494ec; */

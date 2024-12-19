@@ -14,11 +14,18 @@ app.use(router);
 app.use(store);
 app.directive('tooltip', {
     mounted(el, binding) {
-        new bootstrap.Tooltip(el, {
+        el._tooltipInstance = new bootstrap.Tooltip(el, {
             title: binding.value,
             placement: binding.arg || 'top'
         });
+    },
+    beforeUnmount(el) {
+        const instance = bootstrap.Tooltip.getInstance(el);
+        if (instance) {
+            instance.dispose();
+        }
     }
 });
+
 
 app.mount('#app');
