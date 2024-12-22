@@ -1,7 +1,7 @@
 <template>
     <div class="container">
-        <div class="d-flex justify-content-center align-items-center mb-2">
-            Status of excercise:
+        <div class="d-flex justify-content-center align-items-center mb-2 border p-3 rounded-3 bg-white">
+            Status of excercise card:
             <div class="d-flex align-items-center ms-3">
                 <span class="status-legend bg-light-red me-2"></span><span class="me-4">Not submit</span>
                 <span class="status-legend bg-light-orange me-2"></span><span class="me-4">Late submitted</span>
@@ -9,51 +9,56 @@
             </div>
         </div>
 
-        <div v-if="listAssignments.length === 0" class="alert alert-info text-center">
-            You have no assignments at the moment.
-        </div>
-
-        <!-- Assignment cards -->
-        <div class="p-2 assign-card">
-            <div v-for="assignment in listAssignments" :key="assignment.id" class="card shadow-sm"
-                :class="getStatusCardClass(assignment.assignmentStatus)" title="Do this exercise">
-                <router-link :to="toRouterLink(assignment.exam.examType, assignment.id)"
-                    class="card-body justify-content-between text-decoration-none">
-                    <div class="d-flex justify-content-between align-items-center mb-1">
-                        <h5 class="card-title">{{ assignment.name }}</h5>
-                        <span :class="getExamType(assignment.exam.examType)"
-                            class="tagType p-1 rounded-2 border border-secondary"> {{
-                                assignment.exam.examType }} </span>
-                    </div>
-                    <p class="card-text mb-2" :title="assignment.description">{{ assignment.description.length > 55 ?
-                        assignment.description.slice(0, 55) +
-                        '...' : assignment.description }}</p>
-                    <div class="d-flex justify-content-between">
-                        <table>
-                            <tbody>
-                                <tr>
-                                    <td class="pe-2">Assignment time:</td>
-                                    <td class="text-muted">{{ new Date(assignment.assignedAt).toLocaleString() }}</td>
-                                </tr>
-                                <tr>
-                                    <td class="pe-2">Due date:</td>
-                                    <td class="text-danger fw-bold">{{ new Date(assignment.dueDate).toLocaleString() }}
-                                    </td>
-                                </tr>
-                                <tr
-                                    v-if="assignment.assignmentStatus === 'SUBMITTED' || assignment.assignmentStatus === 'LATE_SUBMISSION'">
-                                    <td class="pe-2">Submitted on:</td>
-                                    <td class="text-muted">{{ new Date(assignment.submittedAt).toLocaleString() }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="col-2 d-flex justify-content-center align-items-center total-point"
-                            :class="getPointColor(assignment.point)" title="Exercise point ">
-                            {{ assignment.point }}
+        <div class="border rounded-3 p-2 bg-white">
+            <div v-if="listAssignments.length === 0" class="text-body-tertairy text-center">
+                You have no assignments at the moment.
+            </div>
+            <div class="p-2 assign-card">
+                <div v-for="assignment in listAssignments" :key="assignment.id" class="card shadow-sm"
+                    :class="getStatusCardClass(assignment.assignmentStatus)"
+                    v-tooltip:bottom="`${assignment.description}`">
+                    <router-link :to="toRouterLink(assignment.exam.examType, assignment.id)"
+                        class="card-body justify-content-between text-decoration-none">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <h5 class="card-title">{{ assignment.name }}</h5>
+                            <span :class="getExamType(assignment.exam.examType)"
+                                class="tagType p-1 rounded-2 border border-secondary"> {{
+                                    assignment.exam.examType }} </span>
                         </div>
-                    </div>
-                </router-link>
+                        <p class="card-text mb-2">{{
+                            assignment.description.length > 55
+                                ?
+                                assignment.description.slice(0, 55) +
+                                '...' : assignment.description }}</p>
+                        <div class="d-flex justify-content-between">
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td class="pe-2">Assignment time:</td>
+                                        <td class="text-muted">{{ new Date(assignment.assignedAt).toLocaleString() }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="pe-2">Due date:</td>
+                                        <td class="text-danger fw-bold">{{ new Date(assignment.dueDate).toLocaleString()
+                                            }}
+                                        </td>
+                                    </tr>
+                                    <tr
+                                        v-if="assignment.assignmentStatus === 'SUBMITTED' || assignment.assignmentStatus === 'LATE_SUBMISSION'">
+                                        <td class="pe-2">Submitted on:</td>
+                                        <td class="text-muted">{{ new Date(assignment.submittedAt).toLocaleString() }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="col-2 d-flex justify-content-center align-items-center total-point"
+                                :class="getPointColor(assignment.point)" title="Exercise point ">
+                                {{ assignment.point }}
+                            </div>
+                        </div>
+                    </router-link>
+                </div>
             </div>
         </div>
     </div>
@@ -139,12 +144,6 @@ export default {
 </script>
 <style scoped>
 .container {
-    background-color: #ffffff;
-    border: 2px solid #6280e4;
-    border-radius: 10px;
-    padding: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    min-height: 88vh;
     margin-top: 95px;
 }
 

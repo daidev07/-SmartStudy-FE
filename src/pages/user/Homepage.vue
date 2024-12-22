@@ -143,10 +143,10 @@ export default {
 
 <style scoped>
 .home-page {
+  background-color: #f5f5f5;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(180deg, #c9d6ff, #e2e2e2);
   min-height: 100vh;
 }
 

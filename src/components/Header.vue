@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-        <router-link to="/" class="d-flex align-items-center logo-name">
+        <router-link to="/" class="d-flex align-items-center nav-left">
             <img class="logo" :src="require('@/assets/logoHeader.jpg')" />
             <h3 class="ms-3 fw-bold">Smart Study</h3>
         </router-link>
@@ -18,12 +18,15 @@
                 </li>
             </ul>
         </nav>
-        <div v-if="userInfo" class="user-info d-flex justify-content-end align-items-center">
-            <img :src="userInfo.avatarUrl || require('@/assets/nonAvatar.png')" alt="User Avatar" class="avatar me-2" />
-            <span>{{ userInfo.name }}</span>
+        <div class="nav-right d-flex justify-content-end align-items-center">
+            <div v-if="userInfo" class="user-info d-flex justify-content-end align-items-center">
+                <img :src="userInfo.avatarUrl || require('@/assets/nonAvatar.png')" alt="User Avatar"
+                    class="avatar me-2" />
+                <span>{{ userInfo.name }}</span>
+            </div>
+            <router-link v-else to="/login"
+                class="login-btn text-white text-center rounded-3 p-2 w-25">Login</router-link>
         </div>
-
-        <router-link v-else to="/login" class="login-btn">Login</router-link>
     </header>
 </template>
 
@@ -78,13 +81,12 @@ export default {
     align-items: center;
     padding: 15px 30px;
     background-color: #ffffff;
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
     transition: box-shadow 0.3s ease-in-out;
     position: fixed;
     z-index: 1;
 }
 
-.logo-name {
+.nav-left {
     text-decoration: none;
     color: #6280e4;
     width: 20%;
@@ -92,7 +94,7 @@ export default {
     transition: transform 0.3s, color 0.3s ease;
 }
 
-.logo-name:hover {
+.nav-left:hover {
     transform: scale(1.05);
     transition: transform 0.4s ease-in-out;
     color: #4661b8;
@@ -133,24 +135,22 @@ export default {
     padding: 10px 0px;
 }
 
+.nav-right {
+    width: 20%;
+}
+
 .login-btn {
     background-color: #6280e4;
-    color: white;
     border: none;
-    padding: 10px 20px;
-    border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.3s, box-shadow 0.3s ease;
     text-decoration: none;
 }
 
 .login-btn:hover {
-    background-color: #0056b3;
+    transform: scale(1.05);
+    transition: transform 0.4s ease-in-out;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.user-info {
-    width: 20%;
 }
 
 .avatar {

@@ -1,23 +1,24 @@
 <template>
-    <div class="container w-50">
-        <div class="new-post justify-content-center" @click="showModal = true">
-            Click to post something ... <i class="bi bi-balloon-heart"></i>
+    <div class="container rounded-3">
+        <div class="new-post border d-flex justify-content-center rounded-3 p-3 align-items-center bg-white"
+            @click="showModal = true">
+            <span class="text-body-tertiary">What's on your mind? Click to post something ...
+                <i class="bi bi-balloon-heart"></i></span>
         </div>
-        <div v-if="showModal" class="modal">
+        <div v-if="showModal" class="modal d-flex justify-content-center align-items-center">
             <div class="modal-content">
-                <h3>New Post</h3>
-                <textarea v-model="newPostContent" placeholder="Enter the content post" class="post-input">
-        </textarea>
+                <h3 class="text-center">New Post</h3>
+                <textarea v-model="newPostContent" placeholder="Enter the content post" class="post-input"></textarea>
                 <input type="file" @change="onFileChange" accept="image/*" />
-
                 <div class="actions">
                     <button class="btn btn-secondary me-2" @click="closeModal">Cancel</button>
-                    <button class="btn btn-primary" @click="submitPost">Submit</button>
+                    <button class="btn btn-primary" @click="submitPost">Post</button>
                 </div>
             </div>
         </div>
-        <h3 v-if="!newFeeds.length" class="text-center">No post yet!</h3>
-        <div v-else class="newfeeds">
+        <div v-if="!newFeeds.length" class="text-center text-body-tertiary">No post yet! Let's post something to your
+            class.</div>
+        <div v-else class="newfeeds bg-white">
             <div class="post" v-for="(newfeed, index) in newFeeds" :key="newfeed.id">
                 <div class="user-info">
                     <img :src="newfeed.user.avatarUrl || require('@/assets/nonAvatar.png')" alt="Avatar"
@@ -133,21 +134,11 @@ export default {
 </script>
 <style scoped>
 .container {
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     margin-top: 95px;
-    padding: 20px;
-    width: 600px;
-    margin-top: 95px auto;
 }
 
 .new-post {
     background-color: #f0f2f5;
-    border-radius: 10px;
-    padding: 12px;
-    display: flex;
-    align-items: center;
     cursor: pointer;
     margin-bottom: 20px;
 }
@@ -175,9 +166,6 @@ export default {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
 .modal-content {

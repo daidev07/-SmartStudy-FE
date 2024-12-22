@@ -1,20 +1,23 @@
 <template>
-    <div class="container w-75">
-        <div v-if="!isSubmit" class="d-flex justify-content-between mb-2">
+    <div class="container">
+        <div v-if="!isSubmit" class="d-flex justify-content-between border mb-3 bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
-            <button class="btn-submit p-2 rounded-2" @click="submitExam"> <i class="bi bi-check2-circle me-1"></i>
+            <button class="btn-submit color-white p-2 rounded-2" @click="submitExam"> <i
+                    class="bi bi-check2-circle me-1"></i>
                 Submit</button>
         </div>
-        <div v-else class="d-flex justify-content-between mb-3 align-items-center">
+        <div v-else class="d-flex justify-content-between mb-3 align-items-center bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <div v-if="isSubmit" class="d-flex justify-content-between">
                 <div class="me-3">
                     Result for exam
                 </div>
                 <div class="d-flex align-items-center">
-                    <span class="status-legend bg-light-red me-1"></span><span class="me-3">Wrong answer</span>
-                    <span class="status-legend bg-light-green me-1"></span><span class="me-3">Correct answer</span>
-                    <span class="status-legend bg-white me-1"></span><span class="">Your answer</span>
+                    <span class="status-legend bg-wrong-answer rounded-1 me-1"></span><span class="me-3">Wrong
+                        answer</span>
+                    <span class="status-legend bg-right-answer rounded-1 me-1"></span><span class="me-3">Correct
+                        answer</span>
+                    <span class="status-legend bg-your-answer rounded-1 me-1"></span><span class="">Your answer</span>
                 </div>
             </div>
             <h4 class="text-center fw-bold">
@@ -22,18 +25,19 @@
             </h4>
         </div>
         <div class="d-flex justify-content-around gap-2">
-            <div class="mp3-pdf w-50 border border-2 border-primary rounded-3 p-2">
+            <div class="mp3-pdf w-50 bg-white rounded-3">
                 <div class="pdf-file" v-if="examDetail?.pdfFileUrl?.fileUrl">
-                    <iframe :src="examDetail.pdfFileUrl.fileUrl" width="100%" height="98%" frameborder="0"></iframe>
+                    <iframe :src="examDetail.pdfFileUrl.fileUrl" width="100%" height="99%" frameborder="0"></iframe>
                 </div>
-                <div v-else>The pdf file is no longer available, please contact your teacher.</div>
+                <div v-else class="text-body-tertairy">The pdf file is no longer available, please contact your teacher.
+                </div>
             </div>
-            <div v-if="examDetail" class="quizz w-50 border border-2 border-primary rounded-3 p-3">
+            <div v-if="examDetail" class="quizz w-50 bg-white border rounded-3 p-3">
                 <div class="row">
                     <div v-for="(question) in examDetail.questions" :key="question.id">
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <p class="ques-content fw-bold mb-2">{{ question.questionNumber }}. {{
+                                <p class="ques-content mb-2">{{ question.questionNumber }}. {{
                                     question.content }}
                                 </p>
                                 <h5 class="btn-askAI me-1" v-if="isSubmit" title="Ask AI" @click="askAI(question)">
@@ -229,14 +233,7 @@ export default {
 
 <style scoped>
 .container {
-    background-color: #ffffff;
-    border: 2px solid #6280e4;
-    border-radius: 10px;
-    padding: 10px 20px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
-    transition: box-shadow 0.3s;
-    margin-top: 91px;
-    height: 88vh;
+    margin-top: 95px;
 }
 
 h4 {
@@ -246,9 +243,7 @@ h4 {
 
 .btn-submit {
     background-color: #6280e4;
-    color: white;
     border: none;
-
 }
 
 .btn-submit:hover {
@@ -262,11 +257,10 @@ h4 {
 .mp3-pdf {
     height: 80vh;
     overflow-y: auto;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
 }
 
 .pdf-file {
-    height: 77vh;
+    height: 79vh;
     overflow-y: auto;
 }
 
@@ -274,10 +268,6 @@ h4 {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     height: 80vh;
     overflow-y: auto;
-}
-
-.ques-content {
-    color: #6280e4;
 }
 
 .form-check {
@@ -369,22 +359,20 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     display: inline-block;
     width: 32px;
     height: 16px;
-    border-radius: 15%;
 }
 
-.bg-light-red {
+.bg-wrong-answer {
     background-color: #dc3545;
     opacity: 0.6;
 }
 
-.bg-white {
-    border: 2px solid #6280e4;
-    border-radius: 4px;
-}
-
-.bg-light-green {
+.bg-right-answer {
     background-color: #28a745;
     opacity: 0.6;
+}
+
+.bg-your-answer {
+    border: 2px solid #6280e4;
 }
 
 .btn-askAI:hover {
