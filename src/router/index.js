@@ -16,6 +16,7 @@ import MyExercise from '@/pages/user/MyExercise.vue';
 import DoingListeningTest from '@/pages/user/DoingListeningTest.vue';
 import DoingReadingTest from '@/pages/user/DoingReadingTest.vue';
 import DoingWritingTest from '@/pages/user/DoingWritingTest.vue';
+import ReportComponent from '@/pages/user/Report.vue';
 
 const routes = [
     { path: '/', component: Homepage,
@@ -26,6 +27,7 @@ const routes = [
             { path: 'my-excercise/do-listening-test/:id', component: DoingListeningTest, name: 'DoingListeningTest' },
             { path: 'my-excercise/do-reading-test/:id', component: DoingReadingTest, name: 'DoingReadingTest' },
             { path: 'my-excercise/do-writing-test/:id', component: DoingWritingTest, name: 'DoingWritingTest' },
+            { path: 'report', component: ReportComponent},
             { path: 'about', component: About },
         ]
      },

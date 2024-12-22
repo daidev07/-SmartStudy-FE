@@ -7,7 +7,7 @@
                 Submit</button>
         </div>
         <div v-else class="d-flex justify-content-between mb-3 align-items-center bg-white p-3 rounded-3">
-            <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
+            <h4 class="text-center">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <div v-if="isSubmit" class="d-flex justify-content-between">
                 <div class="me-3">
                     Result for exam
@@ -20,8 +20,8 @@
                     <span class="status-legend bg-your-answer rounded-1 me-1"></span><span class="">Your answer</span>
                 </div>
             </div>
-            <h4 class="text-center fw-bold">
-                Your point: <span class="text-danger">{{ assignmentInfo.point }}</span>
+            <h4 class="text-center">
+                Your point: <span class="text-danger fw-bold">{{ assignmentInfo.point }}</span>
             </h4>
         </div>
         <div class="d-flex justify-content-around gap-2">

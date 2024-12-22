@@ -14,6 +14,10 @@
                         My excercise</router-link>
                 </li>
                 <li>
+                    <router-link to="/report" :class="getActiveClass('/report')">
+                        Report</router-link>
+                </li>
+                <li>
                     <router-link to="/about" :class="getActiveClass('/about')">About</router-link>
                 </li>
             </ul>
@@ -73,7 +77,7 @@ export default {
     }
 };
 </script>
-<style scoped>
+<style>
 .header {
     width: 100%;
     display: flex;

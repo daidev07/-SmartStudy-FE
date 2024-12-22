@@ -11,18 +11,21 @@ export default {
 }
 </script>
 
-<style scoped>
-#app {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+<style>
+div,
+span,
+p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: 'Poppins', sans-serif;
+  font-weight: 300;
 }
 
-body {
-  font-family: 'Poppins', sans-serif;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+i {
+  cursor: pointer !important;
 }
 </style>
