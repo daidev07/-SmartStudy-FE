@@ -1,12 +1,12 @@
 <template>
     <div class="container">
-        <div v-if="!isSubmit" class="d-flex justify-content-between border mb-3 bg-white p-3 rounded-3">
+        <div v-if="!isSubmit" class="d-flex justify-content-between border mb-2 bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <button class="btn-submit color-white p-2 rounded-2" @click="submitExam"> <i
                     class="bi bi-check2-circle me-1"></i>
                 Submit</button>
         </div>
-        <div v-else class="d-flex justify-content-between mb-3 align-items-center bg-white p-3 rounded-3">
+        <div v-else class="d-flex justify-content-between mb-2 align-items-center border bg-white p-3 rounded-3">
             <h4 class="text-center">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <div v-if="isSubmit" class="d-flex justify-content-between">
                 <div class="me-3">

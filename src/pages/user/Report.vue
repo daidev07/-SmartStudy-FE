@@ -30,8 +30,12 @@
                 </div>
             </div>
         </div>
-        <div class="border bg-white p-3 rounded-3 mb-3">
-            <div class="container-title fw-bold">Recent homework score statistics</div>
+        <div class="border bg-white p-3 rounded-3 mb-3" style="position: relative; height:40vh">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="container-title fw-bold">Recent homework score statistics</div>
+                <i class="bi bi-info-circle"
+                    v-tooltip:top="'Statistics scores of exercises you have done recently'"></i>
+            </div>
             <Line id="scoreLineChart" :data="chartData" :options="chartOptions" />
         </div>
     </div>
@@ -61,7 +65,7 @@ export default {
             },
             chartOptions: {
                 responsive: true,
-                maintainAspectRatio: true,
+                maintainAspectRatio: false,
                 plugins: {
                     legend: {
                         display: false
