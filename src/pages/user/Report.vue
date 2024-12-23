@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="border p-3 rounded-3 bg-white mb-3">
+        <div class="border p-3 rounded-3 bg-white mb-2">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="container-title fw-bold">Questions Statistics</div>
                 <i class="bi bi-info-circle"
@@ -11,32 +11,62 @@
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/totalNumber.png')" />
                     <div>
                         <div>Did</div>
-                        <div><span class="me-1 text-primary fw-bold fs-5">1000</span> questions</div>
+                        <div><span class="me-1 text-primary fw-bold fs-5">1000</span>questions</div>
                     </div>
                 </div>
                 <div class="right-number border-end d-flex justify-content-center align-items-center">
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/correctAnswer.png')" />
                     <div>
                         <div>Correct</div>
-                        <div><span class="me-1 text-success fw-bold fs-5">1000</span> questions</div>
+                        <div><span class="me-1 text-success fw-bold fs-5">1000</span>questions</div>
                     </div>
                 </div>
                 <div class="wrong-number d-flex justify-content-center align-items-center">
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/wrongAnswer.png')" />
                     <div>
                         <div>Wrong</div>
-                        <div><span class="me-1 text-danger fw-bold fs-5">1000</span> questions</div>
+                        <div><span class="me-1 text-danger fw-bold fs-5">1000</span>questions</div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="border bg-white p-3 rounded-3 mb-3" style="position: relative; height:40vh">
+        <div class="border bg-white pb-5 px-3 pt-3 rounded-3 mb-2" style="position: relative; height:40vh">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="container-title fw-bold">Recent homework score statistics</div>
                 <i class="bi bi-info-circle"
                     v-tooltip:top="'Statistics scores of exercises you have done recently'"></i>
             </div>
             <Line id="scoreLineChart" :data="chartData" :options="chartOptions" />
+        </div>
+        <div class="container-excercise-history border bg-white rounded-3 p-3">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="container-title fw-bold">Recent excercises</div>
+                <i class="bi bi-info-circle" v-tooltip:top="'List of exercises you have done recently'"></i>
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <div class="row justify-content-center align-items-center w-100 border-bottom p-2">
+                    <div class="col-2 text-center">
+                        <div class="fw-bold">
+                            11/12/2020
+                        </div>
+                        <div>
+                            15:22
+                        </div>
+                    </div>
+                    <div class="col-8 d-flex justify-content-between border-start border-end ">
+                        <div class="fs-5 fw-bold">
+                            Reading test 1
+                        </div>
+                        <div class="text-danger fs-4 fw-bold" v-tooltip:top="'Your score'">
+                            95
+                        </div>
+                    </div>
+
+                    <div class="col-2 text-center">
+                        <button class="btn btn-info text-white">View again</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>

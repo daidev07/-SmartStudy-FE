@@ -77,7 +77,7 @@ export default {
     }
 };
 </script>
-<style>
+<style scoped>
 .header {
     width: 100%;
     display: flex;
@@ -133,9 +133,8 @@ export default {
 
 .active-menu {
     color: #6280e4 !important;
-    font-weight: bold;
+    font-size: medium;
     border-bottom: 2px solid #6280e4;
-    border-radius: 4px;
     padding: 10px 0px;
 }
 

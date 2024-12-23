@@ -1,6 +1,6 @@
 <template>
     <div class="container rounded-3">
-        <div class="new-post border d-flex justify-content-center rounded-3 p-3 align-items-center bg-white"
+        <div class="new-post border d-flex justify-content-center rounded-3 mb-2 p-3 align-items-center bg-white"
             @click="showModal = true">
             <span class="text-body-tertiary">What's on your mind? Click to post something ...
                 <i class="bi bi-balloon-heart"></i></span>
@@ -18,23 +18,37 @@
         </div>
         <div v-if="!newFeeds.length" class="text-center text-body-tertiary">No post yet! Let's post something to your
             class.</div>
-        <div v-else class="newfeeds bg-white">
-            <div class="post" v-for="(newfeed, index) in newFeeds" :key="newfeed.id">
-                <div class="user-info">
-                    <img :src="newfeed.user.avatarUrl || require('@/assets/nonAvatar.png')" alt="Avatar"
-                        class="avatar" />
-                    <div class="user-details">
-                        <h5 class="user-name">{{ newfeed.user.name }}</h5> <small>{{ formatTime(newfeed.postedAt)
+        <div v-else class="newfeeds bg-white rounded-3">
+            <div class="post border rounded-3 p-3" v-for="(newfeed, index) in newFeeds" :key="newfeed.id">
+                <div class="user-info d-flex align-items-center justify-content-between">
+                    <div class="d-flex">
+                        <img :src="newfeed.user.avatarUrl || require('@/assets/nonAvatar.png')" alt="Avatar"
+                            class="avatar" />
+                        <div class="user-details d-flex flex-column">
+                            <span class="user-name fw-bold">{{ newfeed.user.name }}</span> <small>{{
+                                formatTime(newfeed.postedAt)
                             }}</small>
+                        </div>
                     </div>
+                    <i class="bi bi-three-dots-vertical"></i>
                 </div>
-                <h4 class="post-title">{{ newfeed.content }}</h4>
-                <img :src="newfeed.imageUrl" alt="Post Image" class="post-image" />
+                <div class="post-title mb-2">{{ newfeed.content }}</div>
+                <div class="text-center">
+                    <img :src="newfeed.imageUrl" alt="Post Image" class="newfeeds-post-image rounded-3" />
+                </div>
 
-                <div class="actions">
-                    <button class="like-btn" @click="likePost(index)">
-                        <i class="bx bx-heart"></i> {{ newfeed.likes }}
-                    </button>
+                <div class="d-flex align-items-center justify-content-center mt-2">
+                    <span class="fs-5 me-1">
+                        {{ newfeed.likes }}
+                    </span>
+                    <div class="newfeeds-action d-flex align-items-center p-2 rounded-3 me-4">
+                        <i class="bx bx-heart me-2 fs-5" @click="likePost(index)"></i>
+                        <span>Love</span>
+                    </div>
+                    <div class="newfeeds-action d-flex align-items-center p-2 rounded-3">
+                        <i class="bi bi-chat-right-heart me-2 fs-5" @click="showComment(index)"></i>
+                        <span>Comment</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -138,9 +152,7 @@ export default {
 }
 
 .new-post {
-    background-color: #f0f2f5;
     cursor: pointer;
-    margin-bottom: 20px;
 }
 
 .new-post .post-input {
@@ -228,24 +240,6 @@ export default {
     border: none;
 }
 
-.newfeeds {
-    margin-top: 20px;
-}
-
-.post {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
 .user-info img {
     width: 50px;
     height: 50px;
@@ -253,9 +247,19 @@ export default {
     margin-right: 10px;
 }
 
-.user-details {
-    display: flex;
-    flex-direction: column;
+.newfeeds-post-image {
+    width: 35%;
+    height: 35%;
+}
+
+.newfeeds-action {
+    cursor: pointer;
+}
+
+.newfeeds-action:hover {
+    background: #e0e3e6;
+    transform: scale(1.05);
+    transition: transform 0.6s ease-in-out;
 }
 
 .user-details h5 {
@@ -267,27 +271,6 @@ export default {
 .user-details small {
     font-size: 12px;
     color: #a8b0b6;
-}
-
-.post-title {
-    font-size: 16px;
-    line-height: 1.5;
-    color: #333;
-    margin-bottom: 10px;
-}
-
-.post-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 8px;
-}
-
-.actions {
-    margin-top: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
 }
 
 .like-btn {
