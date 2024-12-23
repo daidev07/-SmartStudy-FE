@@ -10,10 +10,10 @@
         </div>
 
         <div class="border rounded-3 p-2 bg-white">
-            <div v-if="listAssignments.length === 0" class="text-body-tertairy text-center">
+            <div v-if="listAssignments.length === 0" class="text-body-tertiary text-center">
                 You have no assignments at the moment.
             </div>
-            <div class="p-2 assign-card">
+            <div v-else class="p-2 assign-card">
                 <div v-for="assignment in listAssignments" :key="assignment.id" class="card shadow-sm"
                     :class="getStatusCardClass(assignment.assignmentStatus)"
                     v-tooltip:bottom="`${assignment.description}`">

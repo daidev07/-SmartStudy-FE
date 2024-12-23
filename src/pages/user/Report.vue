@@ -11,21 +11,47 @@
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/totalNumber.png')" />
                     <div>
                         <div>Did</div>
-                        <div><span class="me-1 text-primary fw-bold fs-5">1000</span>questions</div>
+                        <div>
+                            <span class="me-1 fw-bold fs-5">{{ this.didQuestion ? this.didQuestion : 0
+                                }}</span>questions
+                        </div>
                     </div>
                 </div>
                 <div class="right-number border-end d-flex justify-content-center align-items-center">
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/correctAnswer.png')" />
                     <div>
                         <div>Correct</div>
-                        <div><span class="me-1 text-success fw-bold fs-5">1000</span>questions</div>
+                        <div><span class="me-1 text-success fw-bold fs-5">{{ this.correctQuestion ? this.correctQuestion
+                            : 0
+                                }}</span>questions</div>
                     </div>
                 </div>
-                <div class="wrong-number d-flex justify-content-center align-items-center">
+                <div class="wrong-number d-flex justify-content-center align-items-center border-end ">
                     <img class="ratio-img me-3" :src="require('@/assets/ReportPage/wrongAnswer.png')" />
                     <div>
                         <div>Wrong</div>
-                        <div><span class="me-1 text-danger fw-bold fs-5">1000</span>questions</div>
+                        <div><span class="me-1 text-danger fw-bold fs-5">{{ this.wrongQuestion ? this.wrongQuestion :
+                            0
+                                }}</span>questions</div>
+                    </div>
+                </div>
+                <div class="right-number d-flex justify-content-center align-items-center border-end ">
+                    <img class="ratio-img me-3" :src="require('@/assets/ReportPage/notAnswered.png')" />
+                    <div>
+                        <div>Not answered</div>
+                        <div><span class="me-1 text-primary fw-bold fs-5">{{ this.notAnswered ? this.notAnswered
+                            : 0
+                                }}</span>questions</div>
+                    </div>
+                </div>
+                <div class="right-number d-flex justify-content-center align-items-center">
+                    <img class="ratio-img me-3" :src="require('@/assets/ReportPage/correctRatio.png')" />
+                    <div>
+                        <div>Correct ratio</div>
+                        <div><span class="me-1 text-info fw-bold fs-5">{{ this.correctRatio ?
+                            this.correctRatio
+                            : 0
+                                }}</span>%</div>
                     </div>
                 </div>
             </div>
@@ -43,27 +69,31 @@
                 <div class="container-title fw-bold">Recent excercises</div>
                 <i class="bi bi-info-circle" v-tooltip:top="'List of exercises you have done recently'"></i>
             </div>
-            <div class="d-flex justify-content-center align-items-center">
-                <div class="row justify-content-center align-items-center w-100 border-bottom p-2">
+            <div class="p-3">
+                <div v-for="studentAssignment in studentAssignments"
+                    class="row justify-content-center align-items-center w-100 border-bottom p-2"
+                    :key="studentAssignment.id">
                     <div class="col-2 text-center">
                         <div class="fw-bold">
-                            11/12/2020
+                            {{ formatDate(studentAssignment.submittedAt) }}
                         </div>
                         <div>
-                            15:22
+                            {{ formatTime(studentAssignment.submittedAt) }}
                         </div>
                     </div>
                     <div class="col-8 d-flex justify-content-between border-start border-end ">
                         <div class="fs-5 fw-bold">
-                            Reading test 1
+                            {{ studentAssignment.name }}
                         </div>
                         <div class="text-danger fs-4 fw-bold" v-tooltip:top="'Your score'">
-                            95
+                            {{ studentAssignment.point }}
                         </div>
                     </div>
 
                     <div class="col-2 text-center">
-                        <button class="btn btn-info text-white">View again</button>
+                        <button class="btn btn-info text-white"
+                            @click="viewAssignAgain(studentAssignment.id, studentAssignment.exam.examType)">View
+                            again</button>
                     </div>
                 </div>
             </div>
@@ -72,6 +102,9 @@
 </template>
 
 <script>
+import { formatDate, formatTime } from '../../services/DateService.js';
+import axios from 'axios';
+import { mapGetters } from 'vuex';
 import { Line } from 'vue-chartjs';
 import { Chart as ChartJS, LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
 ChartJS.register(LineElement, PointElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
@@ -81,19 +114,22 @@ export default {
     components: {
         Line
     },
-    data() {
-        return {
-            chartData: {
-                labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+    computed: {
+        ...mapGetters(['getUserInfo']),
+        chartData() {
+            return {
+                labels: this.studentAssignments.map(assignment => assignment.name),
                 datasets: [
                     {
                         label: 'Scores',
-                        data: [65, 59, 80, 81, 56, 55, 40],
+                        data: this.studentAssignments.map(assignment => assignment.score),
                         borderColor: '#6280e4',
                     }
                 ]
-            },
-            chartOptions: {
+            };
+        },
+        chartOptions() {
+            return {
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
@@ -105,22 +141,98 @@ export default {
                     x: {
                         title: {
                             display: true,
-                            text: 'Excercise'
+                            text: 'EXERCISES'
                         }
+
                     },
                     y: {
                         title: {
                             display: true,
-                            text: 'Scores'
+                            text: 'POINTS'
+                        },
+                        min: 0,
+                        max: 100,
+                        ticks: {
+                            stepSize: 20
                         }
                     }
                 }
+            };
+        }
+    },
+    watch: {
+        getUserInfo(user) {
+            if (user) {
+                this.fetchStudentReport();
             }
+        }
+    },
+    data() {
+        return {
+            apiUrl: process.env.VUE_APP_API_URL,
+            reports: [],
+            answerResults: [],
+            didQuestion: 0,
+            correctQuestion: 0,
+            wrongQuestion: 0,
+            notAnswered: 0,
+            correctRatio: 0,
+            studentAssignments: [],
         };
     },
     mounted() {
+        if (this.getUserInfo) {
+            this.fetchStudentReport();
+        }
     },
     methods: {
+        async fetchStudentReport() {
+            try {
+                const response = await axios.get(this.apiUrl + `/student-report/user/${this.getUserInfo.id}`);
+                this.reports = response.data.data;
+                this.answerResults = this.reports.answerResults;
+                this.didQuestion = this.answerResults.length;
+                this.correctQuestion = Array.isArray(this.answerResults)
+                    ? this.answerResults.filter(item => item.answer && item.answer.isCorrect).length
+                    : 0;
+                this.wrongQuestion = Array.isArray(this.answerResults)
+                    ? this.answerResults.filter(item => item.answer && !item.answer.isCorrect).length
+                    : 0;
+                this.notAnswered = this.didQuestion - this.correctQuestion - this.wrongQuestion;
+                this.correctRatio = this.didQuestion > 0 ? Math.round(this.correctQuestion / this.didQuestion * 100) : 0;
+                this.studentAssignments = this.reports.studentAssignments.reverse();
+                console.log("STUDENT ASSIGNMENTS:: ", this.studentAssignments);
+
+                this.chartData.labels = this.studentAssignments.map(assign => assign.name);
+                this.chartData.datasets[0].data = this.studentAssignments.map(assign => assign.point);
+                console.log("CHART DATA:: ", this.chartData);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        viewAssignAgain(assignId, examType) {
+            let routeName = '';
+            switch (examType) {
+                case 'READING':
+                    routeName = 'DoingReadingTest';
+                    break;
+                case 'LISTENING':
+                    routeName = 'DoingListeningTest';
+                    break;
+                case 'GRAMMAR':
+                    routeName = 'DoingGrammarTest';
+                    break;
+                case 'WRITING':
+                    routeName = 'DoingWritingTest';
+                    break;
+                default:
+                    console.error('Exam type not recognized:', examType);
+                    return;
+            }
+            this.$router.push({ name: routeName, params: { id: assignId } });
+        },
+        formatDate,
+        formatTime
     }
 }
 </script>
@@ -134,6 +246,6 @@ export default {
 }
 
 .ratio-img {
-    width: 10%;
+    width: 15%;
 }
 </style>

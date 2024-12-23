@@ -30,7 +30,7 @@ const routes = [
             { path: 'report', component: ReportComponent},
             { path: 'about', component: About },
         ]
-     },
+    },
     { path: '/login', component: LoginComponent },
     
     {
