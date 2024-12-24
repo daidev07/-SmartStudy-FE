@@ -27,7 +27,6 @@
         <!-- Nội dung hiển thị dựa trên tab đang chọn -->
         <div class="content">
             <div v-if="activeTab === 'classwork'" class="classwork-tab">
-                <h2>Classwork</h2>
                 <table class="table table-bordered">
                     <thead>
                         <tr>
@@ -63,7 +62,6 @@
             </div>
 
             <div v-else-if="activeTab === 'students'" class="students-tab">
-                <h2>Students</h2>
                 <ul v-if="classDetail.students && classDetail.students.length">
                     <li v-for="(student, index) in classDetail.students" :key="index">
                         {{ student.name }} - {{ student.email }}
@@ -205,10 +203,6 @@ export default {
     padding: 20px;
 }
 
-.class-header {
-    margin-bottom: 20px;
-}
-
 .class-name {
     font-size: 2em;
     font-weight: bold;
@@ -345,11 +339,9 @@ export default {
     background-color: #1e88e5;
 }
 
-/* Responsive design for modal on smaller screens */
 @media (max-width: 768px) {
     .modal-content {
         width: 90%;
-        /* Make modal more responsive on small screens */
     }
 }
 </style>

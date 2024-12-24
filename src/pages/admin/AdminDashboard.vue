@@ -13,7 +13,7 @@
                     </router-link>
                 </li>
             </ul>
-            <div class="logout-button mt-auto">
+            <div class="logout-button mt-auto mb-4">
                 <a href="#" class="nav-link text-white" @mouseover="onHover($event)" @mouseout="onLeave($event)"
                     @click="setActiveComponent('Logout')">
                     <i class="bi bi-box-arrow-right"></i> Logout
@@ -53,7 +53,6 @@ export default {
                 { name: "AnalysisChart", displayName: "Analysis", icon: "bx bx-line-chart", isActive: true },
                 { name: "ClassManagement", displayName: "Class", icon: "bi bi-house", isActive: false },
                 { name: "EmployeesManagement", displayName: "Employees", icon: "bi bi-people", isActive: false },
-                { name: "FileTrainAIManagement", displayName: "File Train AI", icon: "bi bi-cloud-upload", isActive: false },
                 { name: "ExamManagement", displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],
         };
@@ -156,11 +155,6 @@ export default {
 
 .bg-blue {
     background-color: #7494ec;
-}
-
-.logout-button {
-    margin-top: auto;
-    padding: 10px 20px;
 }
 
 #page-content-wrapper {

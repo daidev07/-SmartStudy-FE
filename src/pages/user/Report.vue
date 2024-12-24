@@ -64,7 +64,7 @@
             </div>
             <Line id="scoreLineChart" :data="chartData" :options="chartOptions" />
         </div>
-        <div class="container-excercise-history border bg-white rounded-3 p-3">
+        <div class="container-excercise-history border bg-white rounded-3 p-3 mh-50m mb-2">
             <div class="d-flex justify-content-between align-items-center mb-2">
                 <div class="container-title fw-bold">Recent excercises</div>
                 <i class="bi bi-info-circle" v-tooltip:top="'List of exercises you have done recently'"></i>
@@ -121,7 +121,7 @@ export default {
                 labels: this.studentAssignments.map(assignment => assignment.name),
                 datasets: [
                     {
-                        label: 'Scores',
+                        label: 'Your point',
                         data: this.studentAssignments.map(assignment => assignment.score),
                         borderColor: '#6280e4',
                     }

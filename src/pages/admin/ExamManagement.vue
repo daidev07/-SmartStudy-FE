@@ -1,8 +1,15 @@
 <template>
     <div class="text-center">
-        <div class="fw-bold fs-3 border-bottom border-end border-black title">EXAMS MANAGEMENT</div>
+        <div class="fw-bold fs-3 border rounded-3 px-3 py-2 shadow">
+            EXAMS MANAGEMENT
+        </div>
+        <hr class="fw-bold">
     </div>
-    <div class="btn btn-success mt-2" @click="toggleTestAdding"><i class="bx bxs-file-plus fs-5"></i> New exam</div>
+    <div class="mt-2 text-end">
+        <button class="btn btn-success" @click="toggleTestAdding">
+            <i class="bx bxs-file-plus fs-5 me-2"></i> New exam
+        </button>
+    </div>
     <div v-if="showTestAdding" class="d-flex justify-content-center">
         <TestAdding @close="toggleTestAdding" @refresh="fetchExamList" />
     </div>
@@ -10,21 +17,21 @@
     <div>
         <ul class="nav nav-tabs mt-3">
             <li class="nav-item">
-                <button class="nav-link"
-                    :class="{ active: activeTab === 'GRAMMAR', 'fw-bold': activeTab === 'GRAMMAR' }"
+                <button class="nav-link text-dark"
+                    :class="{ active: activeTab === 'GRAMMAR', 'fw-bold ': activeTab === 'GRAMMAR' }"
                     @click="setActiveTab('GRAMMAR')">
                     Grammar
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link"
+                <button class="nav-link text-dark"
                     :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
                     @click="setActiveTab('LISTENING')">
                     Listening
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link"
+                <button class="nav-link text-dark"
                     :class="{ active: activeTab === 'READING', 'fw-bold': activeTab === 'READING' }"
                     @click="setActiveTab('READING')">
                     Reading
@@ -119,9 +126,6 @@
 import TestAdding from "../../components/TestAdding.vue";
 // import { toast } from "vue3-toastify";
 import axios from "axios";
-// import $ from 'jquery';
-import "datatables.net-dt/css/dataTables.dataTables.css";
-import "datatables.net";
 import { fetchExam } from "@/services/examService";
 import { nextTick } from "vue";
 
@@ -175,9 +179,7 @@ export default {
                 const response = await axios.get(this.apiUrl + "/exam");
                 this.examList = response.data.data;
                 console.log("EXAM LIST:: ", this.examList);
-                // this.$nextTick(() => {
-                //     this.initDataTable();
-                // });
+
             } catch (error) {
                 this.examListError = "Failed to load exam list.";
                 console.error(error);
@@ -185,15 +187,6 @@ export default {
                 this.examListLoading = false;
             }
         },
-        // initDataTable() {
-        //     $('#examTable').DataTable({
-        //         pageLength: 10,
-        //         paging: true,
-        //         columnDefs: [
-        //             { targets: '_all', className: 'text-start' }
-        //         ]
-        //     });
-        // },
         setActiveTab(tab) {
             this.activeTab = tab;
             console.log("Active tab: ", this.activeTab);

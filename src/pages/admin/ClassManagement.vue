@@ -1,6 +1,6 @@
 <template>
     <div class="text-center">
-        <div class="fw-bold fs-3 border-bottom border-end border-black title">
+        <div class="fw-bold fs-3 border rounded-3 px-3 py-2 shadow">
             CLASS MANAGEMENT
         </div>
         <hr class="fw-bold">

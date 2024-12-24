@@ -13,8 +13,6 @@
     "boxicons": "^2.1.4",
     "chart.js": "^4.4.7",
     "core-js": "^3.8.3",
-    "datatables.net": "^2.1.8",
-    "datatables.net-dt": "^2.1.8",
     "date-fns": "^4.1.0",
     "jquery": "^3.7.1",
     "jwt-decode": "^4.0.0",
