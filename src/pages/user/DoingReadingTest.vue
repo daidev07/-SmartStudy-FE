@@ -2,7 +2,7 @@
     <div class="container">
         <div v-if="!isSubmit" class="d-flex justify-content-between border mb-2 bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
-            <button class="btn-submit color-white p-2 rounded-2" @click="submitExam"> <i
+            <button class="btn-submit text-white p-2 rounded-2" @click="submitExam"> <i
                     class="bi bi-check2-circle me-1"></i>
                 Submit</button>
         </div>

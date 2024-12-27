@@ -177,7 +177,7 @@ export default {
             this.examListError = null;
             try {
                 const response = await axios.get(this.apiUrl + "/exam");
-                this.examList = response.data.data;
+                this.examList = response.data.data.reverse();
                 console.log("EXAM LIST:: ", this.examList);
 
             } catch (error) {
