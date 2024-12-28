@@ -69,7 +69,10 @@
                 <div class="container-title fw-bold">Recent excercises</div>
                 <i class="bi bi-info-circle" v-tooltip:top="'List of exercises you have done recently'"></i>
             </div>
-            <div class="p-3">
+            <div v-if="studentAssignments.length === 0" class="text-center text-body-tertiary">No exercises have been
+                done yet.
+            </div>
+            <div v-else class="p-3">
                 <div v-for="studentAssignment in studentAssignments"
                     class="row justify-content-center align-items-center w-100 border-bottom p-2"
                     :key="studentAssignment.id">

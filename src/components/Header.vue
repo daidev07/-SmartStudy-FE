@@ -1,5 +1,5 @@
 <template>
-    <header class="header">
+    <header class="header border-bottom">
         <router-link to="/" class="d-flex align-items-center nav-left">
             <img class="logo" :src="require('@/assets/logoHeader.jpg')" />
             <h3 class="ms-3 fw-bold">Smart Study</h3>

@@ -5,51 +5,21 @@
         </div>
         <hr class="fw-bold">
     </div>
-    <div class="text-end">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal"><i
-                class="bi bi-journal-plus me-1"></i>New Class</button>
-    </div>
-    <div class="modal fade" id="addClassModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="addClassModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addClassModal">Add New Class</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form>
-                        <div>
-                            <label for="name" class="form-label fw-bold">Class name</label>
-                            <input type="text" class="form-control" id="name" placeholder="Enter class name"
-                                v-model="newClass.className" :class="{ 'is-invalid': nameError }" @keyup="checkName">
-                            <div v-if="nameError" class="invalid-feedback">
-                                Name is required
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary" @click="saveNewClass">Submit</button>
-                </div>
-            </div>
-        </div>
+    <div class="text-end mb-3">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">
+            <i class="bi bi-journal-plus me-1"></i>New Class
+        </button>
     </div>
     <div class="class-card-container">
         <div v-for="classItem in classList" :key="classItem.id" class="class-card"
             @click="goToClassDetail(classItem.id)" v-tooltip:bottom="'More information...'">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="class-name">{{ classItem.className }}</h3>
-                <span class="icon" title="Assignment" @click="openAssignmentModal(classItem.id)">
-                    <i class="bi bi-chevron-double-up text-success fw-bold fs-4" v-tooltip:right="'Upgrade level'"></i>
-                </span>
+                <h3 class="class-name fw-bold">{{ classItem.className }}</h3>
+                <i class="bi bi-trash3 text-danger fw-bold fs-5" v-tooltip:right="'Delete class'"
+                    @click="openCofirmDeleteModal" data-bs-toggle="modal" data-bs-target="#confirmDeleteClassModal"></i>
             </div>
             <div class="card-body mt-4">
-                <p class="status"
-                    :class="{ 'in_progress': classItem.status === 'IN PROGRESS', 'completed': classItem.status === 'COMPLETED' }">
-                    {{ classItem.status }}
-                </p>
+                <span class="text-body-tertiary">Student: </span>
             </div>
         </div>
         <div v-if="isModalVisible" class="modal-overlay">
@@ -84,6 +54,54 @@
             </div>
         </div>
     </div>
+    <!-- Modal add new class -->
+    <div class="modal fade" id="addClassModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="addClassModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="addClassModal">Add New Class</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div>
+                            <label for="name" class="form-label fw-bold">Class name</label>
+                            <input type="text" class="form-control" id="name" placeholder="Enter class name"
+                                v-model="newClass.className" :class="{ 'is-invalid': nameError }" @keyup="checkName">
+                            <div v-if="nameError" class="invalid-feedback">
+                                Name is required
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" @click="saveNewClass">Submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal confirm delete class -->
+    <div class="modal fade" id="confirmDeleteClassModal" data-bs-backdrop="static" data-bs-keyboard="false"
+        tabindex="-1" aria-labelledby="confirmDeleteClassModal" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5 text-danger" id="staticBackdropLabel">Confirm delete class</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-danger">
+                    Deleting a class will not show the class on this page, are you sure you want to delete it?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                    <button type="button" class="btn btn-danger">Yes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </template>
 <script>
 import axios from 'axios';
@@ -116,10 +134,14 @@ export default {
         this.fetchClassList();
     },
     methods: {
+        async openCofirmDeleteModal() {
+            console.log('Delete class');
+
+        },
         async saveNewClass() {
             this.nameError = false;
             let isValid = true;
-            if (this.newClass.name === '') {
+            if (this.newClass.className === '') {
                 this.nameError = true;
                 isValid = false;
             }
@@ -133,11 +155,14 @@ export default {
                     this.fetchClassList();
                     const addNewClassModal = new bootstrap.Modal(document.getElementById('addClassModal'));
                     addNewClassModal.hide();
-                } else if (response.data.data.code == 430) {
-                    toast.error('Class name already exists, try another name');
+                    this.newClass = {
+                        className: '',
+                    };
                 }
             } catch (error) {
-                console.error('Failed to save new class:', error);
+                if (error.response.data.code == 430) {
+                    toast.error('Class name already exists, try another name');
+                }
             }
         },
         async fetchClassList() {
@@ -189,7 +214,7 @@ export default {
                 toast.error('Failed to create assignment');
             }
         }, checkName() {
-            if (this.newClass.name !== '') {
+            if (this.newClass.className !== '') {
                 this.nameError = false;
             } else {
                 this.nameError = true;
@@ -229,19 +254,9 @@ export default {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.class-name {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 0;
-}
-
 .icon {
     font-size: 1.2rem;
     color: #666;
-}
-
-.card-body {
-    display: flex;
 }
 
 .level-1 {

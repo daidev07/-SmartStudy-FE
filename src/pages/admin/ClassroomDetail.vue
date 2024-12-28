@@ -1,10 +1,9 @@
 <template>
-    <div class="classroom-detail-container">
+    <div class="classroom-detail-container p-2">
         <!-- Header với tên lớp -->
         <div class="d-flex justify-content-between">
             <div class="class-header">
-                <h1 class="class-name">{{ classDetail.name }}</h1>
-                <h4> Level {{ classDetail.level?.name }}</h4>
+                <h1 class="class-name">{{ classDetail.className }}</h1>
             </div>
             <div>
                 <button v-if="activeTab === 'classwork'" class="btn btn-success" @click="openClassworkModal">New
@@ -140,6 +139,7 @@ export default {
             try {
                 const response = await axios.get(this.apirUrl + '/class/' + this.classId);
                 this.classDetail = response.data.data;
+                console.log('classDetail:', this.classDetail);
             } catch (error) {
                 this.classDetailError = error;
             } finally {
@@ -199,10 +199,6 @@ export default {
 };
 </script>
 <style scoped>
-.classroom-detail-container {
-    padding: 20px;
-}
-
 .class-name {
     font-size: 2em;
     font-weight: bold;
