@@ -80,7 +80,7 @@
                         <div class="mb-3">
                             <label for="name" class="form-label fw-bold">Name</label>
                             <input type="text" class="form-control" id="name" placeholder="Enter full name"
-                                v-model="newEmployee.name" :class="{ 'is-invalid': nameError }" @keyup="checkName">
+                                v-model="newClass.name" :class="{ 'is-invalid': nameError }" @keyup="checkName">
                             <div v-if="nameError" class="invalid-feedback">
                                 Name is required
                             </div>
@@ -245,7 +245,7 @@ export default {
                     toast.success("Create successfully!");
                 }
             } catch (error) {
-                if (error.response.data.code == 413) {
+                if (error.response.data.code == 414) {
                     toast.error("Username already exists. Try another one!");
                 }
             }

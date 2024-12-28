@@ -18,13 +18,6 @@
         <ul class="nav nav-tabs mt-3">
             <li class="nav-item">
                 <button class="nav-link text-dark"
-                    :class="{ active: activeTab === 'GRAMMAR', 'fw-bold ': activeTab === 'GRAMMAR' }"
-                    @click="setActiveTab('GRAMMAR')">
-                    Grammar
-                </button>
-            </li>
-            <li class="nav-item">
-                <button class="nav-link text-dark"
                     :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
                     @click="setActiveTab('LISTENING')">
                     Listening
@@ -138,7 +131,7 @@ export default {
             examListError: null,
             showTestAdding: false,
             answerLetters: ["A", "B", "C", "D"],
-            activeTab: "GRAMMAR",
+            activeTab: "LISTENING",
             isViewClick: false,
             examDetails: null,
         };

@@ -176,7 +176,7 @@ export default {
         async submitClasswork() {
             const { name, description, dueDate, examId } = this.classwork;
             try {
-                const res = await axios.post(`${this.apirUrl}/classroom-assignment/assign/${this.classId}/${examId}`, {
+                const res = await axios.post(`${this.apirUrl}/classroom-assignment/class/${this.classId}/exam/${examId}`, {
                     name,
                     description,
                     dueDate: dueDate,

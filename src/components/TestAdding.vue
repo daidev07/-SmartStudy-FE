@@ -3,11 +3,6 @@
         <h4 class="text-center fw-bold">ADDING NEW EXAM</h4>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <button class="nav-link" :class="{ active: activeTab === 'GRAMMAR' }" @click="activeTab = 'GRAMMAR'">
-                    Grammar
-                </button>
-            </li>
-            <li class="nav-item">
                 <button class="nav-link" :class="{ active: activeTab === 'LISTENING' }"
                     @click="activeTab = 'LISTENING'">
                     Listening
@@ -19,21 +14,6 @@
                 </button>
             </li>
         </ul>
-
-        <div v-if="activeTab === 'GRAMMAR'" class="mt-3">
-            <form>
-                <div class="mb-2 d-flex">
-                    <label for="examName" class="form-label w-50">Exam Name:</label>
-                    <input type="text" class="form-control" v-model="grammar.examName" required />
-                </div>
-                <div class="mb-2 d-flex">
-                    <label for="grammarFile" class="form-label w-50"> Exam Excel File
-                        <i class="bi bi-exclamation-diamond me-1"></i>:</label>
-                    <input type="file" class="form-control" @change="onFileChange($event, 'grammarFile')"
-                        accept=".xls,.xlsx" required />
-                </div>
-            </form>
-        </div>
 
         <div v-if="activeTab === 'LISTENING'" class="mt-3">
             <form>
@@ -96,7 +76,7 @@ export default {
     data() {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
-            activeTab: "GRAMMAR",
+            activeTab: "LISTENING",
             grammar: {
                 examName: "",
                 grammarFile: null,

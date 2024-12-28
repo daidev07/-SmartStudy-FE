@@ -126,8 +126,8 @@ export default {
             return {
                 "bg-body-tertiary": examType === "LISTENING",
                 "bg-body-secondary": examType === "WRITING",
-                "bg-primary-subtle": examType === "GRAMMAR",
-                "bg-success-subtle": examType === "READING"
+                "bg-success-subtle": examType === "GRAMMAR",
+                "bg-primary-subtle": examType === "READING"
             };
         },
         getPointColor(point) {
