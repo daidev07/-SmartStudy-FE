@@ -3,13 +3,16 @@
         <h4 class="text-center fw-bold">ADDING NEW EXAM</h4>
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <button class="nav-link" :class="{ active: activeTab === 'LISTENING' }"
+                <button class="nav-link"
+                    :class="{ active: activeTab === 'LISTENING', 'fw-bold': activeTab === 'LISTENING' }"
                     @click="activeTab = 'LISTENING'">
                     Listening
                 </button>
             </li>
             <li class="nav-item">
-                <button class="nav-link" :class="{ active: activeTab === 'READING' }" @click="activeTab = 'READING'">
+                <button class="nav-link"
+                    :class="{ active: activeTab === 'READING', 'fw-bold': activeTab === 'READING' }"
+                    @click="activeTab = 'READING'">
                     Reading
                 </button>
             </li>
@@ -191,5 +194,9 @@ export default {
 button {
     margin-top: 10px;
     padding: 5px 10px;
+}
+
+.nav-link {
+    color: black;
 }
 </style>

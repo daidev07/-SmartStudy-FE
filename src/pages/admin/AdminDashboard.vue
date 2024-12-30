@@ -50,10 +50,10 @@ export default {
         return {
             logo: require('@/assets/logo.png'),
             sidebarItems: [
-                { name: "AnalysisChart", displayName: "Analysis", icon: "bx bx-line-chart", isActive: true },
-                { name: "ClassManagement", displayName: "Class", icon: "bi bi-house", isActive: false },
-                { name: "EmployeesManagement", displayName: "Employees", icon: "bi bi-people", isActive: false },
-                { name: "ExamManagement", displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
+                { name: "AnalysisChart", path: '', displayName: "Analysis", icon: "bx bx-line-chart", isActive: true },
+                { name: "ClassManagement", path: 'class-management', displayName: "Class", icon: "bi bi-house", isActive: false },
+                { name: "EmployeesManagement", path: 'employees-management', displayName: "Employees", icon: "bi bi-people", isActive: false },
+                { name: "ExamManagement", path: 'exam-management', displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],
         };
     },
@@ -72,8 +72,9 @@ export default {
     },
     methods: {
         updateActiveState() {
+            const currentPath = this.$route.path;
             this.sidebarItems.forEach(item => {
-                item.isActive = (item.name === this.$route.name);
+                item.isActive = (item.path === '' && currentPath === '/admin-dashboard') || (item.path !== '' && currentPath.startsWith(`/admin-dashboard/${item.path}`));
             });
         },
         onHover(event) {
