@@ -105,7 +105,7 @@
 </template>
 
 <script>
-import { formatDate, formatTime } from '../../services/DateService.js';
+import { formatDate, formatTime } from '../../utils/FormatDateAndTime.js';
 import axios from 'axios';
 import { mapGetters } from 'vuex';
 import { Line } from 'vue-chartjs';

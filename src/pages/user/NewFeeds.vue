@@ -41,7 +41,7 @@
                     <div class="user-details d-flex flex-column">
                         <span class="user-name fw-bold">{{ newfeed.user.name }}</span> <small>{{
                             formatTime(newfeed.postedAt)
-                            }}</small>
+                        }}</small>
                     </div>
                 </div>
                 <i class="bi bi-three-dots-vertical"></i>
@@ -71,7 +71,7 @@
 import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
-import { formatTime } from '../../services/TimeService.js';
+import { formatTimeChatbot } from '../../utils/FormatDateAndTime.js';
 import bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
 export default {
@@ -151,11 +151,9 @@ export default {
                 console.error("Invalid photo, please try again:", error);
             }
             this.fetchNewfeeds();
-
-
         },
-        formatTime(dateString) {
-            return formatTime(dateString);
+        formatTimeChatbot(dateString) {
+            return formatTimeChatbot(dateString);
         }
     }
 };

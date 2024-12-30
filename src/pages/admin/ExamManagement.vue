@@ -47,7 +47,7 @@
                         <tr v-for="exam in filteredExams" :key="exam.id" scope="row">
                             <td class="text-center">{{ exam.id }}</td>
                             <td class="text-start">{{ exam.name }}</td>
-                            <td>{{ new Date(exam.createdAt).toLocaleString() }}</td>
+                            <td>{{ formatDateAndTime(exam.createdAt) }}</td>
                             <td class="text-center">
                                 <button class="btn btn-info btn-sm me-2" @click="fetchExamDetail(exam.id)">View /
                                     Update</button>
@@ -72,8 +72,7 @@
                         <div v-if="examDetails.listenFile">
                             <div class="d-flex justify-content-between">
                                 <h5 class="fw-bold">MP3 Listen File:</h5>
-                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
-                                    style="cursor: pointer"></i>
+                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"></i>
                             </div>
                             <audio controls class="w-100">
                                 <source :src="examDetails.listenFile.fileUrl" type="audio/mpeg" />
@@ -117,6 +116,7 @@
 </template>
 <script>
 import TestAdding from "../../components/TestAdding.vue";
+import { formatDateAndTime } from "@/utils/FormatDateAndTime.js";
 // import { toast } from "vue3-toastify";
 import axios from "axios";
 import { fetchExam } from "@/services/examService";
@@ -148,6 +148,7 @@ export default {
         },
     },
     methods: {
+        formatDateAndTime,
         toggleTestAdding() {
             this.showTestAdding = !this.showTestAdding;
         },

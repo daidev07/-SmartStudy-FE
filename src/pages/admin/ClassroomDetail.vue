@@ -94,8 +94,8 @@
                             <td>{{ index + 1 }}</td>
                             <td>{{ classwork.name }}</td>
                             <td>{{ classwork.description || 'No description' }}</td>
-                            <td>{{ formatDate(classwork.assignedAt) }}</td>
-                            <td>{{ classwork.dueDate ? formatDate(classwork.dueDate) : 'No due date' }}</td>
+                            <td>{{ formatDateAndTime(classwork.assignedAt) }}</td>
+                            <td>{{ classwork.dueDate ? formatDateAndTime(classwork.dueDate) : 'No due date' }}</td>
                             <td class="text-center">
                                 <button class="btn btn-primary btn-sm" data-bs-toggle="tooltip" title="View Exam">
                                     <i class="bi bi-eye"></i>
@@ -178,7 +178,7 @@
 </template>
 <script>
 import axios from 'axios';
-import { formatDate } from '@/services/DateService';
+import { formatDate, formatDateAndTime } from '@/utils/FormatDateAndTime';
 import { toast } from 'vue3-toastify';
 
 export default {
@@ -208,6 +208,7 @@ export default {
     },
     methods: {
         formatDate,
+        formatDateAndTime,
         async fetchNewsfeed() {
             try {
                 const response = await axios.get(this.apirUrl + '/newsfeed/class/' + this.classId);
