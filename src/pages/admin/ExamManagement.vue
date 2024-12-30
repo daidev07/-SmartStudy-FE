@@ -69,23 +69,23 @@
                 </h4>
                 <div class="d-flex">
                     <div class="show-file w-50 p-3">
-                        <div v-if="examDetails.listenFileUrl">
+                        <div v-if="examDetails.listenFile">
                             <div class="d-flex justify-content-between">
                                 <h5 class="fw-bold">MP3 Listen File:</h5>
                                 <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
                                     style="cursor: pointer"></i>
                             </div>
                             <audio controls class="w-100">
-                                <source :src="examDetails.listenFileUrl.fileUrl" type="audio/mpeg" />
+                                <source :src="examDetails.listenFile.fileUrl" type="audio/mpeg" />
                             </audio>
                         </div>
-                        <div v-if="examDetails.pdfFileUrl">
+                        <div v-if="examDetails.pdfFile">
                             <div class="d-flex justify-content-between">
                                 <h5 class="fw-bold">PDF File:</h5>
                                 <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
                                     style="cursor: pointer"></i>
                             </div>
-                            <iframe :src="examDetails.pdfFileUrl.fileUrl" class="w-100"
+                            <iframe :src="examDetails.pdfFile.fileUrl" class="w-100"
                                 :style="{ height: examDetails.listenFileUrl ? '77vh' : '83vh' }"></iframe>
                         </div>
                     </div>

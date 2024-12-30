@@ -24,7 +24,7 @@
         </nav>
         <div class="nav-right d-flex justify-content-end align-items-center">
             <div v-if="userInfo" class="user-info d-flex justify-content-end align-items-center">
-                <img :src="userInfo.avatarUrl || require('@/assets/nonAvatar.png')" alt="User Avatar"
+                <img :src="userInfo.avatarFile || require('@/assets/nonAvatar.png')" alt="User Avatar"
                     class="avatar me-2" />
                 <span>{{ userInfo.name }}</span>
             </div>

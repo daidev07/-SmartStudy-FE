@@ -26,8 +26,8 @@
         </div>
         <div class="d-flex justify-content-around gap-2">
             <div class="mp3-pdf w-50 bg-white rounded-3">
-                <div class="pdf-file" v-if="examDetail?.pdfFileUrl?.fileUrl">
-                    <iframe :src="examDetail.pdfFileUrl.fileUrl" width="100%" height="99%" frameborder="0"></iframe>
+                <div class="pdf-file" v-if="examDetail?.pdfFile?.fileUrl">
+                    <iframe :src="examDetail.pdfFile.fileUrl" width="100%" height="99%" frameborder="0"></iframe>
                 </div>
                 <div v-else class="text-body-tertairy">The pdf file is no longer available, please contact your teacher.
                 </div>
@@ -37,7 +37,7 @@
                     <div v-for="(question) in examDetail.questions" :key="question.id">
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <p class="ques-content mb-2">{{ question.questionNumber }}. {{
+                                <p class="ques-content mb-2 fw-bold ">{{ question.questionNumber }}. {{
                                     question.content }}
                                 </p>
                                 <h5 class="btn-askAI me-1" v-if="isSubmit" title="Ask AI" @click="askAI(question)">
@@ -268,6 +268,10 @@ h4 {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
     height: 80vh;
     overflow-y: auto;
+}
+
+.ques-content {
+    color: #6280e4;
 }
 
 .form-check {

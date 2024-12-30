@@ -13,14 +13,14 @@
         </div>
         <div class="d-flex justify-content-around gap-2">
             <div class="mp3-pdf w-50 border border-2 border-primary rounded-3 p-2">
-                <div class="w-100" v-if="examDetail?.listenFileUrl?.fileUrl">
+                <div class="w-100" v-if="examDetail?.listenFile?.fileUrl">
                     <audio controls class="w-100">
-                        <source :src="examDetail.listenFileUrl.fileUrl" type="audio/mpeg">
+                        <source :src="examDetail.listenFile.fileUrl" type="audio/mpeg">
                     </audio>
                 </div>
                 <div v-else>The listen file is no longer available, please contact your teacher.</div>
-                <div class="pdf-file" v-if="examDetail?.pdfFileUrl?.fileUrl">
-                    <iframe :src="examDetail.pdfFileUrl.fileUrl" width="100%" height="98%" frameborder="0"></iframe>
+                <div class="pdf-file" v-if="examDetail?.pdfFile?.fileUrl">
+                    <iframe :src="examDetail.pdfFile.fileUrl" width="100%" height="98%" frameborder="0"></iframe>
                 </div>
                 <div v-else>The pdf file is no longer available, please contact your teacher.</div>
             </div>

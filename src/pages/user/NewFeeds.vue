@@ -36,19 +36,19 @@
         <div class="post border rounded-3 p-3 bg-white mb-2" v-for="(newfeed, index) in newFeeds" :key="newfeed.id">
             <div class="user-info d-flex align-items-center justify-content-between">
                 <div class="d-flex">
-                    <img :src="newfeed.user.avatarUrl || require('@/assets/nonAvatar.png')" alt="Avatar"
+                    <img :src="newfeed.user.avatarFile || require('@/assets/nonAvatar.png')" alt="Avatar"
                         class="avatar" />
                     <div class="user-details d-flex flex-column">
                         <span class="user-name fw-bold">{{ newfeed.user.name }}</span> <small>{{
                             formatTime(newfeed.postedAt)
-                        }}</small>
+                            }}</small>
                     </div>
                 </div>
                 <i class="bi bi-three-dots-vertical"></i>
             </div>
             <div class="post-title mb-2">{{ newfeed.content }}</div>
             <div class="text-center">
-                <img :src="newfeed.imageUrl" alt="Post Image" class="newfeeds-post-image rounded-3" />
+                <img :src="newfeed.imageFile" alt="Post Image" class="newfeeds-post-image rounded-3" />
             </div>
 
             <div class="d-flex align-items-center justify-content-center mt-2">
