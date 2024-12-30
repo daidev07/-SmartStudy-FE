@@ -37,15 +37,13 @@
                 <table id="examTable" class="table table-striped table-bordered">
                     <thead class="thead-dark">
                         <tr>
-                            <th class="text-center">Exam Id</th>
                             <th class="text-start">Exam Name</th>
                             <th>Date Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="table-group-divider">
                         <tr v-for="exam in filteredExams" :key="exam.id" scope="row">
-                            <td class="text-center">{{ exam.id }}</td>
                             <td class="text-start">{{ exam.name }}</td>
                             <td>{{ formatDateAndTime(exam.createdAt) }}</td>
                             <td class="text-center">
@@ -85,7 +83,7 @@
                                     style="cursor: pointer"></i>
                             </div>
                             <iframe :src="examDetails.pdfFile.fileUrl" class="w-100"
-                                :style="{ height: examDetails.listenFileUrl ? '77vh' : '83vh' }"></iframe>
+                                :style="{ height: examDetails.listenFile ? '77vh' : '87vh' }"></iframe>
                         </div>
                     </div>
 

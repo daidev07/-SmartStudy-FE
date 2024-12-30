@@ -69,33 +69,32 @@
                 <div class="container-title fw-bold">Recent excercises</div>
                 <i class="bi bi-info-circle" v-tooltip:top="'List of exercises you have done recently'"></i>
             </div>
-            <div v-if="studentAssignments.length === 0" class="text-center text-body-tertiary">No exercises have been
+            <div v-if="listDoneAssigns.length === 0" class="text-center text-body-tertiary">No exercises have been
                 done yet.
             </div>
             <div v-else class="p-3">
-                <div v-for="studentAssignment in studentAssignments"
-                    class="row justify-content-center align-items-center w-100 border-bottom p-2"
-                    :key="studentAssignment.id">
+                <div v-for="doneAssign in listDoneAssigns"
+                    class="row justify-content-center align-items-center w-100 border-bottom p-2" :key="doneAssign.id">
                     <div class="col-2 text-center">
                         <div class="fw-bold">
-                            {{ formatDate(studentAssignment.submittedAt) }}
+                            {{ formatDate(doneAssign.submittedAt) }}
                         </div>
                         <div>
-                            {{ formatTime(studentAssignment.submittedAt) }}
+                            {{ formatTime(doneAssign.submittedAt) }}
                         </div>
                     </div>
                     <div class="col-8 d-flex justify-content-between border-start border-end ">
                         <div class="fs-5 fw-bold">
-                            {{ studentAssignment.name }}
+                            {{ doneAssign.name }}
                         </div>
                         <div class="text-danger fs-4 fw-bold" v-tooltip:top="'Your score'">
-                            {{ studentAssignment.point }}
+                            {{ doneAssign.point }}
                         </div>
                     </div>
 
                     <div class="col-2 text-center">
                         <button class="btn btn-info text-white"
-                            @click="viewAssignAgain(studentAssignment.id, studentAssignment.exam.examType)">View
+                            @click="viewAssignAgain(doneAssign.id, doneAssign.exam.examType)">View
                             again</button>
                     </div>
                 </div>
@@ -105,7 +104,7 @@
 </template>
 
 <script>
-import { formatDate, formatTime } from '../../utils/FormatDateAndTime.js';
+import { formatDate, formatTime } from '@/utils/FormatDateAndTime.js';
 import axios from 'axios';
 import { mapGetters } from 'vuex';
 import { Line } from 'vue-chartjs';
@@ -121,11 +120,11 @@ export default {
         ...mapGetters(['getUserInfo']),
         chartData() {
             return {
-                labels: this.studentAssignments.map(assignment => assignment.name),
+                labels: this.listDoneAssigns.map(assignment => assignment.name),
                 datasets: [
                     {
                         label: 'Your point',
-                        data: this.studentAssignments.map(assignment => assignment.score),
+                        data: this.listDoneAssigns.map(assignment => assignment.score),
                         borderColor: '#6280e4',
                     }
                 ]
@@ -175,6 +174,7 @@ export default {
             apiUrl: process.env.VUE_APP_API_URL,
             reports: [],
             answerResults: [],
+            listDoneAssigns: [],
             didQuestion: 0,
             correctQuestion: 0,
             wrongQuestion: 0,
@@ -189,10 +189,13 @@ export default {
         }
     },
     methods: {
+        formatDate,
+        formatTime,
         async fetchStudentReport() {
             try {
                 const response = await axios.get(this.apiUrl + `/student-report/user/${this.getUserInfo.id}`);
                 this.reports = response.data.data;
+
                 this.answerResults = this.reports.answerResults;
                 this.didQuestion = this.answerResults.length;
                 this.correctQuestion = Array.isArray(this.answerResults)
@@ -203,8 +206,11 @@ export default {
                     : 0;
                 this.notAnswered = this.didQuestion - this.correctQuestion - this.wrongQuestion;
                 this.correctRatio = this.didQuestion > 0 ? Math.round(this.correctQuestion / this.didQuestion * 100) : 0;
+
                 this.studentAssignments = this.reports.studentAssignments.reverse();
-                console.log("STUDENT ASSIGNMENTS:: ", this.studentAssignments);
+                this.listDoneAssigns = this.studentAssignments
+                    .filter(assign => assign.assignmentStatus !== "NOT_SUBMIT")
+                console.log("LIST DONE ASSIGN:: ", this.listDoneAssigns);
 
                 this.chartData.labels = this.studentAssignments.map(assign => assign.name);
                 this.chartData.datasets[0].data = this.studentAssignments.map(assign => assign.point);
@@ -234,8 +240,7 @@ export default {
             }
             this.$router.push({ name: routeName, params: { id: assignId } });
         },
-        formatDate,
-        formatTime
+
     }
 }
 </script>

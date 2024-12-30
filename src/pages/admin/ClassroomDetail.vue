@@ -79,7 +79,7 @@
                     </button>
                 </div>
                 <table class="table table-bordered table-striped table-hover table-sm ">
-                    <thead class="table-dark">
+                    <thead>
                         <tr>
                             <th>#</th>
                             <th>Name</th>
@@ -89,7 +89,7 @@
                             <th class="text-center">Action</th>
                         </tr>
                     </thead>
-                    <tbody v-if="classworks && classworks.length">
+                    <tbody v-if="classworks && classworks.length" class="table-group-divider">
                         <tr v-for="(classwork, index) in classworks" :key="classwork.id">
                             <td>{{ index + 1 }}</td>
                             <td>{{ classwork.name }}</td>
@@ -133,7 +133,8 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <h4 class="modal-title" id="classworkModalLabel">New Classwork</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                            id="btn-close-modal"></button>
                     </div>
                     <div class="modal-body">
                         <form @submit.prevent="submitClasswork">
@@ -178,7 +179,7 @@
 </template>
 <script>
 import axios from 'axios';
-import { formatDate, formatDateAndTime } from '@/utils/FormatDateAndTime';
+import { formatDate, formatDateAndTime } from '@/utils/FormatDateAndTime.js';
 import { toast } from 'vue3-toastify';
 
 export default {
@@ -253,12 +254,12 @@ export default {
         async submitClasswork() {
             const { name, description, dueDate, examId } = this.classwork;
             try {
-                const res = await axios.post(`${this.apirUrl}/classroom-assignment/class/${this.classId}/exam/${examId}`, {
+                await axios.post(`${this.apirUrl}/classroom-assignment/class/${this.classId}/exam/${examId}`, {
                     name,
                     description,
                     dueDate: dueDate,
                 });
-                console.log('Classwork created:', res);
+                document.querySelector('#btn-close-modal').click();
                 toast.success('Classwork created successfully!');
                 this.fetchClasswork();
             } catch (error) {

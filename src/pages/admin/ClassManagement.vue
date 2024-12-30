@@ -6,12 +6,12 @@
         <hr class="fw-bold">
     </div>
     <div class="text-end mb-3">
-        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addClassModal">
+        <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addNewClassModal">
             <i class="bi bi-journal-plus me-1"></i>New Class
         </button>
     </div>
     <div class="class-card-container">
-        <div v-for="classItem in classList" :key="classItem.id" class="class-card"
+        <div v-for="classItem in classList" :key="classItem.id" class="class-card border rounded-3 p-3"
             @click="goToClassDetail(classItem.id)" v-tooltip:bottom="'More information...'">
             <div class="d-flex justify-content-between align-items-center">
                 <h3 class="class-name fw-bold">{{ classItem.className }}</h3>
@@ -55,13 +55,14 @@
         </div>
     </div>
     <!-- Modal add new class -->
-    <div class="modal fade" id="addClassModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-        aria-labelledby="addClassModal" aria-hidden="true">
+    <div class="modal fade" id="addNewClassModal" tabindex="-1" aria-labelledby="addNewClassModal" aria-hidden="true"
+        data-bs-backdrop="static" data-bs-keyboard="false">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="addClassModal">Add New Class</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <h1 class="modal-title fs-5">Add New Class</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="btn-close-modal"></button>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -127,11 +128,15 @@ export default {
             newClass: {
                 className: '',
             },
+            addNewClassModal: null,
             nameError: false,
         };
     },
     created() {
         this.fetchClassList();
+    },
+    mounted() {
+        this.addNewClassModal = new bootstrap.Modal(document.getElementById('addNewClassModal'));
     },
     methods: {
         async openCofirmDeleteModal() {
@@ -150,14 +155,14 @@ export default {
             }
             try {
                 const response = await axios.post(this.apirUrl + '/class', this.newClass);
-                if (response.data.data.code == 201) {
+                console.log("RESPONSE:: ", response);
+
+                if (response.data.code == 201) {
                     toast.success('New class created successfully');
                     this.fetchClassList();
-                    const addNewClassModal = new bootstrap.Modal(document.getElementById('addClassModal'));
-                    addNewClassModal.hide();
-                    this.newClass = {
-                        className: '',
-                    };
+                    this.addNewClassModal.hide();
+                    document.querySelector('#btn-close-modal').click();
+                    this.newClass = { className: '' };
                 }
             } catch (error) {
                 if (error.response.data.code == 430) {
@@ -236,17 +241,11 @@ export default {
 .class-card-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 13px;
 }
 
 .class-card {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 16px;
-    width: 300px;
-    background-color: #f9f9f9;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s, box-shadow 0.2s;
+    width: 13%
 }
 
 .class-card:hover {

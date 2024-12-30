@@ -40,7 +40,8 @@
                                 <p class="ques-content mb-2 fw-bold ">{{ question.questionNumber }}. {{
                                     question.content }}
                                 </p>
-                                <h5 class="btn-askAI me-1" v-if="isSubmit" title="Ask AI" @click="askAI(question)">
+                                <h5 class="btn-quickAskAI me-1" v-if="isSubmit" title="Ask AI"
+                                    @click="quickAskAI(question)">
                                     <i class="bi bi-patch-question"></i>
                                 </h5>
                             </div>
@@ -129,7 +130,7 @@ export default {
     },
     methods: {
         ...mapActions(['stopLoading', 'openChatbotWithLoader', 'setAskAIKey']),
-        async askAI(question) {
+        async quickAskAI(question) {
             try {
                 this.openChatbotWithLoader();
 
@@ -379,11 +380,11 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     border: 2px solid #6280e4;
 }
 
-.btn-askAI:hover {
+.btn-quickAskAI:hover {
     transform: scale(1.1);
 }
 
-.btn-askAI {
+.btn-quickAskAI {
     padding: 0.5em;
     outline: none;
     color: rgb(255, 255, 255);
@@ -402,7 +403,7 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     align-items: center;
 }
 
-.btn-askAI:before {
+.btn-quickAskAI:before {
     content: "";
     background: linear-gradient(90deg,
             #526fd6,
@@ -420,11 +421,11 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     -webkit-filter: blur(5px);
     width: calc(100% + 4px);
     height: calc(100% + 4px);
-    animation: glowing-btn-askAI 20s linear infinite;
+    animation: glowing-btn-quickAskAI 20s linear infinite;
     transition: opacity 0.3s ease-in-out;
 }
 
-@keyframes glowing-btn-askAI {
+@keyframes glowing-btn-quickAskAI {
     0% {
         background-position: 0 0;
     }
@@ -438,7 +439,7 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     }
 }
 
-.btn-askAI:after {
+.btn-quickAskAI:after {
     z-index: -1;
     content: "";
     position: absolute;

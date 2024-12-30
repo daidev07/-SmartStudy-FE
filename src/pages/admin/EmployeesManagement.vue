@@ -38,9 +38,10 @@
             <thead>
                 <tr>
                     <th class="text-center" width="10%">Avatar</th>
-                    <th width="20%">Name</th>
-                    <th width="20%">Email</th>
-                    <th width="20%">Phone</th>
+                    <th width="15%">Name</th>
+                    <th width="15%">Username</th>
+                    <th width="15%">Email</th>
+                    <th width="15%">Phone</th>
                     <th class="text-center" width="30%">Actions</th>
                 </tr>
             </thead>
@@ -51,6 +52,7 @@
                             alt="avatar" class="rounded-circle" width="50" height="50">
                     </td>
                     <td>{{ employee.name }}</td>
+                    <td>{{ employee.username }}</td>
                     <td>{{ employee.email }}</td>
                     <td>{{ employee.phone }}</td>
                     <td class="text-center">
@@ -73,7 +75,8 @@
                     </h1>
                     <h1 class="modal-title fs-5 fw-bold" id="addEmployeeModal" v-if="activeTab === 'ASSISTANT'">Add New
                         Assistant</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                        id="btn-close-modal"></button>
                 </div>
                 <div class="modal-body">
                     <form>
@@ -146,7 +149,6 @@
 <script>
 import axios from 'axios';
 import { toast } from "vue3-toastify";
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
 export default {
     data() {
@@ -230,7 +232,7 @@ export default {
             }
             try {
                 const response = await axios.post(this.apiUrl + "/user", this.newEmployee);
-                if (response.data.data.code == 201) {
+                if (response.data.code == 201) {
                     this.newEmployee = {
                         name: "",
                         username: "",
@@ -240,8 +242,7 @@ export default {
                         phone: "",
                     };
                     this.fetchData(this.activeTab);
-                    const addEmployeeModal = new bootstrap.Modal(this.$refs.addEmployeeModal);
-                    addEmployeeModal.hide();
+                    document.querySelector('#btn-close-modal').click();
                     toast.success("Create successfully!");
                 }
             } catch (error) {
