@@ -33,7 +33,7 @@
                     <div class="d-flex align-items-center">
                         <span class="status-legend bg-light-red me-1"></span><span class="me-3">Wrong answer</span>
                         <span class="status-legend bg-light-green me-1"></span><span class="me-3">Correct answer</span>
-                        <span class="status-legend bg-white me-1"></span><span class="">Your answer</span>
+                        <span class="status-legend border-studentAnswer me-1"></span><span class="">Your answer</span>
                     </div>
                 </div>
                 <div v-if="examDetail" class="exam-questions">
@@ -91,6 +91,16 @@
                 </div>
             </div>
         </div>
+        <!-- Loader overlay -->
+        <div id="loader-overlay" class="position-fixed top-0 start-0 w-100 h-100 bg-white"
+            :class="{ 'd-none': !isSpinnerLoading, 'd-flex justify-content-center align-items-center': isSpinnerLoading }">
+            <div class="text-center">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Submit successfully, results will be displayed after a few seconds</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -117,6 +127,7 @@ export default {
             answerResults: [],
             userAnswers: {},
             isSubmit: false,
+            isSpinnerLoading: false,
             answerLetters: ['A', 'B', 'C', 'D'],
         };
     },
@@ -132,13 +143,18 @@ export default {
     methods: {
         async submitResults() {
             try {
+                toast.success('Submited successfully');
+                this.isSpinnerLoading = true;
                 const point = await saveResults(this.stuAssignId, this.examDetail.questions, this.getUserId);
                 this.assignmentInfo.point = point;
                 this.isSubmit = true;
-                toast.success('Submit successfully!');
                 this.loadAnswerResults();
             } catch (error) {
                 console.error('Error submitting results:', error);
+            } finally {
+                setTimeout(() => {
+                    this.isSpinnerLoading = false;
+                }, 3000);
             }
         },
         isUserAnswerSelected(questionId, answerId) {
@@ -366,7 +382,7 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     opacity: 0.6;
 }
 
-.bg-white {
+.border-studentAnswer {
     border: 2px solid #6280e4;
     border-radius: 4px;
 }
@@ -374,5 +390,10 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 .bg-light-green {
     background-color: #28a745;
     opacity: 0.6;
+}
+
+#loader-overlay {
+    background-color: white !important;
+    z-index: 9999;
 }
 </style>

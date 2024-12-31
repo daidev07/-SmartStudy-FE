@@ -91,6 +91,16 @@
                 </div>
             </div>
         </div>
+        <!-- Loader overlay -->
+        <div id="loader-overlay" class="position-fixed top-0 start-0 w-100 h-100 bg-white"
+            :class="{ 'd-none': !isSpinnerLoading, 'd-flex justify-content-center align-items-center': isSpinnerLoading }">
+            <div class="text-center">
+                <div class="spinner-border text-info" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-3">Submit successfully, results will be displayed after a few seconds</p>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -118,6 +128,7 @@ export default {
             answerResults: [],
             userAnswers: {},
             isSubmit: false,
+            isSpinnerLoading: false,
             answerLetters: ['A', 'B', 'C', 'D'],
         };
     },
@@ -158,13 +169,18 @@ export default {
         },
         async submitResults() {
             try {
+                toast.success('Submit successfully!');
+                this.isSpinnerLoading = true;
                 const point = await saveResults(this.stuAssignId, this.examDetail.questions, this.getUserId);
                 this.assignmentInfo.point = point;
                 this.isSubmit = true;
-                toast.success('Submit successfully!');
                 this.loadAnswerResults();
             } catch (error) {
                 console.error('Error submitting results:', error);
+            } finally {
+                setTimeout(() => {
+                    this.isSpinnerLoading = false;
+                }, 3000);
             }
         },
         isUserAnswerSelected(questionId, answerId) {
@@ -449,5 +465,10 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
     left: 0;
     top: 0;
     border-radius: 10px;
+}
+
+#loader-overlay {
+    background-color: white !important;
+    z-index: 9999;
 }
 </style>
