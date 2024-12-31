@@ -50,12 +50,13 @@ export function formatTimeChatbot(dateString) {
     if (minutes < 1) {
         return "Just now";
     } else if (minutes < 60) {
-        return `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+        return `about ${minutes} minute${minutes > 1 ? 's' : ''} ago`;
     } else if (hours < 24) {
-        return `${hours} hour${hours > 1 ? 's' : ''} ago`;
-    } else if (days < 30) {
-        return `${days} day${days > 1 ? 's' : ''} ago`;
+        return `about ${hours} hour${hours > 1 ? 's' : ''} ago`;
+    } else if (days < 7) {
+        return `about ${days} day${days > 1 ? 's' : ''} ago`;
     } else {
-        return postedDate.toLocaleDateString();
+        const options = { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false };
+        return postedDate.toLocaleString('en-GB', options).replace(',', ' at');
     }
 }

@@ -18,7 +18,7 @@
         <div v-else v-for="(message, index) in messageDetails" :key="index" class="chat-message ">
           <p v-if="message.messageUser" class="user-message mb-2 p-2">{{ message.messageUser }}</p>
           <p v-if="message.messageBot" class="chatbot-message p-2" v-html="formatBotMessage(message.messageBot)"></p>
-          <p class="text-body-tertiary">{{ formatDate(message?.respondedAt) }}</p>
+          <p class="text-body-tertiary">{{ formatTimeChatbot(message?.respondedAt) }}</p>
         </div>
       </div>
 
@@ -38,8 +38,7 @@ import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 import { mapGetters, mapState, mapActions } from 'vuex';
 import axios from 'axios';
-import { formatDistanceToNow } from 'date-fns';
-
+import { formatTimeChatbot } from '../../utils/FormatDateAndTime.js';
 
 export default {
   name: 'HomePage',
@@ -83,6 +82,7 @@ export default {
     ...mapState(['isLoading', 'askAIKey']),
   },
   methods: {
+    formatTimeChatbot,
     ...mapActions(['stopLoading', 'startLoading', 'toggleChatbot']),
     toggleChatbotOrClose() {
       this.toggleChatbot();
@@ -132,11 +132,6 @@ export default {
         }
       });
     },
-    formatDate(date) {
-      if (!date) return '';
-      const formattedDate = new Date(date);
-      return formatDistanceToNow(formattedDate, { addSuffix: true });
-    }
   }
 };
 </script>
