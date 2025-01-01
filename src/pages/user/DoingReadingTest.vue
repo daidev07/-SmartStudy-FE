@@ -8,7 +8,7 @@
         </div>
         <div v-else class="d-flex justify-content-between mb-2 align-items-center border bg-white p-3 rounded-3">
             <h4 class="text-center">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
-            <div v-if="isSubmit" class="d-flex justify-content-between">
+            <div class="d-flex justify-content-between">
                 <div class="me-3">
                     Result for exam
                 </div>
@@ -32,7 +32,7 @@
                 <div v-else class="text-body-tertairy">The pdf file is no longer available, please contact your teacher.
                 </div>
             </div>
-            <div v-if="examDetail" class="quizz w-50 bg-white border rounded-3 p-3">
+            <div v-if="examDetail" class="quizz w-50 bg-white border rounded-3 p-3 overflow-y-auto">
                 <div class="row">
                     <div v-for="(question) in examDetail.questions" :key="question.id">
                         <div class="mb-3">

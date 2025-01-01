@@ -40,7 +40,7 @@
                         class="avatar" />
                     <div class="user-details d-flex flex-column">
                         <span class="user-name fw-bold">{{ newfeed.user.name }}</span> <small>{{
-                            formatTime(newfeed.postedAt)
+                            formatTimeChatbot(newfeed.postedAt)
                             }}</small>
                     </div>
                 </div>
@@ -108,6 +108,7 @@ export default {
         }
     },
     methods: {
+        formatTimeChatbot,
         async fetchNewfeeds() {
             try {
                 const response = await axios.get(this.apiUrl + `/newsfeed/class/${this.classroomId}`);
@@ -152,9 +153,6 @@ export default {
             }
             this.fetchNewfeeds();
         },
-        formatTimeChatbot(dateString) {
-            return formatTimeChatbot(dateString);
-        }
     }
 };
 </script>
