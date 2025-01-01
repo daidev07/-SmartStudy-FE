@@ -41,7 +41,7 @@
                     <div class="user-details d-flex flex-column">
                         <span class="user-name fw-bold">{{ newfeed.user.name }}</span> <small>{{
                             formatTime(newfeed.postedAt)
-                        }}</small>
+                            }}</small>
                     </div>
                 </div>
                 <i class="bi bi-three-dots-vertical"></i>
@@ -110,7 +110,7 @@ export default {
     methods: {
         async fetchNewfeeds() {
             try {
-                const response = await axios.get(this.apiUrl + `/newfeed/class/${this.classroomId}`);
+                const response = await axios.get(this.apiUrl + `/newsfeed/class/${this.classroomId}`);
                 this.newFeeds = response.data.data.reverse();
                 console.log("LIST NEW FEEDS:: ", this.newFeeds);
             } catch (error) {
@@ -134,7 +134,7 @@ export default {
             console.log("USER ID:: ", this.userId);
 
             try {
-                await axios.post(`${this.apiUrl}/newfeed/all`, formData, {
+                await axios.post(`${this.apiUrl}/newsfeed/all`, formData, {
                     headers: {
                         "Content-Type": "multipart/form-data",
                     },

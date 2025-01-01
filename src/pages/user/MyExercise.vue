@@ -97,8 +97,6 @@ export default {
                 const userId = this.getUserInfo.id;
                 const response = await axios.get(this.apiUrl + `/student-assignment/user/${userId}`);
                 this.listAssignments = response.data.data.reverse();
-                console.log("LIST ASSIGNMENTS:: ", this.listAssignments);
-
             } catch (error) {
                 console.error(error);
             }

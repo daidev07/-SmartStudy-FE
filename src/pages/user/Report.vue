@@ -210,11 +210,9 @@ export default {
                 this.studentAssignments = this.reports.studentAssignments.reverse();
                 this.listDoneAssigns = this.studentAssignments
                     .filter(assign => assign.assignmentStatus !== "NOT_SUBMIT")
-                console.log("LIST DONE ASSIGN:: ", this.listDoneAssigns);
 
                 this.chartData.labels = this.studentAssignments.map(assign => assign.name);
-                this.chartData.datasets[0].data = this.studentAssignments.map(assign => assign.point);
-                console.log("CHART DATA:: ", this.chartData);
+                this.chartData.datasets[0].data = this.studentAssignments.map(assign => assign.point).reverse();
             } catch (error) {
                 console.error(error);
             }
