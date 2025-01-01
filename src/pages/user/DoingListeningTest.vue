@@ -7,7 +7,7 @@
                 Submit</button>
         </div>
         <div v-else class="d-flex justify-content-between mb-2 border bg-white p-3 rounded-3">
-            <h4 class="text-center fw-bold">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
+            <h4 class="text-center">Result for {{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <div class="d-flex justify-content-between">
                 <div class="me-3">
                     Result for exam

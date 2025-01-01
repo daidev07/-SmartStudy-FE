@@ -50,8 +50,8 @@ export default {
         return {
             logo: require('@/assets/logo.png'),
             sidebarItems: [
-                { name: "AnalysisChart", path: '', displayName: "Analysis", icon: "bx bx-line-chart", isActive: true },
-                { name: "ClassManagement", path: 'class-management', displayName: "Class", icon: "bi bi-house", isActive: false },
+                // { name: "AnalysisChart", path: '', displayName: "Analysis", icon: "bx bx-line-chart", isActive: false },
+                { name: "ClassManagement", path: 'class-management', displayName: "Class", icon: "bi bi-house", isActive: true },
                 { name: "EmployeesManagement", path: 'employees-management', displayName: "Employees", icon: "bi bi-people", isActive: false },
                 { name: "ExamManagement", path: 'exam-management', displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],

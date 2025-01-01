@@ -62,9 +62,11 @@
             <div v-if="!isViewClick" class="text-center text-secondary">No exam available to view, let's select one.
             </div>
             <div v-else-if="examDetails" class="detail-container" ref="examDetailSection">
-                <h4 class="text-center">
-                    Details for <span class="text-primary fw-bold"> {{ examDetails.name }} </span> exam
-                </h4>
+                <div class="text-center">
+                    Details for <span class="text-primary fw-bold fs-4"> {{ examDetails.name }} </span><i
+                        class="bi bi-pencil-square ms-2 text-warning" v-tooltip:top="'Edit exam'" data-bs-toggle="modal"
+                        data-bs-target="#updateExamModal"></i> exam
+                </div>
                 <div class="d-flex">
                     <div class="show-file w-50 p-3">
                         <div v-if="examDetails.listenFile">
@@ -108,6 +110,51 @@
                         </div>
                     </div>
                 </div>
+                <div class="modal fade" id="updateExamModal" tabindex="-1" aria-labelledby="updateExamModalLabel"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header ">
+                                <h5 class="modal-title fw-bold" id="updateExamModalLabel">Update Exam</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form @submit.prevent="updateExamDetails">
+                                    <div class="modal-body">
+                                        <label for="examName">Exam Name:</label>
+                                        <input type="text" v-model="examDetails.name" class="form-control"
+                                            :class="{ 'is-invalid': examNameError }" />
+                                        <div v-if="examNameError" class=" invalid-feedback">
+                                            Exam name not be null.
+                                        </div>
+                                        <div v-if="examDetails.examType === 'LISTENING'">
+                                            <label for="listenFile">MP3 File:</label>
+                                            <input type="file" @change="handleFileChange('listenFile', $event)"
+                                                class="form-control" accept=".mp3"
+                                                :class="{ 'is-invalid': mp3FileError }" />
+                                            <div v-if="mp3FileError" class="invalid-feedback">
+                                                Please provide a valid MP3 file.
+                                            </div>
+                                        </div>
+                                        <label for="pdfFile">PDF File:</label>
+                                        <input type="file" @change="handleFileChange('pdfFile', $event)"
+                                            class="form-control" accept=".pdf"
+                                            :class="{ 'is-invalid': pdfFileError }" />
+                                        <div v-if="pdfFileError" class="invalid-feedback">
+                                            Please provide a valid PDF file.
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <button type="submit" class="btn btn-primary">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -115,7 +162,7 @@
 <script>
 import TestAdding from "../../components/TestAdding.vue";
 import { formatDateAndTime } from "@/utils/FormatDateAndTime.js";
-// import { toast } from "vue3-toastify";
+import { toast } from "vue3-toastify";
 import axios from "axios";
 import { fetchExam } from "@/services/examService";
 import { nextTick } from "vue";
@@ -132,6 +179,13 @@ export default {
             activeTab: "LISTENING",
             isViewClick: false,
             examDetails: null,
+            files: {
+                listenFile: null,
+                pdfFile: null,
+            },
+            examNameError: false,
+            mp3FileError: false,
+            pdfFileError: false,
         };
     },
     created() {
@@ -147,6 +201,37 @@ export default {
     },
     methods: {
         formatDateAndTime,
+        handleFileChange(type, event) {
+            this.files[type] = event.target.files[0];
+        },
+        async updateExamDetails() {
+            this.examNameError = this.mp3FileError = this.pdfFileError = false;
+            if (!this.examDetails.name) {
+                this.examNameError = true;
+                return;
+            }
+            const formData = new FormData();
+            formData.append("examName", this.examDetails.name);
+            if (this.examDetails.examType === "LISTENING") {
+                if (this.files.listenFile)
+                    formData.append("listenMp3File", this.files.listenFile);
+                if (this.files.pdfFile)
+                    formData.append("listenPdfFile", this.files.pdfFile);
+            }
+            else if (this.examDetails.examType === "READING") {
+                if (this.files.pdfFile)
+                    formData.append("readingPdfFile", this.files.pdfFile);
+            }
+            try {
+                await axios.put(`${this.apiUrl}/exam/${this.examDetails.id}`, formData);
+                toast.success("Exam updated successfully.");
+
+                this.fetchExamList();
+            } catch (error) {
+                console.error("Error updating exam:", error);
+                toast.error("Failed to update exam.");
+            }
+        },
         toggleTestAdding() {
             this.showTestAdding = !this.showTestAdding;
         },
