@@ -65,7 +65,10 @@
 
         <div class="text-center mt-4">
             <button type="button" class="btn btn-secondary me-2" @click="$emit('close')">Close</button>
-            <button type="button" class="btn btn-primary" @click="saveExcercise">Save</button>
+            <button type="button" class="btn btn-primary" @click="saveExcercise" :disabled="isLoading">
+                <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                <span v-else>Save</span>
+            </button>
         </div>
     </div>
 </template>
@@ -95,7 +98,10 @@ export default {
                 readingPdfFile: null,
                 readingAnswerFile: null,
             },
+            isLoading: false,
         };
+    },
+    components: {
     },
     methods: {
         onFileChange(event, fileKey) {
@@ -156,6 +162,7 @@ export default {
                     toast.error("Invalid tab selected");
                     return;
             }
+            this.isLoading = true;
             try {
                 await axios.post(`${this.apiUrl}${endpoint}`, formData, {
                     headers: {
@@ -176,6 +183,8 @@ export default {
                 } else {
                     toast.error("An error occurred. Please try again later!");
                 }
+            } finally {
+                this.isLoading = false;
             }
         },
     },

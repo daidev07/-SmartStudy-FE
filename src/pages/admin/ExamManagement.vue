@@ -71,8 +71,7 @@
                     <div class="show-file w-50 p-3">
                         <div v-if="examDetails.listenFile">
                             <div class="d-flex justify-content-between">
-                                <h5 class="fw-bold">MP3 Listen File:</h5>
-                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"></i>
+                                <div class="fw-bold">MP3 Listen File:</div>
                             </div>
                             <audio controls class="w-100">
                                 <source :src="examDetails.listenFile.fileUrl" type="audio/mpeg" />
@@ -80,9 +79,7 @@
                         </div>
                         <div v-if="examDetails.pdfFile">
                             <div class="d-flex justify-content-between">
-                                <h5 class="fw-bold">PDF File:</h5>
-                                <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update PDF file'"
-                                    style="cursor: pointer"></i>
+                                <div class="fw-bold">PDF File:</div>
                             </div>
                             <iframe :src="examDetails.pdfFile.fileUrl" class="w-100"
                                 :style="{ height: examDetails.listenFile ? '77vh' : '87vh' }"></iframe>
@@ -90,7 +87,7 @@
                     </div>
 
                     <div class="answer-file w-50 p-3 overflow-auto border-start border-dark">
-                        <h5 class="fw-bold">Answer Details:</h5>
+                        <div class="fw-bold">Answer Details:</div>
                         <div v-for="question in examDetails.questions" :key="question.id" class="mt-2">
                             <div class="d-flex justify-content-between align-items-center">
                                 <span class="mt-2">
@@ -119,17 +116,19 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
                                 </button>
                             </div>
-                            <div class="modal-body">
-                                <form @submit.prevent="updateExamDetails">
-                                    <div class="modal-body">
-                                        <label for="examName">Exam Name:</label>
+                            <form @submit.prevent="updateExamDetails">
+                                <div class="modal-body">
+                                    <div class="mb-2">
+                                        <label for="examName" class="fw-bold">Exam Name:</label>
                                         <input type="text" v-model="examDetails.name" class="form-control"
                                             :class="{ 'is-invalid': examNameError }" />
                                         <div v-if="examNameError" class=" invalid-feedback">
                                             Exam name not be null.
                                         </div>
+                                    </div>
+                                    <div class="mb-2">
                                         <div v-if="examDetails.examType === 'LISTENING'">
-                                            <label for="listenFile">MP3 File:</label>
+                                            <label for="listenFile" class="fw-bold">MP3 File:</label>
                                             <input type="file" @change="handleFileChange('listenFile', $event)"
                                                 class="form-control" accept=".mp3"
                                                 :class="{ 'is-invalid': mp3FileError }" />
@@ -137,7 +136,9 @@
                                                 Please provide a valid MP3 file.
                                             </div>
                                         </div>
-                                        <label for="pdfFile">PDF File:</label>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="pdfFile" class="fw-bold">PDF File:</label>
                                         <input type="file" @change="handleFileChange('pdfFile', $event)"
                                             class="form-control" accept=".pdf"
                                             :class="{ 'is-invalid': pdfFileError }" />
@@ -145,13 +146,17 @@
                                             Please provide a valid PDF file.
                                         </div>
                                     </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Close</button>
-                                        <button type="submit" class="btn btn-primary">Save</button>
-                                    </div>
-                                </form>
-                            </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                                        id="btnCloseUpdateModal">Close</button>
+                                    <button type="submit" class="btn btn-primary" :disabled="isLoading">
+                                        <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        <span v-else>Save</span>
+                                    </button>
+                                </div>
+                            </form>
                         </div>
                     </div>
                 </div>
@@ -159,6 +164,7 @@
         </div>
     </div>
 </template>
+
 <script>
 import TestAdding from "../../components/TestAdding.vue";
 import { formatDateAndTime } from "@/utils/FormatDateAndTime.js";
@@ -186,6 +192,7 @@ export default {
             examNameError: false,
             mp3FileError: false,
             pdfFileError: false,
+            isLoading: false,
         };
     },
     created() {
@@ -222,6 +229,7 @@ export default {
                 if (this.files.pdfFile)
                     formData.append("readingPdfFile", this.files.pdfFile);
             }
+            this.isLoading = true;
             try {
                 await axios.put(`${this.apiUrl}/exam/${this.examDetails.id}`, formData);
                 toast.success("Exam updated successfully.");
@@ -230,6 +238,9 @@ export default {
             } catch (error) {
                 console.error("Error updating exam:", error);
                 toast.error("Failed to update exam.");
+            } finally {
+                this.isLoading = false;
+                document.getElementById("btnCloseUpdateModal").click();
             }
         },
         toggleTestAdding() {
