@@ -140,7 +140,6 @@ export default {
     methods: {
         async submitResults() {
             try {
-                toast.success('Submited successfully');
                 this.isSpinnerLoading = true;
                 const point = await saveResults(this.stuAssignId, this.examDetail.questions, this.getUserId);
                 this.assignmentInfo.point = point;
@@ -152,6 +151,7 @@ export default {
                 setTimeout(() => {
                     this.isSpinnerLoading = false;
                 }, 3000);
+                toast.success('Submited successfully');
             }
         },
         isUserAnswerSelected(questionId, answerId) {

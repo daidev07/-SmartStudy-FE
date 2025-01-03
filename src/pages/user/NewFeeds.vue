@@ -25,7 +25,8 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            id="btnCloseNewPostModal">Cancel</button>
                         <button type="button" class="btn btn-primary" @click="submitPost">Post</button>
                     </div>
                 </div>
@@ -72,7 +73,6 @@ import axios from 'axios';
 import { toast } from 'vue3-toastify';
 import { mapGetters } from 'vuex';
 import { formatTimeChatbot } from '../../utils/FormatDateAndTime.js';
-import bootstrap from 'bootstrap/dist/js/bootstrap.bundle';
 
 export default {
     name: 'NewFeeds',
@@ -140,18 +140,16 @@ export default {
                         "Content-Type": "multipart/form-data",
                     },
                 });
-                const modalElement = document.getElementById('addNewPostModal');
-                const modalInstance = bootstrap.Modal.getInstance(modalElement);
-                if (modalInstance) {
-                    modalInstance.hide();
-                    modalInstance.dispose();
-                }
-                toast.success("Post successfully!");
             } catch (error) {
                 toast.error("Invalid photo, please try again");
                 console.error("Invalid photo, please try again:", error);
+            } finally {
+                this.newPostContent = "";
+                this.selectedFile = null;
+                document.getElementById("btnCloseNewPostModal").click();
+                toast.success("Post successfully!");
+                this.fetchNewfeeds();
             }
-            this.fetchNewfeeds();
         },
     }
 };
