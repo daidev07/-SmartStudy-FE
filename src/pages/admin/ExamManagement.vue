@@ -93,7 +93,8 @@
                                 <span class="mt-2">
                                     <strong> {{ question.questionNumber }}. </strong> {{ question.content }}</span>
                                 <i class="bi bi-pencil-square ms-2" v-tooltip:top="'Update this question'"
-                                    style="cursor: pointer"></i>
+                                    style="cursor: pointer" data-bs-toggle="modal" data-bs-target="#updateQuestionModal"
+                                    @click="fetchQuestionDetails(question.id)"></i>
                             </div>
                             <div v-for="(answer, answerIndex) in question.answers" :key="answer.id">
                                 <div class="d-flex">
@@ -107,6 +108,7 @@
                         </div>
                     </div>
                 </div>
+                <!-- Update Exam Modal -->
                 <div class="modal fade" id="updateExamModal" tabindex="-1" aria-labelledby="updateExamModalLabel"
                     aria-hidden="true">
                     <div class="modal-dialog">
@@ -160,6 +162,76 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Update question Modal -->
+                <div class="modal fade" id="updateQuestionModal" tabindex="-1" aria-labelledby="updateQuestionModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog"
+                        :class="{ 'modal-xl': examDetails.examType === 'READING', 'modal-lg': examDetails.examType === 'LISTENING' }">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title fw-bold" id="updateExamModalLabel">Update question</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                                    id="btnCloseUpdateQuestionModal">
+                                </button>
+                            </div>
+                            <div class="modal-body"
+                                :class="{ 'd-flex justify-content-between gap-3': examDetails.examType === 'READING' }">
+                                <div :class="{ 'w-50': examDetails.examType === 'READING' }">
+                                    <div class="mb-2">
+                                        <label for="questionContent" class="fw-bold mb-2">Question number:</label>
+                                        <input type="text" class="form-control"
+                                            v-model="questionSelected.questionNumber" />
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="questionContent" class="fw-bold mb-2">Question content:</label>
+                                        <textarea type="text" class="form-control" v-model="questionSelected.content">
+                                        </textarea>
+                                    </div>
+                                    <div class="mb-2">
+                                        <label for="answerContent" class="fw-bold mb-2">Answers:</label>
+                                        <div v-for="(answer, answerIndex) in questionSelected.answers" :key="answer.id"
+                                            class="d-flex align-items-center mb-2">
+                                            <textarea class="form-control" rows="1" v-model="answer.content"></textarea>
+                                            <div class="form-check ms-3">
+                                                <input class="form-check-input" type="radio"
+                                                    :id="'answer' + answerIndex" name="correctAnswer"
+                                                    v-model="selectedCorrectAnswer" :value="answer.id"
+                                                    :checked="answer.isCorrect" />
+                                                <label class="form-check-label text-primary"
+                                                    :for="'answer' + answerIndex">Correct</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="expand-content w-50 border-start ps-3"
+                                    v-if="examDetails.examType === 'READING'">
+                                    <div class="mb-2">
+                                        <label for="answerContent" class="fw-bold mb-2">Expand content:</label>
+                                        <div v-if="questionSelected.expandContent?.content">
+                                            <textarea type="text" class="form-control"
+                                                v-model="questionSelected.expandContent.content">
+                                        </textarea>
+                                        </div>
+                                        <div v-else class="text-body-tertiary">
+                                            This question dont have expand content.
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                <button type="button" class="btn btn-primary" @click="saveUpdateQuestion">
+                                    <div>
+                                        <span v-if="isLoading" class="spinner-border spinner-border-sm" role="status"
+                                            aria-hidden="true"></span>
+                                        <span v-else>Save update</span>
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -193,6 +265,7 @@ export default {
             mp3FileError: false,
             pdfFileError: false,
             isLoading: false,
+            questionSelected: []
         };
     },
     created() {
@@ -207,6 +280,50 @@ export default {
         },
     },
     methods: {
+        async saveUpdateQuestion() {
+            const correctAnswerId = this.selectedCorrectAnswer;
+            const requestPayload = {
+                questionId: this.questionSelected.id,
+                questionNumber: this.questionSelected.questionNumber,
+                questionContent: this.questionSelected.content,
+                firstAnswerId: this.questionSelected.answers[0]?.id || null,
+                firstAnswerContent: this.questionSelected.answers[0]?.content || "",
+                correctFirst: this.questionSelected.answers[0]?.id === correctAnswerId,
+                secondAnswerId: this.questionSelected.answers[1]?.id || null,
+                secondAnswerContent: this.questionSelected.answers[1]?.content || "",
+                correctSecond: this.questionSelected.answers[1]?.id === correctAnswerId,
+                thirdAnswerId: this.questionSelected.answers[2]?.id || null,
+                thirdAnswerContent: this.questionSelected.answers[2]?.content || "",
+                correctThird: this.questionSelected.answers[2]?.id === correctAnswerId,
+                fourthAnswerId: this.questionSelected.answers[3]?.id || null,
+                fourthAnswerContent: this.questionSelected.answers[3]?.content || "",
+                correctFourth: this.questionSelected.answers[3]?.id === correctAnswerId,
+                expandContentId: this.questionSelected.expandContent?.id || null,
+                expandContent: this.questionSelected.expandContent?.content || "",
+            };
+            console.log("Request Payload:", requestPayload);
+            this.isLoading = true;
+            try {
+                const response = await axios.put(`${this.apiUrl}/question`, requestPayload);
+                console.log("Response:", response);
+                this.isLoading = false;
+                this.fetchExamDetail(this.examDetails.id);
+                toast.success("Question updated successfully.");
+                document.getElementById("btnCloseUpdateQuestionModal").click();
+            } catch (error) {
+                console.error("Error updating question:", error);
+            }
+        },
+        async fetchQuestionDetails(questionId) {
+            try {
+                const response = await axios.get(`${this.apiUrl}/question/${questionId}`);
+                this.questionSelected = response.data.data;
+                const correctAnswer = this.questionSelected.answers.find(answer => answer.isCorrect);
+                this.selectedCorrectAnswer = correctAnswer ? correctAnswer.id : null;
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        },
         formatDateAndTime,
         handleFileChange(type, event) {
             this.files[type] = event.target.files[0];

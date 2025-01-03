@@ -245,7 +245,7 @@ export default {
 }
 
 .class-card {
-    width: 13%
+    width: 14%
 }
 
 .class-card:hover {

@@ -14,9 +14,9 @@
                         <i class='bx bxs-hide'></i>
                         <!-- <i class='bx bxs-show'></i> -->
                     </div>
-                    <div class="forgot-link">
+                    <!-- <div class="forgot-link">
                         <RouterLink to="/forgot-password" class="forgot-link-router">Forgot Password?</RouterLink>
-                    </div>
+                    </div> -->
                     <button type="submit" class="btn">Login</button>
                 </form>
             </div>

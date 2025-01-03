@@ -211,8 +211,8 @@ export default {
                 this.listDoneAssigns = this.studentAssignments
                     .filter(assign => assign.assignmentStatus !== "NOT_SUBMIT")
 
-                this.chartData.labels = this.studentAssignments.map(assign => assign.name);
-                this.chartData.datasets[0].data = this.studentAssignments.map(assign => assign.point).reverse();
+                this.chartData.labels = this.listDoneAssigns.map(assign => assign.name);
+                this.chartData.datasets[0].data = this.listDoneAssigns.map(assign => assign.point).reverse();
             } catch (error) {
                 console.error(error);
             }
