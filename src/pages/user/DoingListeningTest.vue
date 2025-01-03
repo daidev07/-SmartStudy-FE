@@ -1,5 +1,5 @@
 <template>
-    <div class="container w-75">
+    <div class="container w-75" v-if="!isSpinnerLoading">
         <div v-if="!isSubmit" class="d-flex justify-content-between mb-2 border bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <button class="btn-submit text-white p-2 rounded-2" @click="submitExam"> <i
@@ -89,20 +89,21 @@
             </div>
         </div>
         <!-- Loader overlay -->
-        <div id="loader-overlay" class="position-fixed top-0 start-0 w-100 h-100 bg-white"
-            :class="{ 'd-none': !isSpinnerLoading, 'd-flex justify-content-center align-items-center': isSpinnerLoading }">
-            <div class="text-center">
-                <div class="spinner-border text-info" role="status">
-                    <span class="visually-hidden">Loading...</span>
-                </div>
-                <p class="mt-3">Submit successfully, results will be displayed after a few seconds</p>
+    </div>
+    <div id="loader-overlay"
+        class="container-load m-auto bg-white border rounded-3 p-3 d-flex justify-content-center align-items-center"
+        v-if="isSpinnerLoading">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
+            <p class="mt-3 text-body-tertiary">Submit successfully, results will be displayed after a few seconds...</p>
         </div>
     </div>
 </template>
 
 <script>
-import { toast } from "vue3-toastify";
+// import { toast } from "vue3-toastify";
 import { Modal } from 'bootstrap';
 import { mapGetters } from 'vuex';
 import {
@@ -143,15 +144,12 @@ export default {
                 this.isSpinnerLoading = true;
                 const point = await saveResults(this.stuAssignId, this.examDetail.questions, this.getUserId);
                 this.assignmentInfo.point = point;
-                this.isSubmit = true;
-                this.loadAnswerResults();
             } catch (error) {
                 console.error('Error submitting results:', error);
             } finally {
-                setTimeout(() => {
-                    this.isSpinnerLoading = false;
-                }, 3000);
-                toast.success('Submited successfully');
+                this.isSpinnerLoading = false;
+                this.isSubmit = true;
+                this.loadAnswerResults();
             }
         },
         isUserAnswerSelected(questionId, answerId) {
@@ -221,6 +219,10 @@ export default {
 
 <style scoped>
 .container {
+    margin-top: 91px;
+}
+
+.container-load {
     margin-top: 91px;
 }
 
@@ -375,6 +377,6 @@ input[type="radio"]:checked+.form-check-label.incorrect-answer:hover {
 
 #loader-overlay {
     background-color: white !important;
-    z-index: 9999;
+    z-index: 1000;
 }
 </style>

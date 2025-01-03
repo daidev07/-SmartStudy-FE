@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="container" v-if="!isSpinnerLoading">
         <div v-if="!isSubmit" class="d-flex justify-content-between border mb-2 bg-white p-3 rounded-3">
             <h4 class="text-center fw-bold">{{ examDetail ? examDetail.name : 'Loading...' }}</h4>
             <button class="btn-submit text-white p-2 rounded-2" @click="submitExam"> <i
@@ -102,11 +102,21 @@
             </div>
         </div>
     </div>
+    <div id="loader-overlay"
+        class="container-load m-auto bg-white border rounded-3 p-3 d-flex justify-content-center align-items-center"
+        v-if="isSpinnerLoading">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="mt-3 text-body-tertiary">Submit successfully, results will be displayed after a few seconds...</p>
+        </div>
+    </div>
 </template>
 
 <script>
 import axios from 'axios';
-import { toast } from "vue3-toastify";
+// import { toast } from "vue3-toastify";
 import { Modal } from 'bootstrap';
 import { mapActions, mapGetters } from 'vuex';
 import {
@@ -172,15 +182,12 @@ export default {
                 this.isSpinnerLoading = true;
                 const point = await saveResults(this.stuAssignId, this.examDetail.questions, this.getUserId);
                 this.assignmentInfo.point = point;
-                this.isSubmit = true;
-                this.loadAnswerResults();
             } catch (error) {
                 console.error('Error submitting results:', error);
             } finally {
-                setTimeout(() => {
-                    this.isSpinnerLoading = false;
-                }, 3000);
-                toast.success('Submit successfully!');
+                this.isSpinnerLoading = false;
+                this.isSubmit = true;
+                this.loadAnswerResults();
             }
         },
         isUserAnswerSelected(questionId, answerId) {
@@ -251,6 +258,10 @@ export default {
 <style scoped>
 .container {
     margin-top: 95px;
+}
+
+.container-load {
+    margin-top: 91px;
 }
 
 h4 {

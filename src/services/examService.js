@@ -1,5 +1,5 @@
 import axios from 'axios';
-
+import { toast } from 'vue3-toastify';
 const apiUrl = process.env.VUE_APP_API_URL;
 
 export async function fetchAssignment(assignmentId) {
@@ -57,6 +57,7 @@ export async function saveResults(assignmentId, questions, userId) {
         const point = parseInt((correctAnswers * 100) / totalQuestions);
 
         await axios.post(`${apiUrl}/answer-result`, results, { params: { point: point } });
+        toast.success('Submited successfully');
         return point;
     } catch (error) {
         console.error('Error saving results:', error);
