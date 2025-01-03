@@ -17,6 +17,7 @@ import DoingListeningTest from '@/pages/user/DoingListeningTest.vue';
 import DoingReadingTest from '@/pages/user/DoingReadingTest.vue';
 import DoingWritingTest from '@/pages/user/DoingWritingTest.vue';
 import ReportComponent from '@/pages/user/Report.vue';
+import NotFound from '@/pages/NotFound.vue';
 
 const routes = [
     { path: '/', component: Homepage,
@@ -32,7 +33,7 @@ const routes = [
         ]
     },
     { path: '/login', component: LoginComponent },
-    
+    { path: '/not-found', component: NotFound },
     {
         path: '/admin-dashboard',
         component: AdminDashboard,

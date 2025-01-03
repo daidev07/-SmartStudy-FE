@@ -38,6 +38,7 @@ import axios from 'axios';
 import { toast } from "vue3-toastify";
 import 'vue3-toastify/dist/index.css';
 import { mapActions } from 'vuex';
+import { jwtDecode } from "jwt-decode";
 
 export default {
     name: 'LoginComponent',
@@ -45,7 +46,8 @@ export default {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
             username: '',
-            password: ''
+            password: '',
+            userInfo: null,
         };
     },
     mounted() {
@@ -62,11 +64,21 @@ export default {
                     username: this.username,
                     password: this.password
                 });
-                console.log("Response login::", response);
                 localStorage.setItem('token', response.data.data.token);
                 localStorage.setItem('loginSuccess', JSON.stringify({ type: 'success', message: 'Login successful!', options: { autoClose: 2500 } }));
                 this.saveUserInfo(response.data.data.user);
-                this.$router.push('/');
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const tokenInfo = jwtDecode(token);
+                    const response = await axios.get(this.apiUrl + `/user/${tokenInfo.userName}`);
+                    this.userInfo = response.data.data;
+                    console.log("USER INFO FROM ADMIN: ", this.userInfo);
+                    if (this.userInfo.role === 'STUDENT') {
+                        this.$router.push('/');
+                    } else {
+                        this.$router.push('/admin-dashboard/class-management');
+                    }
+                }
             } catch (error) {
                 if (error.response.status === 400) {
                     toast.error("Username or password is incorrect. Please try again!");

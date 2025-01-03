@@ -70,7 +70,8 @@ export default {
                 this.userInfo = response.data.data;
                 this.saveUserInfo(this.userInfo);
                 console.log("USER INFO HEADER: ", this.userInfo);
-
+            } else {
+                this.$router.push('/login');
             }
         },
 

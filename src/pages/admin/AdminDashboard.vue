@@ -33,13 +33,14 @@ import ClassManagement from './ClassManagement.vue';
 import EmployeesManagement from './EmployeesManagement.vue';
 import FileTrainAIManagement from './FileTrainAIManagement.vue';
 import ExamManagement from './ExamManagement.vue';
-import AnalysisChart from './AnalysisChart.vue';
 import ClassroomDetail from './ClassroomDetail.vue';
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "vue3-toastify";
 
 export default {
     name: "AdminComponent",
     components: {
-        AnalysisChart,
         ClassManagement,
         EmployeesManagement,
         FileTrainAIManagement,
@@ -55,10 +56,19 @@ export default {
                 { name: "EmployeesManagement", path: 'employees-management', displayName: "Employees", icon: "bi bi-people", isActive: false },
                 { name: "ExamManagement", path: 'exam-management', displayName: "Exams", icon: "bi bi-journal-text", isActive: false }
             ],
+            userInfo: null,
+            apiUrl: process.env.VUE_APP_API_URL,
         };
     },
     mounted() {
         this.updateActiveState();
+        this.checkUserPermit();
+        const loginSuccess = localStorage.getItem('loginSuccess');
+        if (loginSuccess) {
+            const { type, message, options } = JSON.parse(loginSuccess);
+            toast[type](message, options);
+            localStorage.removeItem('loginSuccess');
+        }
     },
     computed: {
         activeComponent() {
@@ -71,6 +81,20 @@ export default {
         }
     },
     methods: {
+        async checkUserPermit() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                const tokenInfo = jwtDecode(token);
+                const response = await axios.get(this.apiUrl + `/user/${tokenInfo.userName}`);
+                this.userInfo = response.data.data;
+                console.log("USER INFO FROM ADMIN: ", this.userInfo);
+                if (this.userInfo.role === 'STUDENT') {
+                    this.$router.push('/not-found');
+                }
+            } else {
+                this.$router.push('/login');
+            }
+        },
         updateActiveState() {
             const currentPath = this.$route.path;
             this.sidebarItems.forEach(item => {
