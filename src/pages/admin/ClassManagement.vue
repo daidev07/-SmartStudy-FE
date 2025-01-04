@@ -14,12 +14,14 @@
         <div v-for="classItem in classList" :key="classItem.id" class="class-card border rounded-3 p-3"
             @click="goToClassDetail(classItem.id)" v-tooltip:bottom="'More information...'">
             <div class="d-flex justify-content-between align-items-center">
-                <h3 class="class-name fw-bold">{{ classItem.className }}</h3>
+                <div class="class-name fw-bold fs-5">{{ classItem.className }}</div>
                 <i class="bi bi-trash3 text-danger fw-bold fs-5" v-tooltip:right="'Delete class'"
-                    @click="openCofirmDeleteModal" data-bs-toggle="modal" data-bs-target="#confirmDeleteClassModal"></i>
+                    @click.stop="openCofirmDeleteModal" data-bs-toggle="modal"
+                    data-bs-target="#confirmDeleteClassModal"></i>
             </div>
             <div class="card-body mt-4">
-                <span class="text-body-tertiary">Student: </span>
+                <span class="text-body-tertiary">Students: </span>
+                <span class="fw-bold">{{ classItem.studentCount || 0 }}</span>
             </div>
         </div>
         <div v-if="isModalVisible" class="modal-overlay">
@@ -130,18 +132,30 @@ export default {
             },
             addNewClassModal: null,
             nameError: false,
+            studentCount: 0,
         };
     },
-    created() {
-        this.fetchClassList();
-    },
-    mounted() {
+    async mounted() {
         this.addNewClassModal = new bootstrap.Modal(document.getElementById('addNewClassModal'));
+        await this.fetchClassList();
+        await this.fetchAllStudentCounts();
     },
     methods: {
+        async fetchStudentCount(classId) {
+            try {
+                const response = await axios.get(this.apirUrl + '/user/get-all-by-classId/' + classId);
+                return response.data.data.length;
+            } catch (error) {
+                console.error('Failed to fetch students:', error);
+            }
+        },
+        async fetchAllStudentCounts() {
+            for (const classItem of this.classList) {
+                classItem.studentCount = await this.fetchStudentCount(classItem.id);
+            }
+        },
         async openCofirmDeleteModal() {
             console.log('Delete class');
-
         },
         async saveNewClass() {
             this.nameError = false;
@@ -177,7 +191,6 @@ export default {
                 const response = await axios.get(this.apirUrl + '/class');
                 this.classList = response.data.data;
                 console.log("LIST CLASS:: ", this.classList);
-
             } catch (error) {
                 this.classListError = error;
             } finally {
@@ -218,7 +231,8 @@ export default {
                 console.error('Error creating assignment:', error);
                 toast.error('Failed to create assignment');
             }
-        }, checkName() {
+        },
+        checkName() {
             if (this.newClass.className !== '') {
                 this.nameError = false;
             } else {
@@ -245,7 +259,7 @@ export default {
 }
 
 .class-card {
-    width: 14%
+    width: 16%
 }
 
 .class-card:hover {
