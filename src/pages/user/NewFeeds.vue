@@ -48,22 +48,62 @@
                 <i class="bi bi-three-dots-vertical"></i>
             </div>
             <div class="post-title mb-2">{{ newfeed.content }}</div>
-            <div class="text-center">
-                <img :src="newfeed.imageFile" alt="Post Image" class="newfeeds-post-image rounded-3" />
+            <div class="d-flex jsutiify-content-between gap-3">
+                <div class="img-newsfeed w-50 text-center border-end">
+                    <img :src="newfeed.imageFile" alt="Post Image" class="newfeeds-post-image rounded-3 w-75" />
+                </div>
+                <div class="comments text-start w-50">
+                    <div class="fw-bold mb-2">Comments: </div>
+                    <div class="comment-list overflow-y-auto" :ref="'commentList-' + newfeed.id">
+                        <div v-for="(comment, idx) in newfeed.comments" :key="idx" class="comment">
+                            <div class="d-flex align-items-center  mb-3 ">
+                                <img :src="comment.userResponse.avatarUrl || require('@/assets/nonAvatar.png')"
+                                    alt="Avatar" class="avatar" width="8%" />
+                                <div class="comment-content ms-2 w-100">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <span class="fw-bold bg-info text-white rounded-3 p-1 me-2"
+                                                style="font-size: x-small;">{{
+                                                    comment.userResponse.classroom.className }}</span>
+                                            <span class="fw-bold">
+                                                {{ comment.userResponse.name }}
+                                            </span>
+                                            <span class="text-body-tertiary ms-2" style="font-size: small;">
+                                                {{ formatTimeChatbot(comment.createdAt) }}
+                                            </span>
+                                        </div>
+                                        <div class="text-danger me-3" v-if="comment.isUserComment ||
+                                            comment.isUserPost ||
+                                            this.getUserInfo.role !== 'STUDENT'">
+                                            <i class="bi bi-x-circle-fill" v-tooltip:bottom="'Delete this comment'"></i>
+                                        </div>
+                                    </div>
+                                    <div class="mt-1">{{ comment.content }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="comment-input d-flex align-items-center justify-content-between">
+                        <textarea v-model="newCommentContent[newfeed.id]" class="form-control mt-2"
+                            placeholder="Write a comment ..." rows="1" id="textComment"></textarea>
+                        <div v-if="isLoading" class="spinner-border mx-3 text-info" role="status" aria-hidden="true">
+                        </div>
+                        <div v-else>
+                            <i class="bi bi-send fs-4 mx-3" v-tooltip:bottom="'Send Comment'"
+                                @click="postComment(newfeed.id, newCommentContent[newfeed.id])"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="d-flex align-items-center justify-content-center mt-2">
-                <span class="fs-5 me-1">
-                    {{ newfeed.likes }}
-                </span>
-                <div class="newfeeds-action d-flex align-items-center p-2 rounded-3 me-4">
+            <div class="d-flex align-items-center justify-content-center">
+                <div class="newfeeds-action d-flex align-items-center p-2 rounded-3 me-2">
                     <i class="bx bx-heart me-2 fs-5" @click="likePost(index)"></i>
                     <span>Love</span>
                 </div>
-                <div class="newfeeds-action d-flex align-items-center p-2 rounded-3">
-                    <i class="bi bi-chat-right-heart me-2 fs-5" @click="showComment(index)"></i>
-                    <span>Comment</span>
-                </div>
+                <span class="fs-5">
+                    {{ newfeed.likes }}
+                </span>
             </div>
         </div>
     </div>
@@ -85,11 +125,15 @@ export default {
             newPostContent: "",
             selectedFile: null,
             showModal: false,
+            isLoading: false,
+            newCommentContent: {},
+            userInfo: {},
         };
     },
 
     mounted() {
         if (this.getUserInfo) {
+            this.getUserInfo = this.userInfo;
             this.classroomId = this.getUserInfo.classroom?.id || null;
             this.userId = this.getUserInfo.id || null;
             this.fetchNewfeeds();
@@ -109,11 +153,92 @@ export default {
     },
     methods: {
         formatTimeChatbot,
+        async isPostByUser(postId) {
+            try {
+                const response = await axios.get(`${this.apiUrl}/newsfeed/is-post-by-user`, {
+                    params: {
+                        postId: postId,
+                        userId: this.userId
+                    }
+                });
+                return response.data.data;
+            } catch (error) {
+                console.error("Failed to check if post belongs to user:", error);
+                return false;
+            }
+        },
+        async isCommentByUser(commentId) {
+            try {
+                const response = await axios.get(`${this.apiUrl}/comment/is-comment-by-user`, {
+                    params: {
+                        commentId: commentId,
+                        userId: this.userId
+                    }
+                });
+                return response.data.data;
+            } catch (error) {
+                console.error("Failed to check if comment belongs to user:", error);
+                return false;
+            }
+        },
+        async postComment(newsfeedId, commentContent) {
+            if (!commentContent.trim()) {
+                toast.error("Comment content cannot be empty!");
+                return;
+            }
+            this.isLoading = true;
+            const payload = {
+                newsfeedId: newsfeedId,
+                userId: this.userId,
+                content: commentContent,
+            };
+            try {
+                const response = await axios.post(`${this.apiUrl}/comment/post-to-newsfeed`, payload);
+                if (response.data && response.data.data) {
+                    const newComment = response.data.data;
+                    const newsfeed = this.newFeeds.find(feed => feed.id === newsfeedId);
+                    if (newsfeed) {
+                        newsfeed.comments.push(newComment);
+                        this.newCommentContent[newsfeedId] = "";
+                        this.scrollToBottom(newsfeedId);
+                    }
+                    toast.success("Comment posted successfully!");
+                }
+            } catch (error) {
+                console.error("Failed to post comment:", error);
+                toast.error("Failed to post comment. Please try again.");
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async fetchCommentsByNewsfeedId(newsfeedId) {
+            try {
+                const response = await axios.get(this.apiUrl + `/comment/get-all-by-newsfeedId/${newsfeedId}`);
+                const comments = response.data.data;
+                for (const comment of comments) {
+                    comment.isUserComment = await this.isCommentByUser(comment.id);
+                }
+                const isUserPost = await this.isPostByUser(newsfeedId);
+                for (const comment of comments) {
+                    comment.isUserPost = isUserPost;
+                }
+                return comments;
+            } catch (error) {
+                console.error(error);
+            }
+        },
+
         async fetchNewfeeds() {
             try {
-                const response = await axios.get(this.apiUrl + `/newsfeed/class/${this.classroomId}`);
-                this.newFeeds = response.data.data.reverse();
-                console.log("LIST NEW FEEDS:: ", this.newFeeds);
+                const response = await axios.get(this.apiUrl + `/newsfeed`);
+                const feeds = response.data.data.reverse();
+                for (const feed of feeds) {
+                    const comments = await this.fetchCommentsByNewsfeedId(feed.id);
+                    feed.comments = comments || [];
+                    console.log("COMMENTS:: ", comments);
+                }
+                this.newFeeds = feeds;
+                console.log("LIST NEW FEEDS WITH COMMENTS:: ", this.newFeeds);
             } catch (error) {
                 console.error(error);
             }
@@ -151,6 +276,14 @@ export default {
                 this.fetchNewfeeds();
             }
         },
+        scrollToBottom(newsfeedId) {
+            this.$nextTick(() => {
+                const commentList = this.$refs['commentList-' + newsfeedId];
+                if (commentList) {
+                    commentList.scrollTop = commentList.scrollHeight;
+                }
+            });
+        }
     }
 };
 </script>
@@ -186,11 +319,6 @@ export default {
     margin-right: 10px;
 }
 
-.newfeeds-post-image {
-    width: 35%;
-    height: 35%;
-}
-
 .newfeeds-action {
     cursor: pointer;
 }
@@ -210,6 +338,10 @@ export default {
 .user-details small {
     font-size: 12px;
     color: #a8b0b6;
+}
+
+.comment-list {
+    max-height: 43vh;
 }
 
 .like-btn {
