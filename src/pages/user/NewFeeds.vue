@@ -154,8 +154,8 @@
                             </div>
                             <div v-for="(comment, idx) in newfeed.comments" :key="idx" class="comment">
                                 <div class="d-flex align-items-center  mb-3 ">
-                                    <img :src="comment.userResponse.avatarUrl || require('@/assets/nonAvatar.png')"
-                                        alt="Avatar" class="avatar" width="8%" />
+                                    <img :src="comment.userResponse.avatarFile || require('@/assets/nonAvatar.png')"
+                                        alt="Avatar" class="avatar rounded-5" width="8%" />
                                     <div class="comment-content ms-2 w-100">
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>

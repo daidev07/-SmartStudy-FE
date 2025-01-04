@@ -24,12 +24,39 @@
         </nav>
         <div class="nav-right d-flex justify-content-end align-items-center">
             <div v-if="userInfo" class="user-info d-flex justify-content-end align-items-center">
-                <img :src="userInfo.avatarFile || require('@/assets/nonAvatar.png')" alt="User Avatar"
-                    class="avatar me-2" />
+                <img :src="userInfo?.avatarFile || require('@/assets/nonAvatar.png')" alt="User Avatar"
+                    class="avatar me-2" v-tooltip:bottom="'Update your avatar'" data-bs-toggle="modal"
+                    data-bs-target="#updateAvatarModal" style="cursor: pointer;" />
                 <span>{{ userInfo.name }}</span>
             </div>
             <router-link v-else to="/login"
                 class="login-btn text-white text-center rounded-3 p-2 w-25">Login</router-link>
+        </div>
+        <div class="modal fade" id="updateAvatarModal" tabindex="-1" aria-labelledby="updateAvatarModal"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="updateAvatarModal">
+                            Update Avatar </h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <label for="avatar" class="form-label">Choose your avatar</label>
+                        <input type="file" @change="uploadAvatar" class="form-control" />
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                            id="btnCloseUpdateAvatarModal">Close</button>
+                        <button type="button" class="btn btn-danger" @click="saveAvatar()">
+                            <span v-if="isSpinnerLoading" class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true">
+                            </span>
+                            <span v-else>Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </header>
 </template>
@@ -37,7 +64,8 @@
 <script>
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
-import { mapActions } from "vuex";
+import { toast } from "vue3-toastify";
+import { mapActions, mapGetters } from "vuex";
 
 export default {
     name: 'HeaderComponent',
@@ -45,12 +73,15 @@ export default {
         return {
             apiUrl: process.env.VUE_APP_API_URL,
             userInfo: null,
+            isSpinnerLoading: false,
+            avatarFile: null,
         };
     },
     mounted() {
         this.checkUserLoggedIn();
     },
     computed: {
+        ...mapGetters(['getUserInfo']),
         getActiveClass() {
             return (path) => {
                 if (path === '/') {
@@ -74,7 +105,44 @@ export default {
                 this.$router.push('/login');
             }
         },
-
+        async uploadAvatar(event) {
+            this.avatarFile = event.target.files[0];
+        },
+        async saveAvatar() {
+            try {
+                if (!this.avatarFile) {
+                    toast.warning("Please choose an avatar before saving!");
+                    return;
+                }
+                const formData = new FormData();
+                formData.append("avatar", this.avatarFile);
+                this.isSpinnerLoading = true;
+                const response = await axios.put(
+                    `${this.apiUrl}/user/avatar/${this.userInfo.id}`,
+                    formData,
+                    {
+                        headers: {
+                            "Content-Type": "multipart/form-data",
+                        },
+                    }
+                );
+                console.log("RESPONSE AVATAR: ", response);
+                if (response.data.code == 200) {
+                    this.userInfo.avatarFile = response.data.data.avatarFile;
+                    console.log("USER INFO AFTER UPDATE AVATAR: ", this.userInfo);
+                    this.saveUserInfo(this.userInfo);
+                    toast.success("Avatar updated successfully!");
+                    document.getElementById("btnCloseUpdateAvatarModal").click();
+                } else {
+                    toast.error("Failed to update avatar. Please try again.");
+                }
+            } catch (error) {
+                console.error("Error updating avatar:", error);
+                toast.error("An error occurred while updating the avatar.");
+            } finally {
+                this.isSpinnerLoading = false;
+            }
+        },
     }
 };
 </script>
@@ -159,6 +227,7 @@ export default {
 
 .avatar {
     width: 50px;
+    height: 50px;
     border-radius: 50%;
 }
 </style>

@@ -137,6 +137,10 @@ export default {
 </script>
 
 <style scoped>
+Header {
+  z-index: 2000 !important;
+}
+
 .home-page {
   background-color: #f5f5f5;
   display: flex;
