@@ -37,6 +37,68 @@
                 </div>
             </div>
         </div>
+
+        <div v-if="isNotStudent">
+            <div v-if="!listNewsfeedNotPermit.length" class="text-center text-body-tertiary mb-2">No post need to
+                permit!
+            </div>
+            <div v-else class="mb-2">
+                <div class="border d-flex justify-content-center rounded-3 mb-2 p-3 align-items-center bg-white"
+                    data-bs-toggle="modal" data-bs-target="#notPermitPostModal" style="cursor: pointer;">
+                    <span class="text-primary">Some post need to permit! Click to view ... </span>
+                </div>
+                <div class="modal fade" id="notPermitPostModal" tabindex="-1" aria-labelledby="notPermitPost"
+                    aria-hidden="true">
+                    <div class="modal-dialog  modal-xl">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-4 fw-bold">NOT PERMIT POST</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="post border rounded-3 p-3 bg-white mb-2"
+                                    v-for="(newsfeed) in listNewsfeedNotPermit" :key="newsfeed.id">
+                                    <div class="user-info d-flex align-items-center justify-content-between">
+                                        <div class="d-flex">
+                                            <img :src="newsfeed.user.avatarFile || require('@/assets/nonAvatar.png')"
+                                                alt="Avatar" class="avatar" />
+                                            <div class="user-details d-flex flex-column">
+                                                <span class="user-name fw-bold">{{ newsfeed.user.name }}</span>
+                                                <small>{{
+                                                    formatTimeChatbot(newsfeed.postedAt)
+                                                    }}</small>
+                                            </div>
+                                        </div>
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </div>
+                                    <div class="post-title mb-2">{{ newsfeed.content }}</div>
+                                    <div class="mb-3 text-center">
+                                        <img :src="newsfeed.imageFile" alt="Post Image"
+                                            class="newfeeds-post-image rounded-3 w-50" />
+                                    </div>
+                                    <div class="text-end">
+                                        <button type="button" class="btn btn-danger me-3"
+                                            @click="declinePost(newsfeed.id)">Decline</button>
+                                        <button type="button" class="btn btn-primary" @click="permitPost(newsfeed.id)">
+                                            <span v-if="isSpinnerLoading" class="spinner-border spinner-border-sm"
+                                                role="status" aria-hidden="true">
+                                            </span>
+                                            <span v-else>Accept</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal"
+                                        id="btnCloseNotPermitPostModal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div v-if="!newFeeds.length" class="text-center text-body-tertiary">No post yet! Let's post something to your
             class.</div>
         <div class="post border rounded-3 p-3 bg-white mb-2" v-for="(newfeed) in newFeeds" :key="newfeed.id">
@@ -50,7 +112,33 @@
                             }}</small>
                     </div>
                 </div>
-                <i class="bi bi-three-dots-vertical"></i>
+                <i v-if="this.getUserInfo.role !== 'STUDENT'" class="bi bi-x-circle-fill text-danger"
+                    data-bs-toggle="modal" data-bs-target="#deletePostModal"></i>
+                <!-- DELETE POST MODAL -->
+                <div class="modal fade" id="deletePostModal" tabindex="-1" aria-labelledby="deletePostModal"
+                    aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h1 class="modal-title fs-5 text-danger" id="deletePostModal">
+                                    Delete
+                                    Post</h1>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body text-danger">
+                                Delete post will delete all comments its have. Are you sure you want to delete this
+                                post?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                    id="btnCloseDeletePostModal">Close</button>
+                                <button type="button" class="btn btn-danger"
+                                    @click="deletePost(newfeed.id)">Yes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="post-title mb-2">{{ newfeed.content }}</div>
             <div class="d-flex jsutiify-content-between gap-3">
@@ -72,8 +160,10 @@
                                         <div class="d-flex justify-content-between align-items-center">
                                             <div>
                                                 <span class="fw-bold bg-info text-white rounded-3 p-1 me-2"
+                                                    :class="{ 'bg-danger': !comment.userResponse?.classroom }"
                                                     style="font-size: x-small;">{{
-                                                        comment.userResponse.classroom.className }}</span>
+                                                        comment.userResponse?.classroom ?
+                                                            comment.userResponse.classroom.className : 'TEACHER' }}</span>
                                                 <span class="fw-bold">
                                                     {{ comment.userResponse.name }}
                                                 </span>
@@ -92,13 +182,14 @@
                                         <div class="mt-1">{{ comment.content }}</div>
                                     </div>
                                 </div>
-                                <!-- DELETE COMMET MODAL -->
+                                <!-- DELETE COMMENT MODAL -->
                                 <div class="modal fade" id="deleteCommentModal" tabindex="-1"
                                     aria-labelledby="deleteCommentModal" aria-hidden="true">
                                     <div class="modal-dialog">
                                         <div class="modal-content">
                                             <div class="modal-header">
-                                                <h1 class="modal-title fs-5 text-danger" id="deleteCommentModal">Delete
+                                                <h1 class="modal-title fs-5 text-danger" id="deleteCommentModal">
+                                                    Delete
                                                     Comment</h1>
                                                 <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                     aria-label="Close"></button>
@@ -155,19 +246,25 @@ export default {
             newCommentContent: {},
             userInfo: {},
             commentToDelete: null,
+            listNewsfeedNotPermit: [],
         };
     },
 
     mounted() {
         if (this.getUserInfo) {
-            this.getUserInfo = this.userInfo;
+            this.userInfo = this.getUserInfo;
+            console.log("USER INFO:: ", this.userInfo);
             this.classroomId = this.getUserInfo.classroom?.id || null;
             this.userId = this.getUserInfo.id || null;
             this.fetchNewfeeds();
+            this.fetchNotPermitNewsfeed();
         }
     },
     computed: {
         ...mapGetters(['getUserInfo']),
+        isNotStudent() {
+            return this.getUserInfo?.role && this.getUserInfo.role !== 'STUDENT';
+        }
     },
     watch: {
         getUserInfo(newUserInfo) {
@@ -175,11 +272,54 @@ export default {
                 this.classroomId = newUserInfo.classroom?.id || null;
                 this.userId = newUserInfo.id || null;
                 this.fetchNewfeeds();
+                this.fetchNotPermitNewsfeed();
             }
         }
     },
     methods: {
         formatTimeChatbot,
+        async deletePost(newsfeedId) {
+            this.isSpinnerLoading = true;
+            try {
+                await axios.delete(`${this.apiUrl}/newsfeed/delete-post/${newsfeedId}`);
+                document.getElementById("btnCloseDeletePostModal").click();
+                this.fetchNewfeeds();
+                toast.success("Post deleted successfully!");
+            } catch (error) {
+                console.error("Failed to delete post:", error);
+                toast.error("Failed to delete post. Please try again.");
+            } finally {
+                this.isSpinnerLoading = false;
+            }
+        },
+        async declinePost(newsfeedId) {
+            this.isSpinnerLoading = true;
+            try {
+                await axios.delete(`${this.apiUrl}/newsfeed/delete-post/${newsfeedId}`);
+                this.fetchNotPermitNewsfeed();
+                toast.success("Post deleted successfully!");
+            } catch (error) {
+                console.error("Failed to delete post:", error);
+                toast.error("Failed to delete post. Please try again.");
+            } finally {
+                this.isSpinnerLoading = false;
+            }
+        },
+        async permitPost(newsfeedId) {
+            this.isSpinnerLoading = true;
+            try {
+                const response = await axios.put(`${this.apiUrl}/newsfeed/permit-post/${newsfeedId}`);
+                if (response.data && response.data.code == 200) {
+                    this.fetchNotPermitNewsfeed();
+                    toast.success("Post permitted successfully!");
+                }
+            } catch (error) {
+                console.error("Failed to permit post:", error);
+                toast.error("Failed to permit post. Please try again.");
+            } finally {
+                this.isSpinnerLoading = false;
+            }
+        },
         async deleteComment() {
             if (!this.commentToDelete) {
                 toast.error("No comment selected for deletion.");
@@ -228,7 +368,7 @@ export default {
             }
         },
         async postComment(newsfeedId, commentContent) {
-            if (!commentContent.trim()) {
+            if (!commentContent) {
                 toast.error("Comment content cannot be empty!");
                 return;
             }
@@ -274,10 +414,9 @@ export default {
                 console.error(error);
             }
         },
-
         async fetchNewfeeds() {
             try {
-                const response = await axios.get(this.apiUrl + `/newsfeed`);
+                const response = await axios.get(this.apiUrl + `/newsfeed/permitted`);
                 const feeds = response.data.data.reverse();
                 for (const feed of feeds) {
                     const comments = await this.fetchCommentsByNewsfeedId(feed.id);
@@ -286,6 +425,15 @@ export default {
                 }
                 this.newFeeds = feeds;
                 console.log("LIST NEW FEEDS WITH COMMENTS:: ", this.newFeeds);
+            } catch (error) {
+                console.error(error);
+            }
+        },
+        async fetchNotPermitNewsfeed() {
+            try {
+                const response = await axios.get(this.apiUrl + `/newsfeed/not-permit`);
+                this.listNewsfeedNotPermit = response.data.data.reverse();
+                console.log("listNewsfeedNotPermit:: ", this.listNewsfeedNotPermit);
             } catch (error) {
                 console.error(error);
             }

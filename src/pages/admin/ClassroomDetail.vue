@@ -106,8 +106,12 @@
                                 </div>
                             </td>
                             <td class="text-center">
-                                <span
-                                    :class="{ 'bg-primary p-2 rounded-3 border-primary text-white': student.studyStatus === 'IN_PROGRESS' }">
+                                <span class="p-2 rounded-3" :class="{
+                                    'bg-primary border-primary text-white': student.studyStatus === 'IN_PROGRESS',
+                                    'bg-danger border-primary text-white': student.studyStatus === 'QUIT',
+                                    'bg-success border-primary text-white': student.studyStatus === 'COMPLETED',
+                                    'bg-info border-primary text-white': student.studyStatus === 'PENDING'
+                                }">
                                     {{ student.studyStatus }}
                                 </span>
                             </td>
