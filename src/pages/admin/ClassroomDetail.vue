@@ -176,8 +176,88 @@
                 </div>
             </div>
         </div>
-        <!-- Newsfeed Modal -->
         <!-- User Modal -->
+        <div class="modal fade" id="addStudentModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+            aria-labelledby="addStudentModal" aria-hidden="true" ref="addStudentModal">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header ">
+                        <h1 class="modal-title fs-5 fw-bold">Add new Student</h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="name" class="form-label fw-bold">Name</label>
+                                <input type="text" class="form-control" id="name" placeholder="Enter full name"
+                                    v-model="newStudent.name" :class="{ 'is-invalid': nameError }" @keyup="checkName">
+                                <div v-if="nameError" class="invalid-feedback">
+                                    Name is required
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-bold">Username</label>
+                                <input type="text" class="form-control" id="username"
+                                    placeholder="Enter username for login" v-model="newStudent.username"
+                                    :class="{ 'is-invalid': usernameError }" @keyup="checkUsername">
+                                <div v-if="usernameError" class="invalid-feedback">
+                                    Username is required
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">Password</label>
+                                <input type="password" class="form-control" id="password"
+                                    placeholder="Enter password for login" v-model="newStudent.password"
+                                    :class="{ 'is-invalid': passwordError }" @keyup="checkPassword">
+                                <div v-if="passwordError" class="invalid-feedback">
+                                    Password is required
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label fw-bold">Confirm password</label>
+                                <input type="password" class="form-control" id="confirmPassword"
+                                    placeholder="Enter password again" v-model="newStudent.confirmPassword"
+                                    :class="{ 'is-invalid': confirmPasswordError || matchPasswordError }"
+                                    @keyup="checkConfirmPassword">
+                                <div v-if="confirmPasswordError" class="invalid-feedback">
+                                    Confirm password is required
+                                </div>
+                                <div v-if="matchPasswordError" class="invalid-feedback">
+                                    Password don't match, please check again!
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label fw-bold">Email</label>
+                                <input type="email" class="form-control" id="email"
+                                    placeholder="Enter email for contact" v-model="newStudent.email"
+                                    :class="{ 'is-invalid': emailError }" @keyup="checkEmail">
+                                <div v-if="emailError" class="invalid-feedback">
+                                    Email is required
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label fw-bold">Phone</label>
+                                <input type="text" class="form-control" id="phone"
+                                    placeholder="Enter phone number for contact" v-model="newStudent.phone"
+                                    :class="{ 'is-invalid': phoneError }" @keyup="checkPhone">
+                                <div v-if="phoneError" class="invalid-feedback">
+                                    Phone is required
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
+                            id="btnCloseAddStudentModal">Close</button>
+                        <button type="button" class="btn btn-primary" @click="saveStudent">
+                            <span v-if="isSpinnerLoading" class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true"></span>
+                            <span v-else>Save</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 <script>
@@ -188,20 +268,37 @@ import { toast } from 'vue3-toastify';
 export default {
     data() {
         return {
-            apirUrl: process.env.VUE_APP_API_URL,
+            apiUrl: process.env.VUE_APP_API_URL,
             classDetail: [],
             classworks: [],
             students: [],
             exams: [],
             classId: this.$route.params.id,
             activeTab: 'classwork',
+            isSpinnerLoading: false,
             classwork: {
                 name: '',
                 description: '',
                 dueDate: '',
                 examId: null
             },
-            assignmentDetails: []
+            assignmentDetails: [],
+            newStudent: {
+                name: "",
+                username: "",
+                password: "",
+                confirmPassword: "",
+                email: "",
+                phone: "",
+                classId: this.classId,
+            },
+            nameError: false,
+            usernameError: false,
+            passwordError: false,
+            confirmPasswordError: false,
+            matchPasswordError: false,
+            emailError: false,
+            phoneError: false,
         };
     },
     mounted() {
@@ -211,18 +308,79 @@ export default {
     methods: {
         formatDate,
         formatDateAndTime,
+        async saveStudent() {
+            this.nameError = this.usernameError = this.passwordError = this.confirmPasswordError = this.emailError = this.phoneError = false;
+            let isValid = true;
+            if (this.newStudent.name === '') {
+                this.nameError = true;
+                isValid = false;
+            }
+            if (this.newStudent.username === '') {
+                this.usernameError = true;
+                isValid = false;
+            }
+            if (this.newStudent.password === '') {
+                this.passwordError = true;
+                isValid = false;
+            }
+            if (this.newStudent.confirmPassword === '') {
+                this.confirmPasswordError = true;
+                isValid = false;
+            }
+            if (this.newStudent.email === '') {
+                this.emailError = true;
+                isValid = false;
+            }
+            if (this.newStudent.phone === '') {
+                this.phoneError = true;
+                isValid = false;
+            }
+            if (this.newStudent.password !== this.newStudent.confirmPassword) {
+                this.matchPasswordError = true;
+                isValid = false;
+            }
+            if (!isValid) {
+                return;
+            }
+            this.newStudent.role = "STUDENT";
+            this.newStudent.classroomId = this.classId;
+            this.isSpinnerLoading = true;
+            try {
+                console.log('newStudent info:', this.newStudent);
+                const response = await axios.post(this.apiUrl + "/user", this.newStudent);
+                if (response.data.code == 201) {
+                    this.newStudent = {
+                        name: "",
+                        username: "",
+                        password: "",
+                        confirmPassword: "",
+                        email: "",
+                        phone: "",
+                    };
+                    document.querySelector('#btnCloseAddStudentModal').click();
+                    toast.success("Create student successfully!");
+                }
+            } catch (error) {
+                if (error.response.data.code == 413) {
+                    toast.error("Username already exists. Try another one!");
+                }
+            } finally {
+                this.isSpinnerLoading = false;
+                this.fetchStudents();
+            }
+        },
         filterAssignments(studentId) {
             return this.assignmentDetails.filter(assignment => assignment.user.id === studentId);
         },
 
         async fetchAssignmentDetails() {
-            const response = await axios.get(this.apirUrl + `/student-assignment`)
+            const response = await axios.get(this.apiUrl + `/student-assignment`)
             this.assignmentDetails = response.data.data;
             console.log('Assignment Details::', this.assignmentDetails);
         },
         async fetchStudents() {
             try {
-                const response = await axios.get(this.apirUrl + '/user/get-all-by-classId/' + this.classId);
+                const response = await axios.get(this.apiUrl + '/user/get-all-by-classId/' + this.classId);
                 this.students = response.data.data;
                 console.log('students:', this.students);
             } catch (error) {
@@ -231,7 +389,7 @@ export default {
         },
         async fetchClassDetail() {
             try {
-                const response = await axios.get(this.apirUrl + '/class/' + this.classId);
+                const response = await axios.get(this.apiUrl + '/class/' + this.classId);
                 this.classDetail = response.data.data;
             } catch (error) {
                 this.classDetailError = error;
@@ -241,7 +399,7 @@ export default {
         },
         async fetchClasswork() {
             try {
-                const response = await axios.get(this.apirUrl + '/classroom-assignment/class/' + this.classId);
+                const response = await axios.get(this.apiUrl + '/classroom-assignment/class/' + this.classId);
                 this.classworks = response.data.data.reverse();
                 console.log('classworks:', this.classworks);
             } catch (error) {
@@ -250,7 +408,7 @@ export default {
         },
         async fetchExams() {
             try {
-                const response = await axios.get(this.apirUrl + '/exam');
+                const response = await axios.get(this.apiUrl + '/exam');
                 this.exams = response.data.data;
             } catch (error) {
                 console.error('Failed to fetch exams:', error);
@@ -265,14 +423,11 @@ export default {
                 this.fetchStudents();
                 this.fetchAssignmentDetails();
             }
-            if (tab === 'newsfeed') {
-                this.fetchNewsfeed();
-            }
         },
         async submitClasswork() {
             const { name, description, dueDate, examId } = this.classwork;
             try {
-                await axios.post(`${this.apirUrl}/classroom-assignment/class/${this.classId}/exam/${examId}`, {
+                await axios.post(`${this.apiUrl}/classroom-assignment/class/${this.classId}/exam/${examId}`, {
                     name,
                     description,
                     dueDate: dueDate,
@@ -289,7 +444,56 @@ export default {
                     toast.error('Assignment exists! Please choose another exam.');
                 }
             }
-        }
+        },
+        checkName() {
+            if (this.newStudent.name !== '') {
+                this.nameError = false;
+            } else {
+                this.nameError = true;
+            }
+        },
+        checkUsername() {
+            if (this.newStudent.username !== '') {
+                this.usernameError = false;
+            } else {
+                this.usernameError = true;
+            }
+        },
+        checkPassword() {
+            if (this.newStudent.password !== '') {
+                this.passwordError = false;
+            } else {
+                this.passwordError = true;
+            }
+            this.checkConfirmPassword();
+        },
+        checkConfirmPassword() {
+            if (this.newStudent.confirmPassword === '') {
+                this.confirmPasswordError = true;
+                this.matchPasswordError = false;
+            } else {
+                this.confirmPasswordError = false;
+                if (this.newStudent.password !== this.newStudent.confirmPassword) {
+                    this.matchPasswordError = true;
+                } else {
+                    this.matchPasswordError = false;
+                }
+            }
+        },
+        checkEmail() {
+            if (this.newStudent.email !== '') {
+                this.emailError = false;
+            } else {
+                this.emailError = true;
+            }
+        },
+        checkPhone() {
+            if (this.newStudent.phone !== '') {
+                this.phoneError = false;
+            } else {
+                this.phoneError = true;
+            }
+        },
     },
 };
 </script>
