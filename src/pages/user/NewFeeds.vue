@@ -27,14 +27,19 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal"
                             id="btnCloseNewPostModal">Cancel</button>
-                        <button type="button" class="btn btn-primary" @click="submitPost">Post</button>
+                        <button type="button" class="btn btn-primary" @click="submitPost">
+                            <span v-if="isSpinnerLoading" class="spinner-border spinner-border-sm" role="status"
+                                aria-hidden="true">
+                            </span>
+                            <span v-else>Post</span>
+                        </button>
                     </div>
                 </div>
             </div>
         </div>
         <div v-if="!newFeeds.length" class="text-center text-body-tertiary">No post yet! Let's post something to your
             class.</div>
-        <div class="post border rounded-3 p-3 bg-white mb-2" v-for="(newfeed, index) in newFeeds" :key="newfeed.id">
+        <div class="post border rounded-3 p-3 bg-white mb-2" v-for="(newfeed) in newFeeds" :key="newfeed.id">
             <div class="user-info d-flex align-items-center justify-content-between">
                 <div class="d-flex">
                     <img :src="newfeed.user.avatarFile || require('@/assets/nonAvatar.png')" alt="Avatar"
@@ -52,58 +57,79 @@
                 <div class="img-newsfeed w-50 text-center border-end">
                     <img :src="newfeed.imageFile" alt="Post Image" class="newfeeds-post-image rounded-3 w-75" />
                 </div>
-                <div class="comments text-start w-50">
+                <div class=" text-start w-50">
                     <div class="fw-bold mb-2">Comments: </div>
-                    <div class="comment-list overflow-y-auto" :ref="'commentList-' + newfeed.id">
-                        <div v-for="(comment, idx) in newfeed.comments" :key="idx" class="comment">
-                            <div class="d-flex align-items-center  mb-3 ">
-                                <img :src="comment.userResponse.avatarUrl || require('@/assets/nonAvatar.png')"
-                                    alt="Avatar" class="avatar" width="8%" />
-                                <div class="comment-content ms-2 w-100">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <span class="fw-bold bg-info text-white rounded-3 p-1 me-2"
-                                                style="font-size: x-small;">{{
-                                                    comment.userResponse.classroom.className }}</span>
-                                            <span class="fw-bold">
-                                                {{ comment.userResponse.name }}
-                                            </span>
-                                            <span class="text-body-tertiary ms-2" style="font-size: small;">
-                                                {{ formatTimeChatbot(comment.createdAt) }}
-                                            </span>
+                    <div class=" comments d-flex flex-column justify-content-between">
+                        <div class="comment-list overflow-y-auto" :ref="'commentList-' + newfeed.id">
+                            <div class="text-body-tertiary" v-if="newfeed.comments.length === 0">
+                                No comments yet! Be the first to comment ^^.
+                            </div>
+                            <div v-for="(comment, idx) in newfeed.comments" :key="idx" class="comment">
+                                <div class="d-flex align-items-center  mb-3 ">
+                                    <img :src="comment.userResponse.avatarUrl || require('@/assets/nonAvatar.png')"
+                                        alt="Avatar" class="avatar" width="8%" />
+                                    <div class="comment-content ms-2 w-100">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="fw-bold bg-info text-white rounded-3 p-1 me-2"
+                                                    style="font-size: x-small;">{{
+                                                        comment.userResponse.classroom.className }}</span>
+                                                <span class="fw-bold">
+                                                    {{ comment.userResponse.name }}
+                                                </span>
+                                                <span class="text-body-tertiary ms-2" style="font-size: small;">
+                                                    {{ formatTimeChatbot(comment.createdAt) }}
+                                                </span>
+                                            </div>
+                                            <div class="text-danger me-3" v-if="comment.isUserComment ||
+                                                comment.isUserPost ||
+                                                this.getUserInfo.role !== 'STUDENT'">
+                                                <i class="bi bi-x-circle-fill" v-tooltip:bottom="'Delete this comment'"
+                                                    data-bs-toggle="modal" data-bs-target="#deleteCommentModal"
+                                                    @click="commentToDelete = comment.id"></i>
+                                            </div>
                                         </div>
-                                        <div class="text-danger me-3" v-if="comment.isUserComment ||
-                                            comment.isUserPost ||
-                                            this.getUserInfo.role !== 'STUDENT'">
-                                            <i class="bi bi-x-circle-fill" v-tooltip:bottom="'Delete this comment'"></i>
+                                        <div class="mt-1">{{ comment.content }}</div>
+                                    </div>
+                                </div>
+                                <!-- DELETE COMMET MODAL -->
+                                <div class="modal fade" id="deleteCommentModal" tabindex="-1"
+                                    aria-labelledby="deleteCommentModal" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h1 class="modal-title fs-5 text-danger" id="deleteCommentModal">Delete
+                                                    Comment</h1>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                    aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-danger">
+                                                Are you sure you want to delete this comment?
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                                                    id="btnDeleteCommentModal">Close</button>
+                                                <button type="button" class="btn btn-danger"
+                                                    @click="deleteComment">Yes</button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="mt-1">{{ comment.content }}</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="comment-input d-flex align-items-center justify-content-between">
-                        <textarea v-model="newCommentContent[newfeed.id]" class="form-control mt-2"
-                            placeholder="Write a comment ..." rows="1" id="textComment"></textarea>
-                        <div v-if="isLoading" class="spinner-border mx-3 text-info" role="status" aria-hidden="true">
-                        </div>
-                        <div v-else>
-                            <i class="bi bi-send fs-4 mx-3" v-tooltip:bottom="'Send Comment'"
-                                @click="postComment(newfeed.id, newCommentContent[newfeed.id])"></i>
+                        <div class="comment-input d-flex align-items-center justify-content-between">
+                            <textarea v-model="newCommentContent[newfeed.id]" class="form-control mt-2"
+                                placeholder="Write a comment ..." rows="1" id="textComment"></textarea>
+                            <div v-if="isSpinnerLoading" class="spinner-border mx-3 text-info" role="status"
+                                aria-hidden="true">
+                            </div>
+                            <div v-else>
+                                <i class="bi bi-send fs-4 mx-3" v-tooltip:bottom="'Send Comment'"
+                                    @click="postComment(newfeed.id, newCommentContent[newfeed.id])"></i>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="d-flex align-items-center justify-content-center">
-                <div class="newfeeds-action d-flex align-items-center p-2 rounded-3 me-2">
-                    <i class="bx bx-heart me-2 fs-5" @click="likePost(index)"></i>
-                    <span>Love</span>
-                </div>
-                <span class="fs-5">
-                    {{ newfeed.likes }}
-                </span>
             </div>
         </div>
     </div>
@@ -125,9 +151,10 @@ export default {
             newPostContent: "",
             selectedFile: null,
             showModal: false,
-            isLoading: false,
+            isSpinnerLoading: false,
             newCommentContent: {},
             userInfo: {},
+            commentToDelete: null,
         };
     },
 
@@ -153,6 +180,25 @@ export default {
     },
     methods: {
         formatTimeChatbot,
+        async deleteComment() {
+            if (!this.commentToDelete) {
+                toast.error("No comment selected for deletion.");
+                return;
+            }
+            try {
+                const response = await axios.delete(`${this.apiUrl}/comment/${this.commentToDelete}`);
+                if (response.data && response.data.code == 200) {
+                    document.getElementById("btnDeleteCommentModal").click();
+                    this.fetchNewfeeds();
+                    toast.success("Comment deleted successfully!");
+                }
+            } catch (error) {
+                console.error("Failed to delete comment:", error);
+                toast.error("Failed to delete comment. Please try again.");
+            } finally {
+                this.commentToDelete = null;
+            }
+        },
         async isPostByUser(postId) {
             try {
                 const response = await axios.get(`${this.apiUrl}/newsfeed/is-post-by-user`, {
@@ -186,7 +232,7 @@ export default {
                 toast.error("Comment content cannot be empty!");
                 return;
             }
-            this.isLoading = true;
+            this.isSpinnerLoading = true;
             const payload = {
                 newsfeedId: newsfeedId,
                 userId: this.userId,
@@ -196,6 +242,8 @@ export default {
                 const response = await axios.post(`${this.apiUrl}/comment/post-to-newsfeed`, payload);
                 if (response.data && response.data.data) {
                     const newComment = response.data.data;
+                    const isUserComment = await this.isCommentByUser(newComment.id);
+                    newComment.isUserComment = isUserComment;
                     const newsfeed = this.newFeeds.find(feed => feed.id === newsfeedId);
                     if (newsfeed) {
                         newsfeed.comments.push(newComment);
@@ -208,7 +256,7 @@ export default {
                 console.error("Failed to post comment:", error);
                 toast.error("Failed to post comment. Please try again.");
             } finally {
-                this.isLoading = false;
+                this.isSpinnerLoading = false;
             }
         },
         async fetchCommentsByNewsfeedId(newsfeedId) {
@@ -218,9 +266,8 @@ export default {
                 for (const comment of comments) {
                     comment.isUserComment = await this.isCommentByUser(comment.id);
                 }
-                const isUserPost = await this.isPostByUser(newsfeedId);
                 for (const comment of comments) {
-                    comment.isUserPost = isUserPost;
+                    comment.isUserPost = await this.isPostByUser(newsfeedId);
                 }
                 return comments;
             } catch (error) {
@@ -251,7 +298,7 @@ export default {
                 alert("Pleses enter content or choose image");
                 return;
             }
-
+            this.isSpinnerLoading = true;
             const formData = new FormData();
             formData.append("content", this.newPostContent);
             formData.append("classId", this.classroomId);
@@ -274,6 +321,7 @@ export default {
                 document.getElementById("btnCloseNewPostModal").click();
                 toast.success("Post successfully!");
                 this.fetchNewfeeds();
+                this.isSpinnerLoading = false;
             }
         },
         scrollToBottom(newsfeedId) {
@@ -327,6 +375,10 @@ export default {
     background: #e0e3e6;
     transform: scale(1.05);
     transition: transform 0.6s ease-in-out;
+}
+
+.comments {
+    min-height: 48vh;
 }
 
 .user-details h5 {

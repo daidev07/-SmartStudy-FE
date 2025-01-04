@@ -7,12 +7,6 @@
 
         <ul class="nav nav-tabs">
             <li class="nav-item">
-                <a class="nav-link" :class="{ active: activeTab === 'newsfeed' }" @click="setActiveTab('newsfeed')"
-                    href="#">
-                    Newsfeed
-                </a>
-            </li>
-            <li class="nav-item">
                 <a class="nav-link" :class="{ active: activeTab === 'classwork' }" @click="setActiveTab('classwork')"
                     href="#">
                     Classwork
@@ -27,58 +21,6 @@
         </ul>
 
         <div class="tab-content bg-white p-3 border border-top-0 rounded-bottom-3">
-            <div v-if="activeTab === 'newsfeed'">
-                <div class="text-end mb-2">
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newsfeedModal">
-                        <i class="bi bi-clipboard2-plus-fill me-1"></i>New Post</button>
-                </div>
-                <div v-if="newsfeeds && newsfeeds.length">
-                    <div v-for="(newsfeed) in newsfeeds" :key="newsfeed.id" class="card mb-2 border border-primary">
-                        <div class="card-header">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <img :src="newsfeed.user.avatarUrl || require('@/assets/nonAvatar.png')"
-                                        class="avatar me-2" />
-                                    <span class="fw-bold">{{ newsfeed.user.name }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-body-tertiary">{{ formatDate(newsfeed.createdAt) }}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <p>{{ newsfeed.content }}</p>
-                            <div class="img-content d-flex justify-content-between gap-3">
-                                <div class="border-end text-center w-50">
-                                    <img v-if="newsfeed.imageFile" :src="newsfeed.imageFile"
-                                        class="img-fluid w-75 rounded-3" />
-                                </div>
-                                <div class="text-start w-50">
-                                    <span class="fw-bold">Comments in post:</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div class="d-flex justify-content-between">
-                                <div>
-                                    <img :src="require('@/assets/Newfeed/love.png')" class="me-2" style="width: 5%;"
-                                        v-tooltip:bottom="'Likes'" />
-                                    <span class="fs-5">{{ newsfeed.likes }}</span>
-                                </div>
-                                <div>
-                                    <button class="btn btn-danger btn-sm" data-bs-toggle="tooltip" title="Delete Post">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-                </div>
-                <div v-else class="text-body-tertiary text-center">No post yet</div>
-            </div>
-
             <div v-if="activeTab === 'classwork'">
                 <div class="text-end mb-3">
                     <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#classworkModal">
@@ -122,7 +64,7 @@
             </div>
             <div v-if="activeTab === 'students'">
                 <div class="text-end mb-2">
-                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#studentsModal">
+                    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#addStudentModal">
                         <i class="bi bi-person-plus-fill me-1"></i>New Student</button>
                 </div>
                 <table class="table table-bordered table-striped table-hover table-sm ">
@@ -149,8 +91,11 @@
                             <td class="text-center">{{ student.phone }}</td>
                             <td class="text-center ">
                                 <div class="d-flex justify-content-center">
-                                    <div class="me-2 fs-3 fw-bold" v-for="assignment in filterAssignments(student.id)"
-                                        :key="assignment.id" :class="{
+                                    <div v-if="!filterAssignments(student.id).length" class="text-center text-muted">
+                                        No assignment available.
+                                    </div>
+                                    <div v-else class="me-2 fs-3 fw-bold"
+                                        v-for="assignment in filterAssignments(student.id)" :key="assignment.id" :class="{
                                             'text-success': assignment.point > 70,
                                             'text-warning': assignment.point >= 50 && assignment.point <= 70,
                                             'text-danger': assignment.point < 50
@@ -247,10 +192,9 @@ export default {
             classDetail: [],
             classworks: [],
             students: [],
-            newsfeeds: [],
             exams: [],
             classId: this.$route.params.id,
-            activeTab: 'newsfeed',
+            activeTab: 'classwork',
             classwork: {
                 name: '',
                 description: '',
@@ -263,7 +207,6 @@ export default {
     mounted() {
         this.fetchClassDetail();
         this.fetchExams();
-        this.fetchNewsfeed();
     },
     methods: {
         formatDate,
@@ -284,15 +227,6 @@ export default {
                 console.log('students:', this.students);
             } catch (error) {
                 console.error('Failed to fetch students:', error);
-            }
-        },
-        async fetchNewsfeed() {
-            try {
-                const response = await axios.get(this.apirUrl + '/newsfeed/class/' + this.classId);
-                this.newsfeeds = response.data.data.reverse();
-                console.log('newsfeeds:', this.newsfeeds);
-            } catch (error) {
-                console.error('Failed to fetch newsfeeds:', error);
             }
         },
         async fetchClassDetail() {

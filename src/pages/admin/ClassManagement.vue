@@ -19,9 +19,43 @@
                     @click.stop="openCofirmDeleteModal" data-bs-toggle="modal"
                     data-bs-target="#confirmDeleteClassModal"></i>
             </div>
-            <div class="card-body mt-4">
-                <span class="text-body-tertiary">Students: </span>
-                <span class="fw-bold">{{ classItem.studentCount || 0 }}</span>
+            <div class="card-body mt-4 d-flex justify-content-between">
+                <div>
+                    <span class="text-body-tertiary">Students: </span>
+                    <span class="fw-bold">{{ classItem.studentCount || 0 }}</span>
+                </div>
+                <div>
+                    <span class="p-2 rounded-3" :class="{
+                        'bg-primary-subtle text-primary-emphasis': classItem.classStatus === 'PROCESSING',
+                        'bg-success text-white': classItem.classStatus === 'COMPLETED',
+                        'bg-danger text-white': classItem.classStatus === 'DELETED'
+                    }">
+                        {{ classItem.classStatus }}
+                    </span>
+                </div>
+            </div>
+            <div class="modal fade" id="confirmDeleteClassModal" data-bs-backdrop="static" data-bs-keyboard="false"
+                tabindex="-1" aria-labelledby="confirmDeleteClassModal" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h1 class="modal-title fs-5 text-danger" id="staticBackdropLabel">Confirm delete class</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-danger">
+                            Deleting a class will not show the class on this page, are you sure you want to delete it?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
+                            <button type="button" class="btn btn-danger">
+                                <span v-if="isSpinnerLoading" class="spinner-border spinner-border-sm" role="status"
+                                    aria-hidden="true">
+                                </span>
+                                <span @click="deleteClass(this.selectedClassId)">Yes</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         <div v-if="isModalVisible" class="modal-overlay">
@@ -86,24 +120,7 @@
         </div>
     </div>
     <!-- Modal confirm delete class -->
-    <div class="modal fade" id="confirmDeleteClassModal" data-bs-backdrop="static" data-bs-keyboard="false"
-        tabindex="-1" aria-labelledby="confirmDeleteClassModal" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h1 class="modal-title fs-5 text-danger" id="staticBackdropLabel">Confirm delete class</h1>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body text-danger">
-                    Deleting a class will not show the class on this page, are you sure you want to delete it?
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">No</button>
-                    <button type="button" class="btn btn-danger">Yes</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
 </template>
 <script>
@@ -133,6 +150,8 @@ export default {
             addNewClassModal: null,
             nameError: false,
             studentCount: 0,
+            isSpinnerLoading: false,
+            selectedClassId: null,
         };
     },
     async mounted() {
@@ -141,6 +160,21 @@ export default {
         await this.fetchAllStudentCounts();
     },
     methods: {
+        async deleteClass() {
+            if (!this.selectedClassId) return;
+            this.isSpinnerLoading = true;
+            try {
+                await axios.delete(`${this.apiUrl}/class/${this.selectedClassId}`);
+                this.classList = this.classList.filter(classItem => classItem.id !== this.selectedClassId);
+                toast.success("Class deleted successfully!");
+            } catch (error) {
+                toast.error("Failed to delete class. Please try again.");
+                console.error("Delete class error:", error);
+            } finally {
+                this.isSpinnerLoading = false;
+                this.fetchClassList();
+            }
+        },
         async fetchStudentCount(classId) {
             try {
                 const response = await axios.get(this.apirUrl + '/user/get-all-by-classId/' + classId);
@@ -154,8 +188,8 @@ export default {
                 classItem.studentCount = await this.fetchStudentCount(classItem.id);
             }
         },
-        async openCofirmDeleteModal() {
-            console.log('Delete class');
+        openCofirmDeleteModal(classId) {
+            this.selectedClassId = classId;
         },
         async saveNewClass() {
             this.nameError = false;
